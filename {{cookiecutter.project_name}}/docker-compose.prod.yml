@@ -1,0 +1,76 @@
+version: "3.3"
+
+# For running project with own domain (IT IS REQUIRED) with https (traefic as proxy)
+#
+# docker-compose -f docker-compose.prod.yml up -d
+#
+# It should be available on HOST_NAME adress, for example
+# 1. https://example.com
+# 2. http://example.com -> redirected to https://example.com
+# QUICK NOTES
+# a) By default log_level = DEBUG in traefic and it uses test certificates
+# b) provide your domain name in MAIN_DOMAIN and email DEFAULT_FROM_EMAIL in .env file
+
+services:
+  db:
+    restart: always
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    depends_on:
+        - db
+    restart: always
+    build:
+        context: ./
+        dockerfile: Dockerfile
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.web.rule=Host(`${MAIN_DOMAIN}`)"
+        - "traefik.http.routers.web.entrypoints=websecure"
+        - "traefik.http.routers.web.tls.certresolver=myresolver"
+        - "traefik.http.services.web.loadbalancer.server.port=80"
+    env_file:
+        - .env
+
+    traefik:
+    image: "traefik:v2.4"
+    container_name: "traefik"
+    command:
+        #
+        # comment line below after debugging!
+        - "--log.level=DEBUG"
+        - "--api.dashboard=false"
+        - "--providers.docker=true"
+        - "--providers.docker.exposedbydefault=false"
+        - "--entrypoints.web.address=:80"
+        - "--entrypoints.websecure.address=:443"
+        - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+        - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+        - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+        - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+        #
+        # test certificates, comment line below to use real certificates
+        - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+        - "--certificatesresolvers.myresolver.acme.email=${DEFAULT_FROM_EMAIL}"
+        - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+        - "80:80"
+        - "443:443"
+    volumes:
+        - "./letsencrypt:/letsencrypt"
+        - "/var/run/docker.sock:/var/run/docker.sock:ro"
