@@ -14,6 +14,9 @@ requests = "^2.26.0"
 python-jose = {version = "^3.3.0", extras = ["cryptography"]}
 passlib = {version = "^1.7.4", extras = ["bcrypt"]}
 pydantic = {version = "^1.8.2", extras = ["email"]}
+alembic = "^1.7.3"
+psycopg2 = "^2.9.1"
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", python = ">=3.6.2,<4.0.0"}

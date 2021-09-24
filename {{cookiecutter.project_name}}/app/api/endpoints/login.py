@@ -1,24 +1,15 @@
-from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
 from app.core import security
 from app.core.config import settings
-from app.core.security import get_password_hash
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-
-from app import crud, models, schemas
-from app.api import deps
-from app.core import security
-from app.core.config import settings
-from jose import jwt
-from pydantic import ValidationError
 
 router = APIRouter()
 
