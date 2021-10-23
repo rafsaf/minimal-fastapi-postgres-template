@@ -46,21 +46,21 @@ async def login_access_token(
 @router.post("/test-token", response_model=schemas.User)
 async def test_token(current_user: User = Depends(deps.get_current_user)):
     """
-    Test access token
+    Test access token for current user
     """
     return current_user
 
 
 @router.post("/refresh-token", response_model=schemas.Token)
 async def refresh_token(
-    refresh_token: str, session: AsyncSession = Depends(deps.get_session)
+    input: schemas.TokenRefresh, session: AsyncSession = Depends(deps.get_session)
 ):
     """
     OAuth2 compatible token, get an access token for future requests using refresh token
     """
     try:
         payload = jwt.decode(
-            refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+            input.refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = schemas.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError):

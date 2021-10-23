@@ -13,10 +13,8 @@ RUN mkdir build
 WORKDIR /build
 
 COPY ./app ./app
-COPY ./pytest.ini .
-COPY ./aerich.ini .
+COPY ./alembic.ini .
 COPY ./requirements.txt .
-COPY ./.env .
 
 # We copy our app folder to the /build
 

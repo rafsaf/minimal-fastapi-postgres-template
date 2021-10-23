@@ -17,7 +17,7 @@ async def update_user_me(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Update me.
+    Update current user.
     """
     if user_update.password is not None:
         current_user.hashed_password = get_password_hash(user_update.password)

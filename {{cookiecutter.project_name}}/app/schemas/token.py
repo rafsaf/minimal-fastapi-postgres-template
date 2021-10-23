@@ -15,3 +15,7 @@ class Token(BaseModel):
 class TokenPayload(BaseModel):
     sub: Optional[int] = None
     refresh: Optional[bool] = None
+
+
+class TokenRefresh(BaseModel):
+    refresh_token: str

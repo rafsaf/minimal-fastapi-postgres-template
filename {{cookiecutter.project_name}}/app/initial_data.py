@@ -1,4 +1,5 @@
 import logging
+from asyncio import get_event_loop
 from typing import Optional
 
 from sqlalchemy import select
@@ -7,7 +8,6 @@ from app.core import security
 from app.core.config import settings
 from app.models import User
 from app.session import async_session
-from asyncio import get_event_loop
 
 
 async def main() -> None:

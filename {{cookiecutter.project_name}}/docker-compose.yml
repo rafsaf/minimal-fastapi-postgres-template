@@ -19,7 +19,7 @@ services:
     env_file:
       - .env
     ports:
-      - ${POSTGRES_PORT}:5432
+      - "${POSTGRES_PORT}:5432"
 
   tests_db:
     restart: always
@@ -31,4 +31,4 @@ services:
       - POSTGRES_USER=tests
       - POSTGRES_PASSWORD=tests
     ports:
-      - 65730:5432
+      - "37645:5432"
