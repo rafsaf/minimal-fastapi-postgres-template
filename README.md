@@ -20,6 +20,8 @@ pip install cookiecutter
 cookiecutter https://github.com/rafsaf/minimal-fastapi-postgres-template
 
 cd project_name
+# Poetry install (and activate environment!)
+poetry install
 # Databases
 docker-compose up -d
 # Alembic migrations upgrade and initial_data.py script
