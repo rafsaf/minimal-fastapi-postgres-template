@@ -1,40 +1,40 @@
 import logging
+from typing import Optional
 
 from sqlalchemy import select
 
 from app.core import security
 from app.core.config import settings
 from app.models import User
-from app.session import SessionLocal
+from app.session import async_session
+from asyncio import get_event_loop
 
 
-def main() -> None:
+async def main() -> None:
     logging.info("Start initial data")
-    session = SessionLocal()
-    user = (
-        session.execute(
+    async with async_session() as session:
+
+        result = await session.execute(
             select(User).where(User.email == settings.FIRST_SUPERUSER_EMAIL)
         )
-        .scalars()
-        .first()
-    )
+        user: Optional[User] = result.scalars().first()
 
-    if user is None:
-        new_superuser = User(
-            email=settings.FIRST_SUPERUSER_EMAIL,
-            hashed_password=security.get_password_hash(
-                settings.FIRST_SUPERUSER_PASSWORD
-            ),
-            full_name=settings.FIRST_SUPERUSER_EMAIL,
-        )
-        session.add(new_superuser)
-        session.commit()
-        logging.info("Superuser was created")
-    else:
-        logging.warning("Superuser already exists in database")
+        if user is None:
+            new_superuser = User(
+                email=settings.FIRST_SUPERUSER_EMAIL,
+                hashed_password=security.get_password_hash(
+                    settings.FIRST_SUPERUSER_PASSWORD
+                ),
+                full_name=settings.FIRST_SUPERUSER_EMAIL,
+            )
+            session.add(new_superuser)
+            await session.commit()
+            logging.info("Superuser was created")
+        else:
+            logging.warning("Superuser already exists in database")
 
-    logging.info("Initial data created")
+        logging.info("Initial data created")
 
 
 if __name__ == "__main__":
-    main()
+    get_event_loop().run_until_complete(main())

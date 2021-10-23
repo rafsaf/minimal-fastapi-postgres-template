@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models, schemas
 from app.api import deps
@@ -11,9 +11,9 @@ router = APIRouter()
 
 
 @router.put("/me", response_model=schemas.User)
-def update_user_me(
+async def update_user_me(
     user_update: schemas.UserUpdate,
-    session: Session = Depends(deps.get_session),
+    session: AsyncSession = Depends(deps.get_session),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -27,15 +27,15 @@ def update_user_me(
         current_user.email = user_update.email
 
     session.add(current_user)
-    session.commit()
-    session.refresh(current_user)
+    await session.commit()
+    await session.refresh(current_user)
 
     return current_user
 
 
 @router.get("/me", response_model=schemas.User)
-def read_user_me(
-    session: Session = Depends(deps.get_session),
+async def read_user_me(
+    session: AsyncSession = Depends(deps.get_session),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

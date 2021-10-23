@@ -20,8 +20,15 @@ services:
       - .env
     ports:
       - ${POSTGRES_PORT}:5432
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+
+  tests_db:
+    restart: always
+    image: postgres
+    volumes:
+      - ./tests_data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=tests
+      - POSTGRES_USER=tests
+      - POSTGRES_PASSWORD=tests
+    ports:
+      - 65730:5432

@@ -7,7 +7,7 @@ authors = ["admin <admin@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.6.1"
 fastapi = "^0.68.1"
-SQLAlchemy = {version = "^1.4.25"}
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.26"}
 uvicorn = "^0.15.0"
 python-dotenv = "^0.19.0"
 requests = "^2.26.0"
@@ -15,9 +15,9 @@ python-jose = {version = "^3.3.0", extras = ["cryptography"]}
 passlib = {version = "^1.7.4", extras = ["bcrypt"]}
 pydantic = {version = "^1.8.2", extras = ["email"]}
 alembic = "^1.7.3"
-psycopg2 = "^2.9.1"
 python-multipart = "^0.0.5"
 sqlalchemy2-stubs = "^0.0.2-alpha.18"
+asyncpg = "^0.24.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", python = ">=3.6.2,<4.0.0"}
@@ -28,6 +28,7 @@ sqlalchemy-stubs = "^0.4"
 coverage = "^5.5"
 pytest = "^6.2.5"
 mypy = "^0.910"
+pytest-asyncio = "^0.16.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
