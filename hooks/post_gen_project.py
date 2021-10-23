@@ -5,7 +5,7 @@ to .env which is gitignored, then remove template env file as it is redundant
 
 from pathlib import Path
 
-env_template_file = Path("./.env_template")
+env_template_file = Path("./.env.template")
 env_file = Path("./.env")
 
 env_file.write_text(env_template_file.read_text())
