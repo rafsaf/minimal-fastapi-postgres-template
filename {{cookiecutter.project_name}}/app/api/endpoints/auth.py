@@ -1,30 +1,40 @@
-from typing import Any
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import ValidationError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import schemas
 from app.api import deps
 from app.core import security
 from app.core.config import settings
+from app.models import User
 
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
+@router.post("/access-token", response_model=schemas.Token)
 def login_access_token(
-    db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
-) -> Any:
+    session: Session = Depends(deps.get_session),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
     """
-    OAuth2 compatible token login, get an access token for future requests
+    OAuth2 compatible token, get an access token for future requests using username and password
     """
-    user = crud.user.authenticate(
-        db, email=form_data.username, password=form_data.password
+
+    user: Optional[User] = (
+        session.execute(select(User).where(User.email == form_data.username))
+        .scalars()
+        .first()
     )
-    if not user:
+
+    if user is None:
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+
+    if not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     access_token, expire_at = security.create_access_token(user.id)
@@ -38,8 +48,8 @@ def login_access_token(
     }
 
 
-@router.post("/login/test-token", response_model=schemas.User)
-def test_token(current_user: models.User = Depends(deps.get_current_user)) -> Any:
+@router.post("/test-token", response_model=schemas.User)
+def test_token(current_user: User = Depends(deps.get_current_user)):
     """
     Test access token
     """
@@ -47,7 +57,10 @@ def test_token(current_user: models.User = Depends(deps.get_current_user)) -> An
 
 
 @router.post("/refresh-token", response_model=schemas.Token)
-async def refresh_token(refresh_token: str, db: Session = Depends(deps.get_db)):
+def refresh_token(refresh_token: str, session: Session = Depends(deps.get_session)):
+    """
+    OAuth2 compatible token, get an access token for future requests using refresh token
+    """
     try:
         payload = jwt.decode(
             refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -63,8 +76,12 @@ async def refresh_token(refresh_token: str, db: Session = Depends(deps.get_db)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = crud.user.get(db, id=token_data.sub)
-    if not user:
+
+    user: Optional[User] = (
+        session.execute(select(User).where(User.id == token_data.sub)).scalars().first()
+    )
+
+    if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     access_token, expire_at = security.create_access_token(user.id)
     refresh_token, refresh_expire_at = security.create_refresh_token(user.id)

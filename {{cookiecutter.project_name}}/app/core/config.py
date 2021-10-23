@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
 
@@ -42,12 +42,16 @@ class Settings(BaseSettings):
         return cors_origins
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def _assemble_db_connection(cls, v: str, values: Dict[str, str]) -> str:
+    def _assemble_db_connection(cls, v: str, values: Dict[str, Optional[str]]) -> str:
         if v != "":
             return v
         if values.get("DEBUG"):
             postgres_server = "localhost"
         else:
+            assert (
+                values.get("POSTGRES_SERVER") is not None
+            ), "Variable POSTGRES_SERVER cannot be None"
+
             postgres_server = values.get("POSTGRES_SERVER")
 
         return AnyUrl.build(

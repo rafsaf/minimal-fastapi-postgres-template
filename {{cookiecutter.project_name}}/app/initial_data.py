@@ -1,21 +1,39 @@
 import logging
 
-from app.db.init_db import init_db
-from app.db.session import SessionLocal
+from sqlalchemy import select
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
-def init() -> None:
-    db = SessionLocal()
-    init_db(db)
+from app.core import security
+from app.core.config import settings
+from app.models import User
+from app.session import SessionLocal
 
 
 def main() -> None:
-    logger.info("Creating initial data")
-    init()
-    logger.info("Initial data created")
+    logging.info("Start initial data")
+    session = SessionLocal()
+    user = (
+        session.execute(
+            select(User).where(User.email == settings.FIRST_SUPERUSER_EMAIL)
+        )
+        .scalars()
+        .first()
+    )
+
+    if user is None:
+        new_superuser = User(
+            email=settings.FIRST_SUPERUSER_EMAIL,
+            hashed_password=security.get_password_hash(
+                settings.FIRST_SUPERUSER_PASSWORD
+            ),
+            full_name=settings.FIRST_SUPERUSER_EMAIL,
+        )
+        session.add(new_superuser)
+        session.commit()
+        logging.info("Superuser was created")
+    else:
+        logging.warning("Superuser already exists in database")
+
+    logging.info("Initial data created")
 
 
 if __name__ == "__main__":
