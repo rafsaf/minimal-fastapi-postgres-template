@@ -27,7 +27,7 @@ def create_access_token(subject: Union[str, Any]) -> tuple[str, datetime]:
 
 def create_refresh_token(subject: Union[str, Any]) -> tuple[str, datetime]:
     now = datetime.utcnow()
-    expire = now + timedelta(days=28)
+    expire = now + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
 
     to_encode = {"exp": expire, "sub": str(subject), "refresh": True}
     encoded_jwt: str = jwt.encode(

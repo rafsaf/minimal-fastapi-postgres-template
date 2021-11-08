@@ -8,7 +8,7 @@ Base = cast(Any, declarative_base())
 
 class User(Base):
     __tablename__ = "user"
-    id = cast(int, Column(Integer, primary_key=True, index=True))
-    full_name = cast(str, Column(String(254), nullable=True))
-    email = cast(str, Column(String(254), unique=True, index=True, nullable=False))
-    hashed_password = cast(str, Column(String(128), nullable=False))
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String(254), nullable=True)
+    email = Column(String(254), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(128), nullable=False)

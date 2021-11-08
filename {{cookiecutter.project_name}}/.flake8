@@ -5,10 +5,7 @@ ignore = E203, E501, W503
 exclude = 
     __init__.py,
     .venv,
+    venv,
     __pycache__,
     .github,
     .vscode,
-    config,
-    locale,
-    webhook
-    app/tests/conftest.py

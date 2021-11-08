@@ -1,25 +1,15 @@
-from os import environ, getenv
-
-# We overwrite variables from .env to hardcoded ones to connect with tests database
-# Note, order matters!
-# If we write `from app.main import app` BEFORE hardcoding environment,
-# It would use postgres settings defined in .env file instead of those below.
-
-environ["POSTGRES_USER"] = "tests"
-environ["POSTGRES_PASSWORD"] = "tests"
-environ["POSTGRES_DB"] = "tests"
-environ["POSTGRES_HOST"] = getenv("TESTS_POSTGRES_DB_HOST") or "localhost"
-environ["POSTGRES_PORT"] = "37645"
-
+import os
 import asyncio
 from typing import AsyncGenerator
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
+# We overwrite variables from .env to hardcoded one to connect with test database
+os.environ["ENVIRONMENT"] = "PYTEST"
+
+from app.session import async_engine, async_session
 from app.main import app
 from app.models import Base
 
@@ -39,15 +29,11 @@ async def client():
 
 @pytest.fixture(scope="session")
 async def test_db_setup_sessionmaker():
-    async_test_engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
-    async with async_test_engine.begin() as conn:
+    async with async_engine.begin() as conn:
         # awalys drop and create test db tables between tests session
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    async_test_session = sessionmaker(
-        async_test_engine, expire_on_commit=False, class_=AsyncSession
-    )
-    return async_test_session
+    return async_session
 
 
 @pytest.fixture

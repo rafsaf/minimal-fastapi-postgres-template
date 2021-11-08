@@ -29,7 +29,7 @@ async def login_access_token(
     if user is None:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-    if not security.verify_password(form_data.password, user.hashed_password):
+    if not security.verify_password(form_data.password, user.hashed_password):  # type: ignore
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     access_token, expire_at = security.create_access_token(user.id)

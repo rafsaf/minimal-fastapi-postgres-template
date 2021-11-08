@@ -1,66 +1,73 @@
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
+import toml
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
+pyproject_content = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
 
 
 class Settings(BaseSettings):
-    # DEBUG
-    DEBUG: bool
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
-
-    # SECURITY
+    # CORE SETTINGS
     SECRET_KEY: str
-
-    # PROJECT NAME, API PREFIX, VERSION AND DESC, CORS ORIGINS
-    PROJECT_NAME: str
-    API_STR: str
-    VERSION: str
-    DESCRIPTION: str
+    ENVIRONMENT: Literal["DEV", "PYTEST", "STAGE", "PRODUCTION"]
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_MINUTES: int
     BACKEND_CORS_ORIGINS: Union[str, List[AnyHttpUrl]]
 
-    # POSTGRESQL
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_SERVER: str
-    POSTGRES_PORT: str
-    POSTGRES_DB: str
-    SQLALCHEMY_DATABASE_URI: str = ""
+    # PROJECT NAME, API PREFIX, VERSION AND DESC, CORS ORIGINS
+    PROJECT_NAME: str = pyproject_content["name"]
+    VERSION: str = pyproject_content["version"]
+    DESCRIPTION: str = pyproject_content["description"]
+
+    # POSTGRESQL DEFAULT DATABASE
+    DEFAULT_DATABASE_HOSTNAME: str
+    DEFAULT_DATABASE_USER: str
+    DEFAULT_DATABASE_PASSWORD: str
+    DEFAULT_DATABASE_PORT: str
+    DEFAULT_DATABASE_DB: str
+    DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
+
+    # POSTGRESQL TEST DATABASE
+    TEST_DATABASE_HOSTNAME: str
+    TEST_DATABASE_USER: str
+    TEST_DATABASE_PASSWORD: str
+    TEST_DATABASE_PORT: str
+    TEST_DATABASE_DB: str
+    TEST_SQLALCHEMY_DATABASE_URI: str = ""
 
     # FIRST SUPERUSER
     FIRST_SUPERUSER_EMAIL: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
 
     # VALIDATORS
-
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @validator("BACKEND_CORS_ORIGINS")
     def _assemble_cors_origins(cls, cors_origins):
         if isinstance(cors_origins, str):
             return [item.strip() for item in cors_origins.split(",")]
         return cors_origins
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def _assemble_db_connection(cls, v: str, values: Dict[str, Optional[str]]) -> str:
-        if v != "":
-            return v
-        if values.get("DEBUG"):
-            postgres_server = "localhost"
-        else:
-            assert (
-                values.get("POSTGRES_SERVER") is not None
-            ), "Variable POSTGRES_SERVER cannot be None"
-
-            postgres_server = values.get("POSTGRES_SERVER")
-
+    @validator("DEFAULT_SQLALCHEMY_DATABASE_URI")
+    def _assemble_default_db_connection(cls, v: str, values: Dict[str, str]) -> str:
         return AnyUrl.build(
             scheme="postgresql+asyncpg",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=postgres_server or "localhost",
-            port=values.get("POSTGRES_PORT"),
-            path=f"/{values.get('POSTGRES_DB')}",
+            user=values["DEFAULT_DATABASE_USER"],
+            password=values["DEFAULT_DATABASE_PASSWORD"],
+            host=values["DEFAULT_DATABASE_HOSTNAME"],
+            port=values["DEFAULT_DATABASE_PORT"],
+            path=f"/{values['DEFAULT_DATABASE_DB']}",
+        )
+
+    @validator("TEST_SQLALCHEMY_DATABASE_URI")
+    def _assemble_test_db_connection(cls, v: str, values: Dict[str, str]) -> str:
+        return AnyUrl.build(
+            scheme="postgresql+asyncpg",
+            user=values["TEST_DATABASE_USER"],
+            password=values["TEST_DATABASE_PASSWORD"],
+            host=values["TEST_DATABASE_HOSTNAME"],
+            port=values["TEST_DATABASE_PORT"],
+            path=f"/{values['TEST_DATABASE_DB']}",
         )
 
     class Config:
