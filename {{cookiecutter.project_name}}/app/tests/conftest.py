@@ -1,13 +1,15 @@
 import asyncio
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.security import get_password_hash
 from app.main import app
-from app.models import Base
+from app.models import Base, User
 from app.session import async_engine, async_session
 
 
@@ -42,3 +44,20 @@ async def test_db_setup_sessionmaker():
 async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, None]:
     async with test_db_setup_sessionmaker() as session:
         yield session
+
+
+@pytest.fixture
+async def default_user(session: AsyncSession):
+    result = await session.execute(select(User).where(User.email == "user@email.com"))
+    user: Optional[User] = result.scalars().first()
+    if user is None:
+        new_user = User(
+            email="user@email.com",
+            hashed_password=get_password_hash("password"),
+            full_name="fullname",
+        )
+        session.add(new_user)
+        await session.commit()
+        await session.refresh(new_user)
+        return new_user
+    return user

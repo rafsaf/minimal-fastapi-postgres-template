@@ -1,4 +1,4 @@
-## Small FastAPI template, all boring and tedious things covered
+## Minimal async FastAPI + postgresql template
 
 ![OpenAPIexample](./docs/OpenAPI_example.png)
 
@@ -57,3 +57,159 @@ This project is heavily base on official template https://github.com/tiangolo/fu
 ## Step by step example
 
 I always enjoy to to have some kind of example in templates (even if I don't like it much, _some_ parts may be useful and save my time...), so let's create `POST` endpoint for creating dogs.
+
+### 1. Add `HappyDog` model
+
+```python
+# /app/models.py
+(...)
+
+class HappyDog(Base):
+    __tablename__ = "happy_dog"
+    id = Column(Integer, primary_key=True, index=True)
+    puppy_name = Column(String(500))
+    puppy_age = Column(Integer)
+```
+
+### 2. Create and apply alembic migrations
+
+```bash
+# Run
+alembic revision --autogenerate -m "add_happy_dog"
+
+# Somethig like `YYYY-MM-DD-....py` will appear in `/alembic/versions` folder
+
+alembic upgrade head
+
+# (...)
+# INFO  [alembic.runtime.migration] Running upgrade cefce371682e -> 038f530b0e9b, add_happy_dog
+```
+
+PS. Note, alembic is configured in a way that it work with async setup and also detects specific column changes.
+
+### 3. Create schemas
+
+```python
+# /app/schemas/happy_dog.py
+
+from typing import Optional
+
+from pydantic import BaseModel
+
+
+class BaseHappyDog(BaseModel):
+    puppy_name: str
+    puppy_age: Optional[int]
+
+
+class CreateHappyDog(BaseHappyDog):
+    pass
+
+
+class HappyDog(BaseHappyDog):
+    id: int
+
+```
+
+Then add it to schemas `__init__.py`
+
+```python
+# /app/schemas/__init__.py
+
+from .token import Token, TokenPayload, TokenRefresh
+from .user import User, UserCreate, UserUpdate
+from .happy_dog import HappyDog, CreateHappyDog
+```
+
+### 4. Create endpoint
+
+```python
+# /app/api/endpoints/dogs.py
+
+from typing import Any
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app import models, schemas
+from app.api import deps
+
+router = APIRouter()
+
+
+@router.post("/", response_model=schemas.HappyDog, status_code=201)
+async def create_happy_dog(
+    dog_create: schemas.CreateHappyDog,
+    session: AsyncSession = Depends(deps.get_session),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Creates new happy dog. Only for logged users.
+    """
+    new_dog = models.HappyDog(
+        puppy_name=dog_create.puppy_name, puppy_age=dog_create.puppy_age
+    )
+
+    session.add(new_dog)
+    await session.commit()
+    await session.refresh(new_dog)
+
+    return new_dog
+
+```
+
+Also, add it to router
+
+```python
+# /app/api/api.py
+
+from fastapi import APIRouter
+
+from app.api.endpoints import auth, users, dogs
+
+api_router = APIRouter()
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+api_router.include_router(users.router, prefix="/users", tags=["users"])
+# new content below
+api_router.include_router(dogs.router, prefix="/dogs", tags=["dogs"])
+
+```
+
+### 5. Test it simply
+
+```python
+# /app/tests/test_dogs.py
+
+import pytest
+from httpx import AsyncClient
+from app.models import User
+
+pytestmark = pytest.mark.asyncio
+
+
+async def test_dog_endpoint(client: AsyncClient, default_user: User):
+    # better to create fixture auth_client or similar than repeat code with access_token
+    access_token = await client.post(
+        "/auth/access-token",
+        data={
+            "username": "user@email.com",
+            "password": "password",
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert access_token.status_code == 200
+    access_token = access_token.json()["access_token"]
+
+    puppy_name = "Sonia"
+    puppy_age = 6
+
+    create_dog = await client.post(
+        "/dogs/",
+        json={"puppy_name": puppy_name, "puppy_age": puppy_age},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert create_dog.status_code == 201
+    create_dog_json = create_dog.json()
+    assert create_dog_json["puppy_name"] == puppy_name
+    assert create_dog_json["puppy_age"] == puppy_age
+
+```
