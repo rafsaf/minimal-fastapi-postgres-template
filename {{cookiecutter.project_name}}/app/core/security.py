@@ -1,3 +1,9 @@
+"""
+Black-box security shortcuts to generate JWT tokens and password hash/verify
+
+`subject` in access/refresh func may be antyhing unique to User account, `id` etc.
+"""
+
 from datetime import datetime, timedelta
 from typing import Any, Union
 

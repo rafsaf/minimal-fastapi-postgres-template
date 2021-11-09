@@ -1,3 +1,9 @@
+"""
+SQL Alchemy models declaration.
+
+Note, imported by alembic migrations logic, see `alembic/env.py`
+"""
+
 from typing import Any, cast
 
 from sqlalchemy import Column, Integer, String

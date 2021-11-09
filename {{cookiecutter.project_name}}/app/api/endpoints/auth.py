@@ -8,12 +8,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
-from app.api.routers import api_v1_router
-from app.api.api_v1 import deps
+from app.api import deps
 from app.core import security
 from app.core.config import settings
 from app.models import User
-
 
 router = APIRouter()
 
@@ -90,6 +88,3 @@ async def refresh_token(
         "refresh_token": refresh_token,
         "refresh_expire_at": refresh_expire_at,
     }
-
-
-api_v1_router.include_router(router, prefix="", tags=["users"])

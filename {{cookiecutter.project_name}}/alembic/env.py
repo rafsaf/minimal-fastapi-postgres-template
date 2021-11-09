@@ -31,8 +31,6 @@ target_metadata = Base.metadata
 
 
 def get_database_uri():
-    if settings.ENVIRONMENT == "PYTEST":
-        return settings.TEST_SQLALCHEMY_DATABASE_URI
     return settings.DEFAULT_SQLALCHEMY_DATABASE_URI
 
 

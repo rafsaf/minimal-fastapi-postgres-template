@@ -5,10 +5,10 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.main import app
 from app.models import Base
 from app.session import async_engine, async_session
-from app.core.config import settings
 
 
 @pytest.fixture(scope="session")
@@ -26,11 +26,13 @@ async def client():
 
 @pytest.fixture(scope="session")
 async def test_db_setup_sessionmaker():
+    # assert if we use TEST_DB URL for 100%
     assert settings.ENVIRONMENT == "PYTEST"
     assert str(async_engine.url) == settings.TEST_SQLALCHEMY_DATABASE_URI
 
+    # always drop and create test db tables between tests session
     async with async_engine.begin() as conn:
-        # awalys drop and create test db tables between tests session
+
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     return async_session

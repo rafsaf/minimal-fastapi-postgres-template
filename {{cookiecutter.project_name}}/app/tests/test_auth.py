@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_password_hash
 from app.models import User
 
-# All test coroutines will be treated as marked.
+# All test coroutines in file will be treated as marked (async allowed).
 pytestmark = pytest.mark.asyncio
 
 
@@ -31,6 +31,7 @@ async def default_user(session: AsyncSession):
 
 async def test_login_endpoints(client: AsyncClient, default_user: User):
 
+    # access-token endpoint
     access_token = await client.post(
         "/auth/access-token",
         data={
@@ -45,6 +46,7 @@ async def test_login_endpoints(client: AsyncClient, default_user: User):
     access_token = token["access_token"]
     refresh_token = token["refresh_token"]
 
+    # test-token endpoint
     test_token = await client.post(
         "/auth/test-token", headers={"Authorization": f"Bearer {access_token}"}
     )
@@ -52,6 +54,7 @@ async def test_login_endpoints(client: AsyncClient, default_user: User):
     response_user = test_token.json()
     assert response_user["email"] == default_user.email
 
+    # refresh-token endpoint
     get_new_token = await client.post(
         "/auth/refresh-token", json={"refresh_token": refresh_token}
     )

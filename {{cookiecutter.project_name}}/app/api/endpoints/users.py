@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models, schemas
-from app.api.api_v1 import deps
+from app.api import deps
 from app.core.security import get_password_hash
 
 router = APIRouter()

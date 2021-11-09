@@ -13,7 +13,7 @@ from app.core.config import settings
 from app.models import User
 from app.session import async_session
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="v1/auth/access-token")
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="auth/access-token")
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
