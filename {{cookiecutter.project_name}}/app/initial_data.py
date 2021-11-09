@@ -1,4 +1,3 @@
-import logging
 from asyncio import get_event_loop
 from typing import Optional
 
@@ -11,7 +10,7 @@ from app.session import async_session
 
 
 async def main() -> None:
-    logging.info("Start initial data")
+    print("Start initial data")
     async with async_session() as session:
 
         result = await session.execute(
@@ -29,11 +28,11 @@ async def main() -> None:
             )
             session.add(new_superuser)
             await session.commit()
-            logging.info("Superuser was created")
+            print("Superuser was created")
         else:
-            logging.warning("Superuser already exists in database")
+            print("Superuser already exists in database")
 
-        logging.info("Initial data created")
+        print("Initial data created")
 
 
 if __name__ == "__main__":

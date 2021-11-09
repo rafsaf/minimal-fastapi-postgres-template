@@ -1,4 +1,3 @@
-import os
 import asyncio
 from typing import AsyncGenerator
 
@@ -6,12 +5,10 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# We overwrite variables from .env to hardcoded one to connect with test database
-os.environ["ENVIRONMENT"] = "PYTEST"
-
-from app.session import async_engine, async_session
 from app.main import app
 from app.models import Base
+from app.session import async_engine, async_session
+from app.core.config import settings
 
 
 @pytest.fixture(scope="session")
@@ -29,6 +26,9 @@ async def client():
 
 @pytest.fixture(scope="session")
 async def test_db_setup_sessionmaker():
+    assert settings.ENVIRONMENT == "PYTEST"
+    assert str(async_engine.url) == settings.TEST_SQLALCHEMY_DATABASE_URI
+
     async with async_engine.begin() as conn:
         # awalys drop and create test db tables between tests session
         await conn.run_sync(Base.metadata.drop_all)

@@ -27,10 +27,10 @@ services:
     volumes:
       - ./test_database_data/db:/var/lib/postgresql/data
     environment:
-      - DEFAULT_DATABASE_DB=tests
-      - DEFAULT_DATABASE_USER=tests
-      - DEFAULT_DATABASE_PASSWORD=tests
+      - POSTGRES_DB=${TEST_DATABASE_DB}
+      - POSTGRES_USER=${TEST_DATABASE_USER}
+      - POSTGRES_PASSWORD=${TEST_DATABASE_PASSWORD}
     env_file:
       - .env
     ports:
-      - "37645:5432"
+      - "${TEST_DATABASE_PORT}:5432"
