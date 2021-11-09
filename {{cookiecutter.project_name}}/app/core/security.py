@@ -1,3 +1,9 @@
+"""
+Black-box security shortcuts to generate JWT tokens and password hash/verify
+
+`subject` in access/refresh func may be antyhing unique to User account, `id` etc.
+"""
+
 from datetime import datetime, timedelta
 from typing import Any, Union
 
@@ -27,7 +33,7 @@ def create_access_token(subject: Union[str, Any]) -> tuple[str, datetime]:
 
 def create_refresh_token(subject: Union[str, Any]) -> tuple[str, datetime]:
     now = datetime.utcnow()
-    expire = now + timedelta(days=28)
+    expire = now + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
 
     to_encode = {"exp": expire, "sub": str(subject), "refresh": True}
     encoded_jwt: str = jwt.encode(

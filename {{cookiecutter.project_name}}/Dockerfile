@@ -1,23 +1,24 @@
+# See https://unit.nginx.org/installation/#docker-images
+
 FROM nginx/unit:1.25.0-python3.9
 
-# Our Debian with Python and Nginx for python apps.
-# See https://hub.docker.com/r/nginx/unit/
 ENV PYTHONUNBUFFERED 1
 
-COPY ./app/initial.sh /docker-entrypoint.d/initial.sh
-COPY ./config/config.json /docker-entrypoint.d/config.json
+# Nginx unit config and init.sh will be consumed at container startup.
+COPY ./app/init.sh /docker-entrypoint.d/init.sh
+COPY ./nginx-unit-config.json /docker-entrypoint.d/config.json
+RUN chmod +x /docker-entrypoint.d/init.sh
 
+# Build folder for our app, only stuff that matters copied.
 RUN mkdir build
-
-# We create folder named build for our app.
 WORKDIR /build
 
 COPY ./app ./app
+COPY ./alembic ./alembic
 COPY ./alembic.ini .
 COPY ./requirements.txt .
 
-# We copy our app folder to the /build
-
+# Update, install requirements and then cleanup.
 RUN apt update && apt install -y python3-pip                                  \
     && pip3 install -r requirements.txt                                       \
     && apt remove -y python3-pip                                              \

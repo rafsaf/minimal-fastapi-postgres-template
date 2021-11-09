@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "{{cookiecutter.project_name}}"
-version = "0.1.0"
-description = ""
+version = "0.1.0-alpha"
+description = "FastAPI project generated using minimal-fastapi-postgres-template."
 authors = ["admin <admin@example.com>"]
 
 [tool.poetry.dependencies]

@@ -1,5 +1,11 @@
-import logging
-from asyncio import get_event_loop
+"""
+Put here any Python code that must be runned before application startup.
+It is included in `init.sh` script.
+
+By defualt `main` create a superuser if not exists
+"""
+
+import asyncio
 from typing import Optional
 
 from sqlalchemy import select
@@ -11,7 +17,7 @@ from app.session import async_session
 
 
 async def main() -> None:
-    logging.info("Start initial data")
+    print("Start initial data")
     async with async_session() as session:
 
         result = await session.execute(
@@ -29,12 +35,12 @@ async def main() -> None:
             )
             session.add(new_superuser)
             await session.commit()
-            logging.info("Superuser was created")
+            print("Superuser was created")
         else:
-            logging.warning("Superuser already exists in database")
+            print("Superuser already exists in database")
 
-        logging.info("Initial data created")
+        print("Initial data created")
 
 
 if __name__ == "__main__":
-    get_event_loop().run_until_complete(main())
+    asyncio.run(main())

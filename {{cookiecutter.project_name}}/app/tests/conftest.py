@@ -1,27 +1,16 @@
-from os import environ, getenv
-
-# We overwrite variables from .env to hardcoded ones to connect with tests database
-# Note, order matters!
-# If we write `from app.main import app` BEFORE hardcoding environment,
-# It would use postgres settings defined in .env file instead of those below.
-
-environ["POSTGRES_USER"] = "tests"
-environ["POSTGRES_PASSWORD"] = "tests"
-environ["POSTGRES_DB"] = "tests"
-environ["POSTGRES_HOST"] = getenv("TESTS_POSTGRES_DB_HOST") or "localhost"
-environ["POSTGRES_PORT"] = "37645"
-
 import asyncio
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.security import get_password_hash
 from app.main import app
-from app.models import Base
+from app.models import Base, User
+from app.session import async_engine, async_session
 
 
 @pytest.fixture(scope="session")
@@ -39,18 +28,36 @@ async def client():
 
 @pytest.fixture(scope="session")
 async def test_db_setup_sessionmaker():
-    async_test_engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
-    async with async_test_engine.begin() as conn:
-        # awalys drop and create test db tables between tests session
+    # assert if we use TEST_DB URL for 100%
+    assert settings.ENVIRONMENT == "PYTEST"
+    assert str(async_engine.url) == settings.TEST_SQLALCHEMY_DATABASE_URI
+
+    # always drop and create test db tables between tests session
+    async with async_engine.begin() as conn:
+
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    async_test_session = sessionmaker(
-        async_test_engine, expire_on_commit=False, class_=AsyncSession
-    )
-    return async_test_session
+    return async_session
 
 
 @pytest.fixture
 async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, None]:
     async with test_db_setup_sessionmaker() as session:
         yield session
+
+
+@pytest.fixture
+async def default_user(session: AsyncSession):
+    result = await session.execute(select(User).where(User.email == "user@email.com"))
+    user: Optional[User] = result.scalars().first()
+    if user is None:
+        new_user = User(
+            email="user@email.com",
+            hashed_password=get_password_hash("password"),
+            full_name="fullname",
+        )
+        session.add(new_user)
+        await session.commit()
+        await session.refresh(new_user)
+        return new_user
+    return user
