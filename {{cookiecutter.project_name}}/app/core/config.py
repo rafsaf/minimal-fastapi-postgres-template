@@ -20,10 +20,17 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 """
 
 from pathlib import Path
-from typing import Dict, List, Literal, Union
+from typing import Dict, List, Union
 
 import toml
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
+
+# Literal from typing_extensions for python 3.7 support, remove if not needed
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+#
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
 pyproject_content = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
@@ -64,7 +71,7 @@ class Settings(BaseSettings):
 
     # VALIDATORS
     @validator("BACKEND_CORS_ORIGINS")
-    def _assemble_cors_origins(cls, cors_origins):
+    def _assemble_cors_origins(cls, cors_origins: Union[str, List[AnyHttpUrl]]):
         if isinstance(cors_origins, str):
             return [item.strip() for item in cors_origins.split(",")]
         return cors_origins
