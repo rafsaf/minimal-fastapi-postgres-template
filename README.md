@@ -1,3 +1,11 @@
+<a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/actions?query=workflow%3Atests" target="_blank">
+    <img src="https://github.com/rafsaf/minimal-fastapi-postgres-template/workflows/tests/badge.svg" alt="Test">
+</a>
+
+<a href="https://github.com/rafsaf/respo/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/github/license/rafsaf/respo" alt="License">
+</a>
+
 ## Minimal async FastAPI + postgresql template
 
 ![OpenAPIexample](./docs/OpenAPI_example.png)

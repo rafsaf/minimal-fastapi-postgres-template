@@ -25,7 +25,7 @@ from typing import Dict, List, Union
 import toml
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
 
-# Literal from typing_extensions for python 3.6 and 3.7 support, remove if not needed
+# Literal from typing_extensions for python 3.7 support, remove if not needed
 try:
     from typing import Literal
 except ImportError:
