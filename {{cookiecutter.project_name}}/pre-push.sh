@@ -1,6 +1,6 @@
 echo "export requirements.txt"
-poetry export -o requirements.txt
-poetry export -o requirements-dev.txt --dev
+poetry export -o requirements.txt --without-hashes
+poetry export -o requirements-dev.txt --dev --without-hashes
 echo "autoflake"
 autoflake --recursive --in-place  \
         --remove-unused-variables \

@@ -5,7 +5,7 @@ Black-box security shortcuts to generate JWT tokens and password hash/verify
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Union, Tuple
+from typing import Any, Tuple, Union
 
 from jose import jwt
 from passlib.context import CryptContext
