@@ -20,10 +20,15 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 """
 
 from pathlib import Path
-from typing import Dict, List, Literal, Union
+from typing import Dict, List, Union
 
 import toml
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
 pyproject_content = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
