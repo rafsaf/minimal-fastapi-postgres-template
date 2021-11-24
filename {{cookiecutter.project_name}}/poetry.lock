@@ -816,7 +816,7 @@ typing-extensions = ">=3.7.4"
 name = "sqlalchemy2-stubs"
 version = "0.0.2a19"
 description = "Typing Stubs for SQLAlchemy 1.4"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -911,7 +911,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "41633de5e7f1c83d6b8443e9e478b724b54d3646a6611c50cf3317a524e17c33"
+content-hash = "23b3dd692f8d269ebe9b318ff32c8cbf041797b800575fbb546b695c31e103a7"
 
 [metadata.files]
 alembic = [

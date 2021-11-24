@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,8 +12,8 @@ router = APIRouter()
 async def update_user_me(
     user_update: schemas.UserUpdate,
     session: AsyncSession = Depends(deps.get_session),
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+    current_user: models.User = Depends(deps.get_current_user),
+):
     """
     Update current user.
     """
@@ -35,8 +33,8 @@ async def update_user_me(
 
 @router.get("/me", response_model=schemas.User)
 async def read_user_me(
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+    current_user: models.User = Depends(deps.get_current_user),
+):
     """
     Get current user.
     """

@@ -64,7 +64,7 @@ class Settings(BaseSettings):
 
     # VALIDATORS
     @validator("BACKEND_CORS_ORIGINS")
-    def _assemble_cors_origins(cls, cors_origins):
+    def _assemble_cors_origins(cls, cors_origins: Union[str, List[AnyHttpUrl]]):
         if isinstance(cors_origins, str):
             return [item.strip() for item in cors_origins.split(",")]
         return cors_origins
