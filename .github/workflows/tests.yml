@@ -1,0 +1,64 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 30000:5432
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies and actiavte virtualenv
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r {{cookiecutter.project_name}}/requirements-dev.txt
+          pip install cookiecutter
+      - name: Lint with flake8
+        run: |
+          source .venv/bin/activate
+          # stop the build if there are Python syntax errors or undefined names
+          cd \{\{cookiecutter.project_name\}\}/
+          flake8 app --count --exit-zero --statistics
+      - name: Test new cookiecuttered project is passing pytest test
+        run: |
+          source .venv/bin/activate
+          python tests/create_test_project.py
+          export TEST_DATABASE_HOSTNAME=localhost
+          export TEST_DATABASE_USER=test
+          export TEST_DATABASE_PASSWORD=test
+          export TEST_DATABASE_PORT=30000
+          export TEST_DATABASE_DB=test
+
+          pytest generated_project_for_tests

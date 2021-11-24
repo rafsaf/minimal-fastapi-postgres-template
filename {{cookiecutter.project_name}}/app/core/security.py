@@ -5,7 +5,7 @@ Black-box security shortcuts to generate JWT tokens and password hash/verify
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any, Union, Tuple
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -18,7 +18,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 
 
-def create_access_token(subject: Union[str, Any]) -> tuple[str, datetime]:
+def create_access_token(subject: Union[str, Any]) -> Tuple[str, datetime]:
     now = datetime.utcnow()
     expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
@@ -31,7 +31,7 @@ def create_access_token(subject: Union[str, Any]) -> tuple[str, datetime]:
     return encoded_jwt, expire
 
 
-def create_refresh_token(subject: Union[str, Any]) -> tuple[str, datetime]:
+def create_refresh_token(subject: Union[str, Any]) -> Tuple[str, datetime]:
     now = datetime.utcnow()
     expire = now + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
 
