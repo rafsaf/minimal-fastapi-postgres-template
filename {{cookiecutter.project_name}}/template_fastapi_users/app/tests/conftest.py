@@ -1,15 +1,20 @@
 import asyncio
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core import security, config
+from fastapi_users.password import get_password_hash
+from app.core import config
 from app.main import app
-from app.models import Base, User
+from app.models import Base
 from app.session import async_engine, async_session
+from app.tests import utils
+
+default_user_email = "geralt@wiedzmin.pl"
+default_user_hash = get_password_hash("geralt")
+superuser_user_email = "yennefer@wiedzmin.pl"
+superuser_user_hash = get_password_hash("yennefer")
 
 
 @pytest.fixture(scope="session")
@@ -21,7 +26,7 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 async def client():
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(app=app, base_url="http://doesnt.matter") as client:
         yield client
 
 
@@ -47,16 +52,11 @@ async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, No
 
 @pytest.fixture
 async def default_user(session: AsyncSession):
-    result = await session.execute(select(User).where(User.email == "user@email.com"))
-    user: Optional[User] = result.scalars().first()
-    if user is None:
-        new_user = User(
-            email="user@email.com",
-            hashed_password=security.get_password_hash("password"),
-            full_name="fullname",
-        )
-        session.add(new_user)
-        await session.commit()
-        await session.refresh(new_user)
-        return new_user
-    return user
+    return await utils.create_db_user(default_user_email, default_user_hash, session)
+
+
+@pytest.fixture
+async def superuser_user(session: AsyncSession):
+    return await utils.create_db_user(
+        superuser_user_email, superuser_user_hash, session, is_superuser=True
+    )

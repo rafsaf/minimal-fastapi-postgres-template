@@ -6,23 +6,20 @@ authors = ["admin <admin@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.70.1,<0.71.0"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.29"}
-uvicorn = "^0.16.0"
 python-dotenv = "^0.19.2"
-requests = "^2.27.1"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pydantic = {extras = ["email"], version = "^1.9.0"}
 alembic = "^1.7.5"
-python-multipart = "^0.0.5"
 asyncpg = "^0.25.0"
+fastapi-users = {extras = ["sqlalchemy2"], version = "^9.2.0"}
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.12b0", allow-prereleases = true}
 autoflake = "^1.4"
+uvicorn = "^0.16.0"
 flake8 = "^4.0.1"
 isort = "^5.10.1"
+requests = "^2.27.1"
 coverage = "^6.2"
 pytest = "^6.2.5"
 pytest-asyncio = "^0.16.0"

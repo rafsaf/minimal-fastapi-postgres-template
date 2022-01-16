@@ -20,14 +20,13 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 """
 
 from pathlib import Path
-from typing import Union, Literal
+from typing import Literal, Union
 
 import toml
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
 
-
 PROJECT_DIR = Path(__file__).parent.parent.parent
-pyproject_content = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
+PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
 
 
 class Settings(BaseSettings):
@@ -35,14 +34,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ENVIRONMENT: Literal["DEV", "PYTEST", "STAGE", "PRODUCTION"]
     ACCESS_TOKEN_EXPIRE_MINUTES: int
-    SECURITY_BCRYPT_DEFAULT_ROUNDS: int = 12
     REFRESH_TOKEN_EXPIRE_MINUTES: int
     BACKEND_CORS_ORIGINS: Union[str, list[AnyHttpUrl]]
 
     # PROJECT NAME, VERSION AND DESCRIPTION
-    PROJECT_NAME: str = pyproject_content["name"]
-    VERSION: str = pyproject_content["version"]
-    DESCRIPTION: str = pyproject_content["description"]
+    PROJECT_NAME: str = PYPROJECT_CONTENT["name"]
+    VERSION: str = PYPROJECT_CONTENT["version"]
+    DESCRIPTION: str = PYPROJECT_CONTENT["description"]
 
     # POSTGRESQL DEFAULT DATABASE
     DEFAULT_DATABASE_HOSTNAME: str

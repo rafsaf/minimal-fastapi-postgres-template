@@ -1,56 +1,64 @@
 """
-Black-box security shortcuts to generate JWT tokens and password hash/verify
+You can have several authentication methods, e.g. a cookie 
+authentication for browser-based queries and a JWT token authentication for pure API queries.
 
-`subject` in access/refresh func may be antyhing unique to User account, `id` etc.
+In this template, token will be sent through Bearer header
+{"Authorization": "Bearer xyz"}
+using JWT tokens.
+
+There are more option to consider, refer to
+https://fastapi-users.github.io/fastapi-users/configuration/authentication/ 
+
+UserManager class is core fastapi users class with customizable attrs and methods
+https://fastapi-users.github.io/fastapi-users/configuration/user-manager/
 """
 
-from datetime import datetime, timedelta
-from typing import Any, Union
 
-from jose import jwt
-from passlib.context import CryptContext
+from typing import Optional
 
+from fastapi import Request
+from fastapi_users.authentication import (
+    AuthenticationBackend,
+    BearerTransport,
+    JWTStrategy,
+)
+from fastapi_users.manager import BaseUserManager
+
+from app import schemas
 from app.core import config
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=config.settings.SECURITY_BCRYPT_DEFAULT_ROUNDS,
+
+def get_jwt_strategy() -> JWTStrategy:
+    return JWTStrategy(
+        secret=config.settings.SECRET_KEY,
+        lifetime_seconds=config.settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+
+BEARER_TRANSPORT = BearerTransport(tokenUrl="auth/jwt/login")
+AUTH_BACKEND = AuthenticationBackend(
+    name="jwt",
+    transport=BEARER_TRANSPORT,
+    get_strategy=get_jwt_strategy,
 )
 
 
-ALGORITHM = "HS256"
+class UserManager(BaseUserManager[schemas.UserCreate, schemas.UserDB]):
+    user_db_model = schemas.UserDB
+    reset_password_token_secret = config.settings.SECRET_KEY
+    verification_token_secret = config.settings.SECRET_KEY
 
+    async def on_after_register(
+        self, user: schemas.UserDB, request: Optional[Request] = None
+    ):
+        print(f"User {user.id} has registered.")
 
-def create_access_token(subject: Union[str, Any]) -> tuple[str, datetime]:
-    now = datetime.utcnow()
-    expire = now + timedelta(minutes=config.settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    async def on_after_forgot_password(
+        self, user: schemas.UserDB, token: str, request: Optional[Request] = None
+    ):
+        print(f"User {user.id} has forgot their password. Reset token: {token}")
 
-    to_encode = {"exp": expire, "sub": str(subject), "refresh": False}
-    encoded_jwt: str = jwt.encode(
-        to_encode,
-        config.settings.SECRET_KEY,
-        algorithm=ALGORITHM,
-    )
-    return encoded_jwt, expire
-
-
-def create_refresh_token(subject: Union[str, Any]) -> tuple[str, datetime]:
-    now = datetime.utcnow()
-    expire = now + timedelta(minutes=config.settings.REFRESH_TOKEN_EXPIRE_MINUTES)
-
-    to_encode = {"exp": expire, "sub": str(subject), "refresh": True}
-    encoded_jwt: str = jwt.encode(
-        to_encode,
-        config.settings.SECRET_KEY,
-        algorithm=ALGORITHM,
-    )
-    return encoded_jwt, expire
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    async def on_after_request_verify(
+        self, user: schemas.UserDB, token: str, request: Optional[Request] = None
+    ):
+        print(f"Verification requested for user {user.id}. Verification token: {token}")

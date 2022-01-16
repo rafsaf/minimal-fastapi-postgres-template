@@ -1,26 +1,42 @@
+"""
+All fields in schemas are defaults from FastAPI Users, repeated below for easier view
+"""
+
+from fastapi_users import models
+import uuid
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import UUID4, EmailStr, Field
 
 
-class BaseUser(BaseModel):
-    class Config:
-        orm_mode = True
-
-
-class User(BaseUser):
-    id: int
+class User(models.BaseUser):
+    id: UUID4 = Field(default_factory=uuid.uuid4)
     email: EmailStr
-    full_name: str
+    is_active: bool = True
+    is_superuser: bool = False
+    is_verified: bool = False
 
 
-class UserUpdate(BaseUser):
-    email: Optional[EmailStr]
-    password: Optional[str]
-    full_name: Optional[str]
-
-
-class UserCreate(BaseUser):
+class UserCreate(models.BaseUserCreate):
     email: EmailStr
     password: str
-    full_name: str
+    is_active: Optional[bool] = True
+    is_superuser: Optional[bool] = False
+    is_verified: Optional[bool] = False
+
+
+class UserUpdate(models.BaseUserUpdate):
+    password: Optional[str]
+    email: Optional[EmailStr]
+    is_active: Optional[bool]
+    is_superuser: Optional[bool]
+    is_verified: Optional[bool]
+
+
+class UserDB(User, models.BaseUserDB):
+    id: UUID4 = Field(default_factory=uuid.uuid4)
+    email: EmailStr
+    is_active: bool = True
+    is_superuser: bool = False
+    is_verified: bool = False
+    hashed_password: str
