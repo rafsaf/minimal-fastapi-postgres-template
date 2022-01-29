@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
-from app.core import security, config
+from app.core import config, security
 from app.models import User
 from app.session import async_session
 

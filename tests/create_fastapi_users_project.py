@@ -1,5 +1,5 @@
 """
-Creates template project in root folder with default values
+Creates fastapi_users template project in root folder with default values
 """
 
 from pathlib import Path
@@ -14,7 +14,8 @@ def main():
         template=str(ROOT_FOLDER),
         no_input=True,
         extra_context={
-            "project_name": "generated_project_for_tests",
+            "project_name": "fastapi_users_project",
+            "use_fastapi_users": True,
         },
     )
 

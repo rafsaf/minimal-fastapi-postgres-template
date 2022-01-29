@@ -5,8 +5,8 @@ Main FastAPI app instance declaration
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core import config
 from app.api.api import api_router
+from app.core import config
 
 app = FastAPI(
     title=config.settings.PROJECT_NAME,

@@ -2,9 +2,10 @@ import asyncio
 from typing import AsyncGenerator
 
 import pytest
+from fastapi_users.password import get_password_hash
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi_users.password import get_password_hash
+
 from app.core import config
 from app.main import app
 from app.models import Base

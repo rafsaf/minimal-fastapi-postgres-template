@@ -9,5 +9,3 @@ import os
 
 # This will ensure using test database
 os.environ["ENVIRONMENT"] = "PYTEST"
-# This will change default 12 bcrypt rounds to only 1 so hashing password func will be short
-os.environ["SECURITY_BCRYPT_DEFAULT_ROUNDS"] = "1"

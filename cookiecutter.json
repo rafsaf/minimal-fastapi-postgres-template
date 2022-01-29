@@ -1,3 +1,4 @@
 {
-    "project_name": "Base Project"
+  "project_name": "Base Project",
+  "use_fastapi_users": false
 }

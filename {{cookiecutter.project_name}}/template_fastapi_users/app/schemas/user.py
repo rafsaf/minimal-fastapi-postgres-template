@@ -2,10 +2,10 @@
 All fields in schemas are defaults from FastAPI Users, repeated below for easier view
 """
 
-from fastapi_users import models
 import uuid
 from typing import Optional
 
+from fastapi_users import models
 from pydantic import UUID4, EmailStr, Field
 
 

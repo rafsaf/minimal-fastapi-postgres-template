@@ -1,5 +1,5 @@
 """
-You can have several authentication methods, e.g. a cookie 
+You can have several authentication methods, e.g. a cookie
 authentication for browser-based queries and a JWT token authentication for pure API queries.
 
 In this template, token will be sent through Bearer header
@@ -7,7 +7,7 @@ In this template, token will be sent through Bearer header
 using JWT tokens.
 
 There are more option to consider, refer to
-https://fastapi-users.github.io/fastapi-users/configuration/authentication/ 
+https://fastapi-users.github.io/fastapi-users/configuration/authentication/
 
 UserManager class is core fastapi users class with customizable attrs and methods
 https://fastapi-users.github.io/fastapi-users/configuration/user-manager/

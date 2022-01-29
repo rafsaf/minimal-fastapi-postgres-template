@@ -13,8 +13,8 @@ async def test_login_endpoints(client: AsyncClient, default_user: User):
     access_token = await client.post(
         "/auth/access-token",
         data={
-            "username": "user@email.com",
-            "password": "password",
+            "username": "geralt@wiedzmin.pl",
+            "password": "geralt",
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )

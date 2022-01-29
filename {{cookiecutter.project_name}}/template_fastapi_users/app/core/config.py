@@ -34,7 +34,6 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ENVIRONMENT: Literal["DEV", "PYTEST", "STAGE", "PRODUCTION"]
     ACCESS_TOKEN_EXPIRE_MINUTES: int
-    REFRESH_TOKEN_EXPIRE_MINUTES: int
     BACKEND_CORS_ORIGINS: Union[str, list[AnyHttpUrl]]
 
     # PROJECT NAME, VERSION AND DESCRIPTION

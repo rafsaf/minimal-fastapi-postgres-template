@@ -6,10 +6,13 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import security, config
+from app.core import config, security
 from app.main import app
 from app.models import Base, User
 from app.session import async_engine, async_session
+
+default_user_email = "geralt@wiedzmin.pl"
+default_user_hash = security.get_password_hash("geralt")
 
 
 @pytest.fixture(scope="session")
@@ -47,12 +50,12 @@ async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, No
 
 @pytest.fixture
 async def default_user(session: AsyncSession):
-    result = await session.execute(select(User).where(User.email == "user@email.com"))
+    result = await session.execute(select(User).where(User.email == default_user_email))
     user: Optional[User] = result.scalars().first()
     if user is None:
         new_user = User(
-            email="user@email.com",
-            hashed_password=security.get_password_hash("password"),
+            email=default_user_email,
+            hashed_password=default_user_hash,
             full_name="fullname",
         )
         session.add(new_user)

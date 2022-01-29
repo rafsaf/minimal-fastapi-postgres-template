@@ -1,13 +1,11 @@
 import random
 import string
-from fastapi_users import password
+
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from pydantic.networks import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
-
 from app import schemas
-from app.core import config
 from app.models import UserTable
 
 
