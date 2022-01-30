@@ -7,7 +7,7 @@ to .env which is gitignored, then remove template env file as it is redundant.
 from pathlib import Path
 from shutil import copytree, rmtree
 
-PROJECT_NAME = "{{ cookiecutter.module_name }}"
+PROJECT_NAME = "{{ cookiecutter.project_name }}"
 USE_FASTAPI_USERS = bool("{{ cookiecutter.use_fastapi_users }}")
 TEMPLATES = ["template_fastapi_users", "template_minimal"]
 
