@@ -2,13 +2,15 @@
     <img src="https://github.com/rafsaf/minimal-fastapi-postgres-template/workflows/tests/badge.svg" alt="Test">
 </a>
 
-<a href="https://github.com/rafsaf/respo/blob/main/LICENSE" target="_blank">
-    <img src="https://img.shields.io/github/license/rafsaf/respo" alt="License">
+<a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template" alt="License">
 </a>
+
+:information_source: This repository contains two different templates to choose from.
 
 ## Minimal async FastAPI + postgresql template
 
-![OpenAPIexample](./docs/OpenAPI_example.png)
+![template-fastapi-minimal-openapi-example](./docs/template-minimal-openapi-example.png)
 
 - SQLAlchemy using new 2.0 API + async queries
 - Postgresql database under `asyncpg`
@@ -19,6 +21,20 @@
 - poetry
 - `pre-push.sh` script with poetry export, autoflake, black, isort and flake8
 - Setup for async tests, one func test for token flow and very extensible `conftest.py`
+
+## Async FastAPI + postgresql template based on [fastapi-users](https://fastapi-users.github.io/fastapi-users/)
+
+- SQLAlchemy using new 2.0 API + async queries
+- Postgresql database under `asyncpg`
+- Alembic migrations
+- Very minimal project structure yet ready for quick start building new api
+- Refresh token endpoint (not only access like in official template)
+- Two databases in docker-compose.yml (second one for tests)
+- poetry
+- `pre-push.sh` script with poetry export, autoflake, black, isort and flake8
+- Setup for async tests, one func test for token flow and very extensible `conftest.py`
+
+![template-fastapi-users-openapi-example](./docs/template-fastapi-users-openapi-example.png)
 
 ## What this repo is
 
