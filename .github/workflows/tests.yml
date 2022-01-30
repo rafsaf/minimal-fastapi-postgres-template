@@ -56,7 +56,7 @@ jobs:
         run: |
           python -m venv .venv2
           source .venv2/bin/activate
-          pip install -r {{cookiecutter.project_name}}/template_minimal/requirements-dev.txt
+          pip install -r {{cookiecutter.project_name}}/template_fastapi_users/requirements-dev.txt
           pip install cookiecutter
       - name: Lint with flake8 minimal project
         run: |
