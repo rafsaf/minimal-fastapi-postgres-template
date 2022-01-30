@@ -16,7 +16,7 @@ def copy_choosen_template_to_main_dir(used_template: str):
     if used_template not in TEMPLATES:
         raise ValueError(f"{used_template} not in {TEMPLATES}")
 
-    copytree(used_template, "./")
+    copytree(used_template, "./", dirs_exist_ok=True)
 
     for template in TEMPLATES:
         rmtree(Path(template))
