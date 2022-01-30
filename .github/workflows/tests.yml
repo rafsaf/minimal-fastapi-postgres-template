@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.9", "3.10"]
 
     services:
       postgres:
@@ -32,33 +32,64 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Load cached venv
-        id: cached-poetry-dependencies
+      - name: Load cached venv1
+        id: cached-poetry-dependencies1
         uses: actions/cache@v2
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          path: .venv1
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('{{cookiecutter.project_name}}/template_minimal/poetry.lock') }}
       - name: Install dependencies and actiavte virtualenv
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        if: steps.cached-poetry-dependencies1.outputs.cache-hit != 'true'
         run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install -r {{cookiecutter.project_name}}/requirements-dev.txt
+          python -m venv .venv1
+          source .venv1/bin/activate
+          pip install -r {{cookiecutter.project_name}}/template_minimal/requirements-dev.txt
           pip install cookiecutter
-      - name: Lint with flake8
+      - name: Load cached venv2
+        id: cached-poetry-dependencies2
+        uses: actions/cache@v2
+        with:
+          path: .venv2
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('{{cookiecutter.project_name}}/template_fastapi_users/poetry.lock') }}
+      - name: Install dependencies and actiavte virtualenv
+        if: steps.cached-poetry-dependencies2.outputs.cache-hit != 'true'
         run: |
-          source .venv/bin/activate
+          python -m venv .venv2
+          source .venv2/bin/activate
+          pip install -r {{cookiecutter.project_name}}/template_fastapi_users/requirements-dev.txt
+          pip install cookiecutter
+      - name: Lint with flake8 minimal project
+        run: |
+          source .venv1/bin/activate
           # stop the build if there are Python syntax errors or undefined names
-          cd \{\{cookiecutter.project_name\}\}/
+          cd \{\{cookiecutter.project_name\}\}/template_minimal
           flake8 app --count --exit-zero --statistics
-      - name: Test new cookiecuttered project is passing pytest test
+      - name: Lint with flake8 fastapi_users project
         run: |
-          source .venv/bin/activate
-          python tests/create_test_project.py
+          source .venv2/bin/activate
+          # stop the build if there are Python syntax errors or undefined names
+          cd \{\{cookiecutter.project_name\}\}/template_fastapi_users
+          flake8 app --count --exit-zero --statistics
+      - name: Test minimal project is passing pytest test
+        run: |
+          source .venv1/bin/activate
+          python tests/create_minimal_project.py
           export TEST_DATABASE_HOSTNAME=localhost
           export TEST_DATABASE_USER=test
           export TEST_DATABASE_PASSWORD=test
           export TEST_DATABASE_PORT=30000
           export TEST_DATABASE_DB=test
 
-          pytest generated_project_for_tests
+          pytest minimal_project
+
+      - name: Test fastapi_users project is passing pytest test
+        run: |
+          source .venv2/bin/activate
+          python tests/create_fastapi_users_project.py
+          export TEST_DATABASE_HOSTNAME=localhost
+          export TEST_DATABASE_USER=test
+          export TEST_DATABASE_PASSWORD=test
+          export TEST_DATABASE_PORT=30000
+          export TEST_DATABASE_DB=test
+
+          pytest fastapi_users_project
