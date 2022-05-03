@@ -9,6 +9,7 @@ import asyncio
 from typing import Optional
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import config, security
 from app.models import User
@@ -18,6 +19,7 @@ from app.session import async_session
 async def main() -> None:
     print("Start initial data")
     async with async_session() as session:
+        session: AsyncSession  # resolves type issues with async_session
 
         result = await session.execute(
             select(User).where(User.email == config.settings.FIRST_SUPERUSER_EMAIL)

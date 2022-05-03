@@ -1,7 +1,7 @@
 import asyncio
 from typing import AsyncGenerator, Optional
 
-import pytest
+import pytest, pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,18 +17,19 @@ default_user_hash = security.get_password_hash("geralt")
 
 @pytest.fixture(scope="session")
 def event_loop():
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     yield loop
     loop.close()
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture()
 async def client():
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def test_db_setup_sessionmaker():
     # assert if we use TEST_DB URL for 100%
     assert config.settings.ENVIRONMENT == "PYTEST"
@@ -42,13 +43,13 @@ async def test_db_setup_sessionmaker():
     return async_session
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, None]:
     async with test_db_setup_sessionmaker() as session:
         yield session
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def default_user(session: AsyncSession):
     result = await session.execute(select(User).where(User.email == default_user_email))
     user: Optional[User] = result.scalars().first()

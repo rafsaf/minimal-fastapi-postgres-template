@@ -1,20 +1,29 @@
 """
 SQL Alchemy models declaration.
+https://docs.sqlalchemy.org/en/14/orm/declarative_styles.html#example-two-dataclasses-with-declarative-table
+Dataclass style for powerful autocompletion support.
 
-Note, imported by alembic migrations logic, see `alembic/env.py`
+Note, it is used by alembic migrations logic, see `alembic/env.py`
+
 """
 
-from typing import Any, cast
+from dataclasses import dataclass, field
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm.decl_api import declarative_base
+from sqlalchemy.orm import registry
 
-Base = cast(Any, declarative_base())
+Base = registry()
 
 
-class User(Base):
+@Base.mapped
+@dataclass
+class User:
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String(254), nullable=True)
-    email = Column(String(254), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(128), nullable=False)
+    __sa_dataclass_metadata_key__ = "sa"
+
+    id: int = field(init=False, metadata={"sa": Column(Integer, primary_key=True)})
+    email: str = field(metadata={"sa": Column(String(254), nullable=False, index=True)})
+    hashed_password: str = field(metadata={"sa": Column(String(128), nullable=False)})
+    full_name: str | None = field(
+        default=None, metadata={"sa": Column(String(254), nullable=True)}
+    )

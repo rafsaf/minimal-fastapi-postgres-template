@@ -18,11 +18,11 @@ async def update_user_me(
     Update current user.
     """
     if user_update.password is not None:
-        current_user.hashed_password = get_password_hash(user_update.password)  # type: ignore
+        current_user.hashed_password = get_password_hash(user_update.password)
     if user_update.full_name is not None:
-        current_user.full_name = user_update.full_name  # type: ignore
+        current_user.full_name = user_update.full_name
     if user_update.email is not None:
-        current_user.email = user_update.email  # type: ignore
+        current_user.email = user_update.email
 
     session.add(current_user)
     await session.commit()
