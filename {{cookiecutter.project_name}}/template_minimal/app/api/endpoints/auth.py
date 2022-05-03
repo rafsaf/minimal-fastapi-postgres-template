@@ -1,8 +1,8 @@
 from typing import Optional
 
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +28,7 @@ async def login_access_token(
     if user is None:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-    if not security.verify_password(form_data.password, user.hashed_password):  # type: ignore
+    if not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     access_token, expire_at = security.create_access_token(user.id)
@@ -64,7 +64,7 @@ async def refresh_token(
             algorithms=[security.ALGORITHM],
         )
         token_data = schemas.TokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
+    except (jwt.DecodeError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
