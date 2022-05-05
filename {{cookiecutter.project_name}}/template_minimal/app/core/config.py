@@ -20,7 +20,7 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 """
 
 from pathlib import Path
-from typing import Literal, Union
+from typing import Literal
 
 import toml
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
@@ -32,11 +32,12 @@ PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
 class Settings(BaseSettings):
     # CORE SETTINGS
     SECRET_KEY: str
-    ENVIRONMENT: Literal["DEV", "PYTEST", "STAGE", "PRODUCTION"]
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    ENVIRONMENT: Literal["DEV", "PYTEST", "STG", "PRD"] = "DEV"
     SECURITY_BCRYPT_DEFAULT_ROUNDS: int = 12
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_MINUTES: int
-    BACKEND_CORS_ORIGINS: Union[str, list[AnyHttpUrl]]
+    BACKEND_CORS_ORIGINS: str | list[AnyHttpUrl]
+    ALLOWED_HOSTS: str | list[str] = ["localhost"]
 
     # PROJECT NAME, VERSION AND DESCRIPTION
     PROJECT_NAME: str = PYPROJECT_CONTENT["name"]
@@ -65,10 +66,16 @@ class Settings(BaseSettings):
 
     # VALIDATORS
     @validator("BACKEND_CORS_ORIGINS")
-    def _assemble_cors_origins(cls, cors_origins: Union[str, list[AnyHttpUrl]]):
+    def _assemble_cors_origins(cls, cors_origins: str | list[AnyHttpUrl]):
         if isinstance(cors_origins, str):
             return [item.strip() for item in cors_origins.split(",")]
         return cors_origins
+
+    @validator("ALLOWED_HOSTS")
+    def _assemble_cors_allowed_hosts(cls, allowed_hosts: str | list[AnyHttpUrl]):
+        if isinstance(allowed_hosts, str):
+            return [item.strip() for item in allowed_hosts.split(",")]
+        return allowed_hosts
 
     @validator("DEFAULT_SQLALCHEMY_DATABASE_URI")
     def _assemble_default_db_connection(cls, v: str, values: dict[str, str]) -> str:
