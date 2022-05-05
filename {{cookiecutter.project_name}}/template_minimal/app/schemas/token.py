@@ -1,20 +1,19 @@
-from datetime import datetime
-from typing import Optional
-
 from pydantic import BaseModel
 
 
 class Token(BaseModel):
     token_type: str
     access_token: str
-    expire_at: datetime
+    expires_at: int
     refresh_token: str
-    refresh_expire_at: datetime
+    refresh_token_expires_at: int
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[int] = None
-    refresh: Optional[bool] = None
+    sub: str | None = None
+    refresh: bool | None = None
+    iat: float
+    exp: float
 
 
 class TokenRefresh(BaseModel):

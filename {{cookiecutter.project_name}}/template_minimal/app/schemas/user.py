@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, EmailStr
 
 
@@ -9,15 +7,15 @@ class BaseUser(BaseModel):
 
 
 class User(BaseUser):
-    id: int
+    id: str
     email: EmailStr
-    full_name: str
+    full_name: str | None
 
 
 class UserUpdate(BaseUser):
-    email: Optional[EmailStr]
-    password: Optional[str]
-    full_name: Optional[str]
+    email: EmailStr | None
+    password: str | None
+    full_name: str | None
 
 
 class UserCreate(BaseUser):

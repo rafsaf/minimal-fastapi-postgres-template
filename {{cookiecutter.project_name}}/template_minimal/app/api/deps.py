@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -26,7 +26,7 @@ async def get_current_user(
 
     try:
         payload = jwt.decode(
-            token, config.settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+            token, config.settings.SECRET_KEY, algorithms=[security.JWT_ALGORITHM]
         )
         token_data = schemas.TokenPayload(**payload)
     except (jwt.DecodeError, ValidationError):
@@ -41,7 +41,7 @@ async def get_current_user(
         )
 
     result = await session.execute(select(User).where(User.id == token_data.sub))
-    user: Optional[User] = result.scalars().first()
+    user: User | None = result.scalars().first()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
