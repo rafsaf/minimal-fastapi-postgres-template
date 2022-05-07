@@ -14,17 +14,16 @@ app = FastAPI(
     openapi_url="/openapi.json",
     docs_url="/",
 )
-# Set all CORS enabled origins and allowed trusted hosts
-if config.settings.BACKEND_CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.add_middleware(
-        TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS
-    )
-
 app.include_router(api_router)
+
+# Sets all CORS enabled origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Guards against HTTP Host Header attacks
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)

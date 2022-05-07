@@ -1,12 +1,8 @@
-import pytest
 from httpx import AsyncClient
 
 from app.main import app
 from app.models import User
 from app.tests.conftest import default_user_email, default_user_password
-
-# All test coroutines in file will be treated as marked (async allowed).
-pytestmark = pytest.mark.asyncio
 
 
 async def test_auth_access_token(client: AsyncClient, default_user: User):
@@ -18,14 +14,15 @@ async def test_auth_access_token(client: AsyncClient, default_user: User):
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-
     assert response.status_code == 200
     token = response.json()
-    assert token["token_type"] == "bearer"
+    assert token["token_type"] == "Bearer"
     assert "access_token" in token
-    assert "expire_at" in token
+    assert "expires_at" in token
+    assert "issued_at" in token
     assert "refresh_token" in token
-    assert "refresh_expire_at" in token
+    assert "refresh_token_expires_at" in token
+    assert "refresh_token_issued_at" in token
 
 
 async def test_auth_access_token_fail_no_user(client: AsyncClient):
@@ -58,8 +55,10 @@ async def test_auth_refresh_token(client: AsyncClient, default_user: User):
     )
     assert new_token_response.status_code == 200
     token = new_token_response.json()
-    assert token["token_type"] == "bearer"
+    assert token["token_type"] == "Bearer"
     assert "access_token" in token
-    assert "expire_at" in token
+    assert "expires_at" in token
+    assert "issued_at" in token
     assert "refresh_token" in token
-    assert "refresh_expire_at" in token
+    assert "refresh_token_expires_at" in token
+    assert "refresh_token_issued_at" in token

@@ -1,8 +1,8 @@
 version: "3.7"
 
-# Database + Webserver (under http, for testing setup)
+# Database + Webserver (under http, for testing setup on localhost:80)
 #
-# docker-compose up -f docker-compose.local.yml -d
+# docker-compose up -f docker-compose.dev.yml -d
 #
 
 services:

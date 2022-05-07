@@ -24,25 +24,18 @@ from sqlalchemy.orm import registry
 Base = registry()
 
 
-def random_uuid():
-    return str(uuid.uuid4())
-
-
 @Base.mapped
 @dataclass
 class User:
     __tablename__ = "user"
     __sa_dataclass_metadata_key__ = "sa"
 
-    id: str = field(
+    id: uuid.UUID = field(
         init=False,
-        default_factory=random_uuid,
-        metadata={
-            "sa": Column(UUID(as_uuid=False), primary_key=True, default=random_uuid)
-        },
+        default_factory=uuid.uuid4,
+        metadata={"sa": Column(UUID(as_uuid=True), primary_key=True)},
     )
-    email: str = field(metadata={"sa": Column(String(254), nullable=False, index=True)})
+    email: str = field(
+        metadata={"sa": Column(String(254), nullable=False, unique=True, index=True)}
+    )
     hashed_password: str = field(metadata={"sa": Column(String(128), nullable=False)})
-    full_name: str | None = field(
-        default=None, metadata={"sa": Column(String(254), nullable=True)}
-    )
