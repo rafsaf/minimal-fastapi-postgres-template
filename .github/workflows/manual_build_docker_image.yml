@@ -14,9 +14,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: copy minimal template to root folder
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Generate projects from templates using cookiecutter
+        # minimal_project folder
         run: |
-          cp -r \{\{cookiecutter.project_name\}\}/template_minimal/ .
+          pip install cookiecutter
+          python tests/create_minimal_project.py
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -25,9 +32,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASS }}
 
       - name: Build and push image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
-          file: Dockerfile
-          context: ./template_minimal
+          file: minimal_project/Dockerfile
+          context: minimal_project
           push: true
           tags: rafsaf/minimal-fastapi-postgres-template:${{ github.event.inputs.tag }}
