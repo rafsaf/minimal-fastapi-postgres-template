@@ -24,6 +24,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           file: Dockerfile
-          context: {{cookiecutter.project_name}}/template_minimal
+          context: ./{{cookiecutter.project_name}}/template_minimal
           push: true
           tags: rafsaf/minimal-fastapi-postgres-template:${{ github.event.inputs.tag }}
