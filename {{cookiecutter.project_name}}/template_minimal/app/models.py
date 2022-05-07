@@ -27,7 +27,7 @@ Base = registry()
 @Base.mapped
 @dataclass
 class User:
-    __tablename__ = "user"
+    __tablename__ = "user_model"
     __sa_dataclass_metadata_key__ = "sa"
 
     id: uuid.UUID = field(
