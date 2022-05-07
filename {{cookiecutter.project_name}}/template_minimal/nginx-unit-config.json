@@ -7,6 +7,7 @@
   "applications": {
     "fastapi": {
       "type": "python 3.10",
+      "user": "root",
       "processes": 1,
       "threads": 1,
       "path": "/build/",
