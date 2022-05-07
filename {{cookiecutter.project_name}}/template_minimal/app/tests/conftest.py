@@ -43,7 +43,7 @@ async def test_db_setup_sessionmaker():
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def session() -> AsyncGenerator[AsyncSession, None]:
+async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         yield session
 
@@ -61,7 +61,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest_asyncio.fixture()
-async def default_user() -> User:
+async def default_user(test_db_setup_sessionmaker) -> User:
     async with async_session() as session:
         result = await session.execute(
             select(User).where(User.email == default_user_email)
