@@ -5,7 +5,7 @@ on:
     workflows:
       - "Run tests"
     branches:
-      - master
+      - main
     types:
       - completed
 
