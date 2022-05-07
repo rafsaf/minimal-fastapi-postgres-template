@@ -22,10 +22,10 @@ jobs:
 
       - name: Build and push image
         uses: docker/build-push-action@v2
-        env:
-          cookiecutter_project_name: "{{cookiecutter_project_name}}"
         with:
           file: Dockerfile
-          context: ./${{cookiecutter_project_name}}/template_minimal
+          context: ./${{ secrets.cookiecutter_project_name }}/template_minimal
+          # workaround due to escape problems
+          # secrets.cookiecutter_project_name="{{cookiecutter.project_name}}"
           push: true
           tags: rafsaf/minimal-fastapi-postgres-template:${{ github.event.inputs.tag }}
