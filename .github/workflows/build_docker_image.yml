@@ -1,0 +1,31 @@
+name: Push minimal template docker image to dockerhub
+
+on:
+  workflow_run:
+    workflows:
+      - "Run tests"
+    branches:
+      - master
+    types:
+      - completed
+
+jobs:
+  push_image_to_dockerhub:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v2
+        with:
+          file: Dockerfile
+          context: {{cookiecutter.project_name}}/template_minimal
+          push: true
+          tags: rafsaf/minimal-fastapi-postgres-template:latest
