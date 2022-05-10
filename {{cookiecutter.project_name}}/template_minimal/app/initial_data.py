@@ -6,23 +6,21 @@ By defualt `main` create a superuser if not exists
 """
 
 import asyncio
-from typing import Optional
 
 from sqlalchemy import select
 
 from app.core import config, security
+from app.core.session import async_session
 from app.models import User
-from app.session import async_session
 
 
 async def main() -> None:
     print("Start initial data")
     async with async_session() as session:
-
         result = await session.execute(
             select(User).where(User.email == config.settings.FIRST_SUPERUSER_EMAIL)
         )
-        user: Optional[User] = result.scalars().first()
+        user: User | None = result.scalars().first()
 
         if user is None:
             new_superuser = User(
@@ -30,7 +28,6 @@ async def main() -> None:
                 hashed_password=security.get_password_hash(
                     config.settings.FIRST_SUPERUSER_PASSWORD
                 ),
-                full_name=config.settings.FIRST_SUPERUSER_EMAIL,
             )
             session.add(new_superuser)
             await session.commit()

@@ -8,7 +8,7 @@ from pathlib import Path
 from shutil import copytree, rmtree
 
 PROJECT_NAME = "{{ cookiecutter.project_name }}"
-USE_FASTAPI_USERS = "{{ cookiecutter.use_fastapi_users }}"
+USE_FASTAPI_USERS = "{{ cookiecutter.experimental_fastapi_users_template }}"
 TEMPLATES = ["template_fastapi_users", "template_minimal"]
 
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     elif USE_FASTAPI_USERS in falsy:
         used_template = "template_minimal"
     else:
-        raise ValueError(f"use_fastapi_users param must be in {truthy + falsy}")
+        raise ValueError(f"'experimental_fastapi_users_template' param must be in {truthy + falsy}")
 
     copy_choosen_template_to_main_dir(used_template=used_template)
     create_env_file_and_remove_env_template()

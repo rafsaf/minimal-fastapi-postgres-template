@@ -2,94 +2,94 @@ name: Run tests
 
 on:
   push:
-  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10"]
-
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: test
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
+          POSTGRES_PASSWORD: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 30000:5432
+          - 5432:5432
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Load cached venv1
-        id: cached-poetry-dependencies1
-        uses: actions/cache@v2
-        with:
-          path: .venv1
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('{{cookiecutter.project_name}}/template_minimal/poetry.lock') }}
-      - name: Install dependencies and actiavte virtualenv
-        if: steps.cached-poetry-dependencies1.outputs.cache-hit != 'true'
+          python-version: "3.10"
+
+      - name: Generate projects from templates using cookiecutter
+        # fastapi_users_project folder
+        # minimal_project folder
         run: |
-          python -m venv .venv1
-          source .venv1/bin/activate
-          pip install -r {{cookiecutter.project_name}}/template_minimal/requirements-dev.txt
           pip install cookiecutter
-      - name: Load cached venv2
-        id: cached-poetry-dependencies2
-        uses: actions/cache@v2
-        with:
-          path: .venv2
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('{{cookiecutter.project_name}}/template_fastapi_users/poetry.lock') }}
-      - name: Install dependencies and actiavte virtualenv
-        if: steps.cached-poetry-dependencies2.outputs.cache-hit != 'true'
-        run: |
-          python -m venv .venv2
-          source .venv2/bin/activate
-          pip install -r {{cookiecutter.project_name}}/template_fastapi_users/requirements-dev.txt
-          pip install cookiecutter
-      - name: Lint with flake8 minimal project
-        run: |
-          source .venv1/bin/activate
-          # stop the build if there are Python syntax errors or undefined names
-          cd \{\{cookiecutter.project_name\}\}/template_minimal
-          flake8 app --count --exit-zero --statistics
-      - name: Lint with flake8 fastapi_users project
-        run: |
-          source .venv2/bin/activate
-          # stop the build if there are Python syntax errors or undefined names
-          cd \{\{cookiecutter.project_name\}\}/template_fastapi_users
-          flake8 app --count --exit-zero --statistics
-      - name: Test minimal project is passing pytest test
-        run: |
-          source .venv1/bin/activate
           python tests/create_minimal_project.py
-          export TEST_DATABASE_HOSTNAME=localhost
-          export TEST_DATABASE_USER=test
-          export TEST_DATABASE_PASSWORD=test
-          export TEST_DATABASE_PORT=30000
-          export TEST_DATABASE_DB=test
-
-          pytest minimal_project
-
-      - name: Test fastapi_users project is passing pytest test
-        run: |
-          source .venv2/bin/activate
           python tests/create_fastapi_users_project.py
-          export TEST_DATABASE_HOSTNAME=localhost
-          export TEST_DATABASE_USER=test
-          export TEST_DATABASE_PASSWORD=test
-          export TEST_DATABASE_PORT=30000
-          export TEST_DATABASE_DB=test
 
-          pytest fastapi_users_project
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      ### template minimal ###
+
+      - name: Load cached venv-1
+        id: cached-poetry-dependencies-template-1
+        uses: actions/cache@v2
+        with:
+          path: minimal_project/.venv
+          key: venv-${{ runner.os }}-${{ hashFiles('minimal_project/poetry.lock') }}
+
+      - name: Install template minimal dependencies
+        if: steps.cached-poetry-dependencies-template-1.outputs.cache-hit != 'true'
+        run: |
+          cd minimal_project
+          poetry install --no-interaction --no-root
+
+      - name: Run template minimal flake8 and then tests
+        env:
+          TEST_DATABASE_HOSTNAME: localhost
+          TEST_DATABASE_PASSWORD: postgres
+          TEST_DATABASE_PORT: 5432
+          TEST_DATABASE_USER: postgres
+          TEST_DATABASE_DB: postgres
+        run: |
+          cd minimal_project
+          poetry run flake8 app --count --exit-zero --statistics
+          poetry run coverage run -m pytest
+
+      ### template fastapi users ###
+
+      - name: Load cached venv-2
+        id: cached-poetry-dependencies-template-2
+        uses: actions/cache@v2
+        with:
+          path: fastapi_users_project/.venv
+          key: venv-${{ runner.os }}-${{ hashFiles('fastapi_users_project/poetry.lock') }}
+
+      - name: Install template fastapi users dependencies
+        if: steps.cached-poetry-dependencies-template-1.outputs.cache-hit != 'true'
+        run: |
+          cd fastapi_users_project
+          poetry install --no-interaction --no-root
+
+      - name: Run template fastapi users flake8 and then tests
+        env:
+          TEST_DATABASE_HOSTNAME: localhost
+          TEST_DATABASE_PASSWORD: postgres
+          TEST_DATABASE_PORT: 5432
+          TEST_DATABASE_USER: postgres
+          TEST_DATABASE_DB: postgres
+        run: |
+          cd fastapi_users_project
+          poetry run flake8 app --count --exit-zero --statistics
+          poetry run coverage run -m pytest

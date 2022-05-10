@@ -17,13 +17,15 @@ what are you doing. All the two validators do is to build full URI (TCP protocol
 to databases to avoid typo bugs.
 
 See https://pydantic-docs.helpmanual.io/usage/settings/
+
+Note, complex types like lists are read as json-encoded strings.
 """
 
 from pathlib import Path
-from typing import Literal, Union
+from typing import Literal
 
 import toml
-from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
+from pydantic import AnyHttpUrl, BaseSettings, EmailStr, PostgresDsn, validator
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
 PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
@@ -32,11 +34,12 @@ PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
 class Settings(BaseSettings):
     # CORE SETTINGS
     SECRET_KEY: str
-    ENVIRONMENT: Literal["DEV", "PYTEST", "STAGE", "PRODUCTION"]
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
-    SECURITY_BCRYPT_DEFAULT_ROUNDS: int = 12
-    REFRESH_TOKEN_EXPIRE_MINUTES: int
-    BACKEND_CORS_ORIGINS: Union[str, list[AnyHttpUrl]]
+    ENVIRONMENT: Literal["DEV", "PYTEST", "STG", "PRD"] = "DEV"
+    SECURITY_BCRYPT_ROUNDS: int = 12
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 40320  # 28 days
+    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
+    ALLOWED_HOSTS: list[str] = ["localhost"]
 
     # PROJECT NAME, VERSION AND DESCRIPTION
     PROJECT_NAME: str = PYPROJECT_CONTENT["name"]
@@ -52,27 +55,20 @@ class Settings(BaseSettings):
     DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
 
     # POSTGRESQL TEST DATABASE
-    TEST_DATABASE_HOSTNAME: str
-    TEST_DATABASE_USER: str
-    TEST_DATABASE_PASSWORD: str
-    TEST_DATABASE_PORT: str
-    TEST_DATABASE_DB: str
+    TEST_DATABASE_HOSTNAME: str = "postgres"
+    TEST_DATABASE_USER: str = "postgres"
+    TEST_DATABASE_PASSWORD: str = "postgres"
+    TEST_DATABASE_PORT: str = "5432"
+    TEST_DATABASE_DB: str = "postgres"
     TEST_SQLALCHEMY_DATABASE_URI: str = ""
 
     # FIRST SUPERUSER
     FIRST_SUPERUSER_EMAIL: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
 
-    # VALIDATORS
-    @validator("BACKEND_CORS_ORIGINS")
-    def _assemble_cors_origins(cls, cors_origins: Union[str, list[AnyHttpUrl]]):
-        if isinstance(cors_origins, str):
-            return [item.strip() for item in cors_origins.split(",")]
-        return cors_origins
-
     @validator("DEFAULT_SQLALCHEMY_DATABASE_URI")
     def _assemble_default_db_connection(cls, v: str, values: dict[str, str]) -> str:
-        return AnyUrl.build(
+        return PostgresDsn.build(
             scheme="postgresql+asyncpg",
             user=values["DEFAULT_DATABASE_USER"],
             password=values["DEFAULT_DATABASE_PASSWORD"],
@@ -83,7 +79,7 @@ class Settings(BaseSettings):
 
     @validator("TEST_SQLALCHEMY_DATABASE_URI")
     def _assemble_test_db_connection(cls, v: str, values: dict[str, str]) -> str:
-        return AnyUrl.build(
+        return PostgresDsn.build(
             scheme="postgresql+asyncpg",
             user=values["TEST_DATABASE_USER"],
             password=values["TEST_DATABASE_PASSWORD"],

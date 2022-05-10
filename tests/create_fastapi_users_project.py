@@ -15,7 +15,7 @@ def main():
         no_input=True,
         extra_context={
             "project_name": "fastapi_users_project",
-            "use_fastapi_users": True,
+            "experimental_fastapi_users_template": True,
         },
     )
 

@@ -1,46 +1,46 @@
 [tool.poetry]
+authors = ["admin <admin@example.com>"]
+description = "FastAPI project generated using minimal-fastapi-postgres-template."
 name = "{{cookiecutter.project_name}}"
 version = "0.1.0-alpha"
-description = "FastAPI project generated using minimal-fastapi-postgres-template."
-authors = ["admin <admin@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-fastapi = "^0.71.0"
+python = "^3.10"
+
+PyJWT = {extras = ["crypto"], version = "^2.3.0"}
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.29"}
-uvicorn = "^0.16.0"
-python-dotenv = "^0.19.2"
-requests = "^2.27.1"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-pydantic = {extras = ["email"], version = "^1.9.0"}
-alembic = "^1.7.5"
-python-multipart = "^0.0.5"
+alembic = "^1.7.7"
 asyncpg = "^0.25.0"
+fastapi = "^0.76.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pydantic = {extras = ["email", "dotenv"], version = "^1.9.0"}
+python-multipart = ">=0.0.5,<0.0.6"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
-black = {version = "^21.12b0", allow-prereleases = true}
 autoflake = "^1.4"
+black = "^22.3.0"
+coverage = "^6.3.2"
 flake8 = "^4.0.1"
+httpx = "^0.22.0"
 isort = "^5.10.1"
-coverage = "^6.2"
-pytest = "^6.2.5"
-pytest-asyncio = "^0.16.0"
-httpx = "^0.21.3"
-sqlalchemy2-stubs = "^0.0.2-alpha.19"
+pytest = "^7.1.2"
+pytest-asyncio = "^0.18.3"
+sqlalchemy2-stubs = "^0.0.2-alpha.22"
+uvicorn = "^0.17.6"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
 
 [tool.pytest.ini_options]
-minversion = "6.0"
 addopts = "-v"
-filterwarnings = [
-    "ignore::passlib.exc.PasslibHashWarning"
-]
+asyncio_mode = "auto"
+filterwarnings = []
+markers = ["pytest.mark.asyncio"]
+minversion = "6.0"
 testpaths = [
-    "app/tests",
+  "app/tests",
 ]
 
 [tool.isort]

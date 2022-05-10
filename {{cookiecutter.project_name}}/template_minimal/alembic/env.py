@@ -3,10 +3,10 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import AsyncEngine
-from asyncio import get_event_loop
-
+import asyncio
 from app.core import config as app_config
 from alembic import context
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -53,6 +53,7 @@ def run_migrations_offline():
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
@@ -93,4 +94,4 @@ async def run_migrations_online():
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    get_event_loop().run_until_complete(run_migrations_online())
+    asyncio.run(run_migrations_online())

@@ -1,43 +1,64 @@
-import pytest
 from httpx import AsyncClient
 
+from app.main import app
 from app.models import User
-
-# All test coroutines in file will be treated as marked (async allowed).
-pytestmark = pytest.mark.asyncio
+from app.tests.conftest import default_user_email, default_user_password
 
 
-async def test_login_endpoints(client: AsyncClient, default_user: User):
-
-    # access-token endpoint
-    access_token = await client.post(
-        "/auth/access-token",
+async def test_auth_access_token(client: AsyncClient, default_user: User):
+    response = await client.post(
+        app.url_path_for("login_access_token"),
         data={
-            "username": "geralt@wiedzmin.pl",
-            "password": "geralt",
+            "username": default_user_email,
+            "password": default_user_password,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-    assert access_token.status_code == 200
-    token = access_token.json()
+    assert response.status_code == 200
+    token = response.json()
+    assert token["token_type"] == "Bearer"
+    assert "access_token" in token
+    assert "expires_at" in token
+    assert "issued_at" in token
+    assert "refresh_token" in token
+    assert "refresh_token_expires_at" in token
+    assert "refresh_token_issued_at" in token
 
-    access_token = token["access_token"]
-    refresh_token = token["refresh_token"]
 
-    # test-token endpoint
-    test_token = await client.post(
-        "/auth/test-token", headers={"Authorization": f"Bearer {access_token}"}
+async def test_auth_access_token_fail_no_user(client: AsyncClient):
+    response = await client.post(
+        app.url_path_for("login_access_token"),
+        data={
+            "username": "xxx",
+            "password": "yyy",
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-    assert test_token.status_code == 200
-    response_user = test_token.json()
-    assert response_user["email"] == default_user.email
 
-    # refresh-token endpoint
-    get_new_token = await client.post(
-        "/auth/refresh-token", json={"refresh_token": refresh_token}
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Incorrect email or password"}
+
+
+async def test_auth_refresh_token(client: AsyncClient, default_user: User):
+    response = await client.post(
+        app.url_path_for("login_access_token"),
+        data={
+            "username": default_user_email,
+            "password": default_user_password,
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    refresh_token = response.json()["refresh_token"]
 
-    assert get_new_token.status_code == 200
-    new_token = get_new_token.json()
-
-    assert "access_token" in new_token
+    new_token_response = await client.post(
+        app.url_path_for("refresh_token"), json={"refresh_token": refresh_token}
+    )
+    assert new_token_response.status_code == 200
+    token = new_token_response.json()
+    assert token["token_type"] == "Bearer"
+    assert "access_token" in token
+    assert "expires_at" in token
+    assert "issued_at" in token
+    assert "refresh_token" in token
+    assert "refresh_token_expires_at" in token
+    assert "refresh_token_issued_at" in token

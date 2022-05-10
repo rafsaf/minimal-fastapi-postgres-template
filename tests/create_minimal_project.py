@@ -15,7 +15,7 @@ def main():
         no_input=True,
         extra_context={
             "project_name": "minimal_project",
-            "use_fastapi_users": False,
+            "experimental_fastapi_users_template": False,
         },
     )
 
