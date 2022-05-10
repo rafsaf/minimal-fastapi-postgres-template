@@ -36,9 +36,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ENVIRONMENT: Literal["DEV", "PYTEST", "STG", "PRD"] = "DEV"
     SECURITY_BCRYPT_ROUNDS: int = 12
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
-    REFRESH_TOKEN_EXPIRE_MINUTES: int
-    BACKEND_CORS_ORIGINS: list[AnyHttpUrl]
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 40320  # 28 days
+    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
     ALLOWED_HOSTS: list[str] = ["localhost"]
 
     # PROJECT NAME, VERSION AND DESCRIPTION
@@ -55,11 +55,11 @@ class Settings(BaseSettings):
     DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
 
     # POSTGRESQL TEST DATABASE
-    TEST_DATABASE_HOSTNAME: str
-    TEST_DATABASE_USER: str
-    TEST_DATABASE_PASSWORD: str
-    TEST_DATABASE_PORT: str
-    TEST_DATABASE_DB: str
+    TEST_DATABASE_HOSTNAME: str = "postgres"
+    TEST_DATABASE_USER: str = "postgres"
+    TEST_DATABASE_PASSWORD: str = "postgres"
+    TEST_DATABASE_PORT: str = "5432"
+    TEST_DATABASE_DB: str = "postgres"
     TEST_SQLALCHEMY_DATABASE_URI: str = ""
 
     # FIRST SUPERUSER
