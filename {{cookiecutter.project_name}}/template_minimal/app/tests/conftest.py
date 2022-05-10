@@ -60,7 +60,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
         yield client
 
 
-@pytest_asyncio.fixture()
+@pytest_asyncio.fixture
 async def default_user(test_db_setup_sessionmaker) -> User:
     async with async_session() as session:
         result = await session.execute(
@@ -80,6 +80,6 @@ async def default_user(test_db_setup_sessionmaker) -> User:
         return user
 
 
-@pytest_asyncio.fixture()
-async def default_user_headers(default_user: User):
+@pytest.fixture
+def default_user_headers(default_user: User):
     return {"Authorization": f"Bearer {default_user_access_token}"}

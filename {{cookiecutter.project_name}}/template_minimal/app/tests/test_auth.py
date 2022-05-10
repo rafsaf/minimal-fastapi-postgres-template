@@ -7,7 +7,7 @@ from app.tests.conftest import default_user_email, default_user_password
 
 async def test_auth_access_token(client: AsyncClient, default_user: User):
     response = await client.post(
-        app.url_path_for("access_token"),
+        app.url_path_for("login_access_token"),
         data={
             "username": default_user_email,
             "password": default_user_password,
@@ -27,7 +27,7 @@ async def test_auth_access_token(client: AsyncClient, default_user: User):
 
 async def test_auth_access_token_fail_no_user(client: AsyncClient):
     response = await client.post(
-        app.url_path_for("access_token"),
+        app.url_path_for("login_access_token"),
         data={
             "username": "xxx",
             "password": "yyy",
@@ -41,7 +41,7 @@ async def test_auth_access_token_fail_no_user(client: AsyncClient):
 
 async def test_auth_refresh_token(client: AsyncClient, default_user: User):
     response = await client.post(
-        app.url_path_for("access_token"),
+        app.url_path_for("login_access_token"),
         data={
             "username": default_user_email,
             "password": default_user_password,

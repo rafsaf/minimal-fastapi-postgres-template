@@ -16,7 +16,7 @@ from app.schemas.responses import AccessTokenResponse
 router = APIRouter()
 
 
-@router.post("/access-token", response_model=AccessTokenResponse, name="access_token")
+@router.post("/access-token", response_model=AccessTokenResponse)
 async def login_access_token(
     session: AsyncSession = Depends(deps.get_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -35,7 +35,7 @@ async def login_access_token(
     return security.generate_access_token_response(str(user.id))
 
 
-@router.post("/refresh-token", response_model=AccessTokenResponse, name="refresh_token")
+@router.post("/refresh-token", response_model=AccessTokenResponse)
 async def refresh_token(
     input: RefreshTokenRequest,
     session: AsyncSession = Depends(deps.get_session),

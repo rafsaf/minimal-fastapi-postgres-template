@@ -11,7 +11,7 @@ from app.schemas.responses import UserResponse
 router = APIRouter()
 
 
-@router.get("/me", response_model=UserResponse, name="read_current_user")
+@router.get("/me", response_model=UserResponse)
 async def read_current_user(
     current_user: User = Depends(deps.get_current_user),
 ):
@@ -19,7 +19,7 @@ async def read_current_user(
     return current_user
 
 
-@router.delete("/me", status_code=204, name="delete_current_user")
+@router.delete("/me", status_code=204)
 async def delete_current_user(
     current_user: User = Depends(deps.get_current_user),
     session: AsyncSession = Depends(deps.get_session),
@@ -29,9 +29,7 @@ async def delete_current_user(
     await session.commit()
 
 
-@router.post(
-    "/reset-password", response_model=UserResponse, name="reset_current_user_password"
-)
+@router.post("/reset-password", response_model=UserResponse)
 async def reset_current_user_password(
     user_update_password: UserUpdatePasswordRequest,
     session: AsyncSession = Depends(deps.get_session),
@@ -44,7 +42,7 @@ async def reset_current_user_password(
     return current_user
 
 
-@router.post("/register", response_model=UserResponse, name="register_new_user")
+@router.post("/register", response_model=UserResponse)
 async def register_new_user(
     new_user: UserCreateRequest,
     session: AsyncSession = Depends(deps.get_session),
