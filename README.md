@@ -1,10 +1,14 @@
+<a href="https://minimal-fastapi-postgres-template.rafsaf.pl/" target="_blank">
+    <img src="https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet" alt="Live example">
+</a>
 <a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE" target="_blank">
     <img src="https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template" alt="License">
 </a>
-<img src="https://img.shields.io/badge/python-3.10-blue" alt="Python">
-<img src="https://img.shields.io/badge/code%20style-black-lightgrey" alt="Black">
-<a href="https://minimal-fastapi-postgres-template.rafsaf.pl/" target="_blank">
-    <img src="https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet" alt="Live example">
+<a href="https://docs.python.org/3/whatsnew/3.10.html" target="_blank">
+    <img src="https://img.shields.io/badge/python-3.10-blue" alt="Python">
+</a>
+<a href="https://github.com/psf/black" target="_blank">
+    <img src="https://img.shields.io/badge/code%20style-black-lightgrey" alt="Black">
 </a>
 <a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml" target="_blank">
     <img src="https://github.com/rafsaf/minimal-fastapi-postgres-template/workflows/tests/badge.svg" alt="Tests">
@@ -34,6 +38,8 @@
 - [x] [Poetry](https://python-poetry.org/docs/) and Python 3.10 based
 - [x] `pre-push.sh` script with poetry export, autoflake, black, isort and flake8
 - [x] Rich setup for pytest async tests with few included and extensible `conftest.py`
+
+<br>
 
 _Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template with added domain and https only._
 
@@ -65,7 +71,7 @@ uvicorn app.main:app --reload
 # Optionally - use git init to initialize git repository
 ```
 
-### Running tests
+#### Running tests
 
 ```bash
 # Note, it will use second database declared in docker-compose.yml, not default one
@@ -84,11 +90,13 @@ pytest
 # ======================================================== 7 passed in 1.75s ========================================================
 ```
 
+<br>
+
 ## About
 
 This project is heavily based on the official template https://github.com/tiangolo/full-stack-fastapi-postgresql (and on my previous work: [link1](https://github.com/rafsaf/fastapi-plan), [link2](https://github.com/rafsaf/docker-fastapi-projects)), but as it now not too much up-to-date, it is much easier to create new one than change official. I didn't like some of conventions over there also (`crud` and `db` folders for example or `schemas` with bunch of files).
 
-`2.0` style SQLAlchemy API is good enough so there is no need to write everything in `crud` and waste our time... The `core` folder was also rewritten. There is great base for writting tests in `tests`, but I didn't want to write hundreds of them, I noticed that usually after changes in the structure of the project, auto tests are useless and you have to write them from scratch anyway (delete old ones...), hence less than more. Similarly with the `User` model, it is very modest, with just id, email and password, because it will be adapted to the project anyway.
+`2.0` style SQLAlchemy API is good enough so there is no need to write everything in `crud` and waste our time... The `core` folder was also rewritten. There is great base for writting tests in `tests`, but I didn't want to write hundreds of them, I noticed that usually after changes in the structure of the project, auto tests are useless and you have to write them from scratch anyway (delete old ones...), hence less than more. Similarly with the `User` model, it is very modest, with just `id` (uuid), `email` and `password_hash`, because it will be adapted to the project anyway.
 
 <br>
 
@@ -153,7 +161,7 @@ class Pet:
 
 ```
 
-Note, we are using super powerful SQLAlchemy feature here - you can read more about this fairy new syntax based on dataclasses [in this topic in docs](https://docs.sqlalchemy.org/en/14/orm/declarative_styles.html#example-two-dataclasses-with-declarative-table).
+Note, we are using super powerful SQLAlchemy feature here - you can read more about this fairy new syntax based on dataclasses [in this topic in the docs](https://docs.sqlalchemy.org/en/14/orm/declarative_styles.html#example-two-dataclasses-with-declarative-table).
 
 <br>
 
@@ -185,9 +193,9 @@ PS. Note, alembic is configured in a way that it work with async setup and also 
 
 ### 3. Create request and response schemas
 
-Note, I personally lately (after seeing clear benefits at work) don't prefer less file than more for things like schemas.
+Note, I personally lately (after seeing clear benefits at work) prefer less files than a lot of them for things like schemas.
 
-Thats why there are only 2 files: `requests.py` and `responses.py` in `schemas` and I would keep it that way even for few dozen of endpoints.
+Thats why there are only 2 files: `requests.py` and `responses.py` in `schemas` folder and I would keep it that way even for few dozen of endpoints.
 
 ```python
 # app/schemas/requests.py
@@ -252,7 +260,7 @@ async def get_all_my_pets(
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
 ):
-    """Creates new pet. Only for logged users."""
+    """Get list of pets for currently logged user."""
 
     pets = await session.execute(
         select(Pet)
@@ -284,8 +292,6 @@ api_router.include_router(pets.router, prefix="/pets", tags=["pets"])
 <br>
 
 ### 5. Write tests
-
-No
 
 ```python
 # /app/tests/test_pets.py
