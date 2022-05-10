@@ -41,7 +41,7 @@ async def get_current_user(
             detail="Could not validate credentials, cannot use refresh token",
         )
     now = int(time.time())
-    if not now >= token_data.issued_at and now <= token_data.expires_at:
+    if now < token_data.issued_at or now > token_data.expires_at:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials, token expired or not yet valid",
