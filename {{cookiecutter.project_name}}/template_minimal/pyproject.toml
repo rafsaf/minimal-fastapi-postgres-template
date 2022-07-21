@@ -28,6 +28,7 @@ pytest = "^7.1.2"
 pytest-asyncio = "^0.18.3"
 sqlalchemy2-stubs = "^0.0.2-alpha.22"
 uvicorn = "^0.17.6"
+poetryup = "^0.9.0"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
