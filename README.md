@@ -32,6 +32,7 @@
     - [4. Create endpoints](#4-create-endpoints)
     - [5. Write tests](#5-write-tests)
   - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
+  - [Docs URL, CORS and Allowed Hosts](#docs-url-cors-and-allowed-hosts)
 
 ## Features
 
@@ -92,8 +93,11 @@ bash init.sh
 ### And this is it:
 uvicorn app.main:app --reload
 
-# Then probably - use git init to initialize git repository
+# You can access docs on  by default
+# 
 ```
+You should then use `git init` to initialize git repository and access OpenAPI spec at http://localhost:8000/ by default. To customize docs url, cors and allowed hosts settings, read section about it.
+
 
 ### Running tests
 
@@ -379,3 +383,43 @@ This template has by default included `Dockerfile` with [Nginx Unit](https://uni
 `nginx-unit-config.json` file included in main folder has some default configuration options, runs app in single process and thread. More info about config file here https://unit.nginx.org/configuration/#python and about also read howto for FastAPI: https://unit.nginx.org/howto/fastapi/.
 
 If you prefer other webservers for FastAPI, check out [Daphne](https://github.com/django/daphne), [Hypercorn](https://pgjones.gitlab.io/hypercorn/index.html) or [Uvicorn](https://www.uvicorn.org/).
+
+## Docs URL, CORS and Allowed Hosts
+
+There are some **opinionated** default settings in `/app/main.py` for documentation, CORS and allowed hosts.
+
+1. Docs
+
+    ```python
+    app = FastAPI(
+        title=config.settings.PROJECT_NAME,
+        version=config.settings.VERSION,
+        description=config.settings.DESCRIPTION,
+        openapi_url="/openapi.json",
+        docs_url="/",
+    )
+    ```
+    Docs page is simpy `/` (by default in FastAPI it is `/docs`). Title, version and description are taken directly from `config` and then directly from `pyproject.toml` file. You can change it completely for the project, remove or use environment variables `PROJECT_NAME`, `VERSION`, `DESCRIPTION`.
+
+2. CORS 
+
+    ```python
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    ```
+
+    If you are not sure what are CORS for, follow https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS. React and most frontend frameworks nowadays operate on `localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in .env file, before going production be sure to include and frontend domain here, like `my-fontend-app.example.com`
+
+3. Allowed Hosts
+
+    ```python
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
+    ```
+
+    Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
+
