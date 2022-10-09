@@ -16,16 +16,22 @@
 
 # Minimal async FastAPI + PostgreSQL template
 
-- [Feauters](#features)
-- [Quickstart](#quickstart)
-- [About](#about)
-- [Step by step example - POST and GET endpoints](#step-by-step-example---post-and-get-endpoints)
-  - [1. Create SQLAlchemy model](#1-create-sqlalchemy-model)
-  - [2. Create and apply alembic migration](#2-create-and-apply-alembic-migration)
-  - [3. Create request and response schemas](#3-create-request-and-response-schemas)
-  - [4. Create endpoint](#4-create-endpoints)
-  - [5. Write tests](#5-write-tests)
-- [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
+- [Minimal async FastAPI + PostgreSQL template](#minimal-async-fastapi--postgresql-template)
+  - [Features](#features)
+  - [Quickstart](#quickstart)
+    - [1. Install cookiecutter globally and cookiecutter this project](#1-install-cookiecutter-globally-and-cookiecutter-this-project)
+    - [2. Install dependecies with poetry or without it](#2-install-dependecies-with-poetry-or-without-it)
+    - [3. Setup databases](#3-setup-databases)
+    - [4. Now you can run app](#4-now-you-can-run-app)
+    - [Running tests](#running-tests)
+  - [About](#about)
+  - [Step by step example - POST and GET endpoints](#step-by-step-example---post-and-get-endpoints)
+    - [1. Create SQLAlchemy model](#1-create-sqlalchemy-model)
+    - [2. Create and apply alembic migration](#2-create-and-apply-alembic-migration)
+    - [3. Create request and response schemas](#3-create-request-and-response-schemas)
+    - [4. Create endpoints](#4-create-endpoints)
+    - [5. Write tests](#5-write-tests)
+  - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
 
 ## Features
 
@@ -47,8 +53,9 @@ _Check out also online example: https://minimal-fastapi-postgres-template.rafsaf
 
 ## Quickstart
 
+
+### 1. Install cookiecutter globally and cookiecutter this project
 ```bash
-# Install cookiecutter globally
 pip install cookiecutter
 
 # And cookiecutter this project :)
@@ -57,21 +64,38 @@ cookiecutter https://github.com/rafsaf/minimal-fastapi-postgres-template
 # if you want experimental fastapi-users template
 # check "experimental_fastapi_users_template"
 # to True in cookiecutter option
-
-cd project_name
-# Poetry install (and activate environment!)
-poetry install
-# Setup two databases
-docker-compose up -d
-# Alembic migrations upgrade and initial_data.py script
-bash init.sh
-# And this is it:
-uvicorn app.main:app --reload
-
-# Optionally - use git init to initialize git repository
 ```
 
-#### Running tests
+### 2. Install dependecies with poetry or without it
+```bash
+cd project_name
+### Poetry install (python3.10)
+poetry install
+
+### Optionally there are also requirements
+python3.10 -m venv venv
+source venv/bin/activate
+pip install -r requirements-dev.txt
+```
+Note, be sure to use `python3.10` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove python3.10+ specific syntax for example `str | int`)
+
+### 3. Setup databases
+```bash
+### Setup two databases
+docker-compose up -d
+
+### Alembic migrations upgrade and initial_data.py script
+bash init.sh
+```
+### 4. Now you can run app
+```bash
+### And this is it:
+uvicorn app.main:app --reload
+
+# Then probably - use git init to initialize git repository
+```
+
+### Running tests
 
 ```bash
 # Note, it will use second database declared in docker-compose.yml, not default one
