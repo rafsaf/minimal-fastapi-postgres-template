@@ -93,8 +93,6 @@ bash init.sh
 ### And this is it:
 uvicorn app.main:app --reload
 
-# You can access docs on  by default
-# 
 ```
 You should then use `git init` to initialize git repository and access OpenAPI spec at http://localhost:8000/ by default. To customize docs url, cors and allowed hosts settings, read section about it.
 
