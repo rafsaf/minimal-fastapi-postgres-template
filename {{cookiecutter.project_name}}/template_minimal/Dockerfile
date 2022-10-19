@@ -1,6 +1,6 @@
 # See https://unit.nginx.org/installation/#docker-images
 
-FROM nginx/unit:1.26.1-python3.10
+FROM nginx/unit:1.28.0-python3.10
 
 ENV PYTHONUNBUFFERED 1
 
