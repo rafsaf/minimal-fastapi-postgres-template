@@ -28,6 +28,7 @@ services:
       - .env
     environment:
       - DEFAULT_DATABASE_HOSTNAME=postgres
+      - DEFAULT_DATABASE_PORT=5432
     ports:
       - 80:80
 
