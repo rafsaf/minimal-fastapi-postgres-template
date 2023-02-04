@@ -22,12 +22,11 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 async def get_current_user(
     session: AsyncSession = Depends(get_session), token: str = Depends(reusable_oauth2)
 ) -> User:
-
     try:
         payload = jwt.decode(
             token, config.settings.SECRET_KEY, algorithms=[security.JWT_ALGORITHM]
         )
-    except (jwt.DecodeError):
+    except jwt.DecodeError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials.",
@@ -48,7 +47,7 @@ async def get_current_user(
         )
 
     result = await session.execute(select(User).where(User.id == token_data.sub))
-    user: User | None = result.scalars().first()
+    user = result.scalars().first()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")

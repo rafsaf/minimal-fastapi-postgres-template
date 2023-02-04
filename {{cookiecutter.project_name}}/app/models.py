@@ -14,12 +14,10 @@ alembic revision --autogenerate -m "migration_name"
 alembic upgrade head
 """
 import uuid
-from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -29,7 +27,10 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "user_model"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email: Mapped[str] = mapped_column(String(254), nullable=False, unique=True, index=True)
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    email: Mapped[str] = mapped_column(
+        String(254), nullable=False, unique=True, index=True
+    )
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
-

@@ -44,7 +44,7 @@ async def test_reset_current_user_password(
     )
     assert response.status_code == 200
     result = await session.execute(select(User).where(User.id == default_user_id))
-    user: User | None = result.scalars().first()
+    user = result.scalars().first()
     assert user is not None
     assert user.hashed_password != default_user_password_hash
 
@@ -62,5 +62,5 @@ async def test_register_new_user(
     )
     assert response.status_code == 200
     result = await session.execute(select(User).where(User.email == "qwe@example.com"))
-    user: User | None = result.scalars().first()
+    user = result.scalars().first()
     assert user is not None

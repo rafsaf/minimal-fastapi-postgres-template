@@ -20,7 +20,7 @@ async def main() -> None:
         result = await session.execute(
             select(User).where(User.email == config.settings.FIRST_SUPERUSER_EMAIL)
         )
-        user: User | None = result.scalars().first()
+        user = result.scalars().first()
 
         if user is None:
             new_superuser = User(

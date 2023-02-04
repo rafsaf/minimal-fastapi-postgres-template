@@ -21,10 +21,10 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 Note, complex types like lists are read as json-encoded strings.
 """
 
+import tomllib
 from pathlib import Path
 from typing import Literal
 
-import tomllib
 from pydantic import AnyHttpUrl, BaseSettings, EmailStr, PostgresDsn, validator
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
