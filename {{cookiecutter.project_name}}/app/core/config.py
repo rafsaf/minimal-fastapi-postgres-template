@@ -24,11 +24,12 @@ Note, complex types like lists are read as json-encoded strings.
 from pathlib import Path
 from typing import Literal
 
-import toml
+import tomllib
 from pydantic import AnyHttpUrl, BaseSettings, EmailStr, PostgresDsn, validator
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
-PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
+with open(f"{PROJECT_DIR}/pyproject.toml", "rb") as f:
+    PYPROJECT_CONTENT = tomllib.load(f)["tool"]["poetry"]
 
 
 class Settings(BaseSettings):

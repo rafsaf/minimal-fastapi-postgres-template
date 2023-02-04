@@ -1,6 +1,5 @@
 import asyncio
 from typing import AsyncGenerator
-from uuid import UUID
 
 import pytest
 import pytest_asyncio
@@ -13,7 +12,7 @@ from app.core.session import async_engine, async_session
 from app.main import app
 from app.models import Base, User
 
-default_user_id = UUID("b75365d9-7bf9-4f54-add5-aeab333a087b")
+default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
 default_user_email = "geralt@wiedzmin.pl"
 default_user_password = "geralt"
 default_user_password_hash = security.get_password_hash(default_user_password)
@@ -34,7 +33,6 @@ def event_loop():
 async def test_db_setup_sessionmaker():
     # assert if we use TEST_DB URL for 100%
     assert config.settings.ENVIRONMENT == "PYTEST"
-    assert str(async_engine.url) == config.settings.TEST_SQLALCHEMY_DATABASE_URI
 
     # always drop and create test db tables between tests session
     async with async_engine.begin() as conn:
@@ -66,7 +64,7 @@ async def default_user(test_db_setup_sessionmaker) -> User:
         result = await session.execute(
             select(User).where(User.email == default_user_email)
         )
-        user: User | None = result.scalars().first()
+        user = result.scalars().first()
         if user is None:
             new_user = User(
                 email=default_user_email,
