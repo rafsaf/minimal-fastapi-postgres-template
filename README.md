@@ -54,20 +54,18 @@ _Check out also online example: https://minimal-fastapi-postgres-template.rafsaf
 
 ## Quickstart
 
-
 ### 1. Install cookiecutter globally and cookiecutter this project
+
 ```bash
 pip install cookiecutter
 
 # And cookiecutter this project :)
 cookiecutter https://github.com/rafsaf/minimal-fastapi-postgres-template
 
-# if you want experimental fastapi-users template
-# check "experimental_fastapi_users_template"
-# to True in cookiecutter option
 ```
 
 ### 2. Install dependecies with poetry or without it
+
 ```bash
 cd project_name
 ### Poetry install (python3.10)
@@ -78,9 +76,11 @@ python3.10 -m venv venv
 source venv/bin/activate
 pip install -r requirements-dev.txt
 ```
+
 Note, be sure to use `python3.10` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove python3.10+ specific syntax for example `str | int`)
 
 ### 3. Setup databases
+
 ```bash
 ### Setup two databases
 docker-compose up -d
@@ -88,14 +88,16 @@ docker-compose up -d
 ### Alembic migrations upgrade and initial_data.py script
 bash init.sh
 ```
+
 ### 4. Now you can run app
+
 ```bash
 ### And this is it:
 uvicorn app.main:app --reload
 
 ```
-You should then use `git init` to initialize git repository and access OpenAPI spec at http://localhost:8000/ by default. To customize docs url, cors and allowed hosts settings, read section about it.
 
+You should then use `git init` to initialize git repository and access OpenAPI spec at http://localhost:8000/ by default. To customize docs url, cors and allowed hosts settings, read section about it.
 
 ### Running tests
 
@@ -388,36 +390,36 @@ There are some **opinionated** default settings in `/app/main.py` for documentat
 
 1. Docs
 
-    ```python
-    app = FastAPI(
-        title=config.settings.PROJECT_NAME,
-        version=config.settings.VERSION,
-        description=config.settings.DESCRIPTION,
-        openapi_url="/openapi.json",
-        docs_url="/",
-    )
-    ```
-    Docs page is simpy `/` (by default in FastAPI it is `/docs`). Title, version and description are taken directly from `config` and then directly from `pyproject.toml` file. You can change it completely for the project, remove or use environment variables `PROJECT_NAME`, `VERSION`, `DESCRIPTION`.
+   ```python
+   app = FastAPI(
+       title=config.settings.PROJECT_NAME,
+       version=config.settings.VERSION,
+       description=config.settings.DESCRIPTION,
+       openapi_url="/openapi.json",
+       docs_url="/",
+   )
+   ```
 
-2. CORS 
+   Docs page is simpy `/` (by default in FastAPI it is `/docs`). Title, version and description are taken directly from `config` and then directly from `pyproject.toml` file. You can change it completely for the project, remove or use environment variables `PROJECT_NAME`, `VERSION`, `DESCRIPTION`.
 
-    ```python
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    ```
+2. CORS
 
-    If you are not sure what are CORS for, follow https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS. React and most frontend frameworks nowadays operate on `localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in .env file, before going production be sure to include and frontend domain here, like `my-fontend-app.example.com`
+   ```python
+   app.add_middleware(
+       CORSMiddleware,
+       allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
+       allow_credentials=True,
+       allow_methods=["*"],
+       allow_headers=["*"],
+   )
+   ```
+
+   If you are not sure what are CORS for, follow https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS. React and most frontend frameworks nowadays operate on `localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in .env file, before going production be sure to include and frontend domain here, like `my-fontend-app.example.com`
 
 3. Allowed Hosts
 
-    ```python
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
-    ```
+   ```python
+   app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
+   ```
 
-    Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
-
+   Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
