@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     image: postgres:latest
     volumes:
-      - ./default_database_data/db:/var/lib/postgresql/data
+      - default_database_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DEFAULT_DATABASE_DB}
       - POSTGRES_USER=${DEFAULT_DATABASE_USER}
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     image: postgres:latest
     volumes:
-      - ./test_database_data/db:/var/lib/postgresql/data
+      - test_database_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${TEST_DATABASE_DB}
       - POSTGRES_USER=${TEST_DATABASE_USER}
@@ -34,3 +34,7 @@ services:
       - .env
     ports:
       - "${TEST_DATABASE_PORT}:5432"
+
+volumes:
+  test_database_data:
+  default_database_data:

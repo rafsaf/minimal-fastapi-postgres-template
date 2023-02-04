@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       # Below will create fresh template in path: minimal_project
       - name: Generate project from template using cookiecutter

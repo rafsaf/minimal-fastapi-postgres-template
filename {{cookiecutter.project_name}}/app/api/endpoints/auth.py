@@ -24,7 +24,7 @@ async def login_access_token(
     """OAuth2 compatible token, get an access token for future requests using username and password"""
 
     result = await session.execute(select(User).where(User.email == form_data.username))
-    user: User | None = result.scalars().first()
+    user = result.scalars().first()
 
     if user is None:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
@@ -69,7 +69,7 @@ async def refresh_token(
         )
 
     result = await session.execute(select(User).where(User.id == token_data.sub))
-    user: User | None = result.scalars().first()
+    user = result.scalars().first()
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")

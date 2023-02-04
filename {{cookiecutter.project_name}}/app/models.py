@@ -13,29 +13,24 @@ alembic revision --autogenerate -m "migration_name"
 # apply all migrations
 alembic upgrade head
 """
-
 import uuid
-from dataclasses import dataclass, field
 
-from sqlalchemy import Column, String
+from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import registry
-
-Base = registry()
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-@Base.mapped
-@dataclass
-class User:
+class Base(DeclarativeBase):
+    pass
+
+
+class User(Base):
     __tablename__ = "user_model"
-    __sa_dataclass_metadata_key__ = "sa"
 
-    id: uuid.UUID = field(
-        init=False,
-        default_factory=uuid.uuid4,
-        metadata={"sa": Column(UUID(as_uuid=True), primary_key=True)},
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    email: str = field(
-        metadata={"sa": Column(String(254), nullable=False, unique=True, index=True)}
+    email: Mapped[str] = mapped_column(
+        String(254), nullable=False, unique=True, index=True
     )
-    hashed_password: str = field(metadata={"sa": Column(String(128), nullable=False)})
+    hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
