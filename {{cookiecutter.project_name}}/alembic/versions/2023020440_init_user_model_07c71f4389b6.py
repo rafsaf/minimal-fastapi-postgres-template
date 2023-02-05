@@ -1,13 +1,13 @@
 """init_user_model
 
 Revision ID: 07c71f4389b6
-Revises: 
+Revises:
 Create Date: 2023-02-04 23:40:00.426237
 
 """
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "07c71f4389b6"
