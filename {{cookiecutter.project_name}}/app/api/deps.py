@@ -1,5 +1,5 @@
 import time
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import jwt
 from fastapi import Depends, HTTPException, status
