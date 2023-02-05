@@ -1,31 +1,31 @@
-# See https://unit.nginx.org/installation/#docker-images
-
-FROM nginx/unit:1.28.0-python3.10
+FROM python:3.11.1-slim-bullseye
 
 ENV PYTHONUNBUFFERED 1
-
-RUN apt-get update && apt-get install -y python3-pip
-
-# Build folder for our app, only stuff that matters copied.
-RUN mkdir build
 WORKDIR /build
 
-# Update, install requirements and then cleanup.
-COPY ./requirements.txt .
+# Create venv, add it to path and install requirements
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
 
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-RUN apt-get remove -y python3-pip  \
-    && apt-get autoremove --purge -y  \
-    && rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/*.list
+# Install uvicorn server
+RUN pip install uvicorn[standard]
 
 # Copy the rest of app
-COPY app ./app
-COPY alembic ./alembic
+COPY app app
+COPY alembic alembic
 COPY alembic.ini .
 COPY pyproject.toml .
+COPY init.sh .
 
-# Nginx unit config and init.sh will be consumed at container startup.
-COPY init.sh /docker-entrypoint.d/init.sh
-COPY nginx-unit-config.json /docker-entrypoint.d/config.json
-RUN chmod a+x /docker-entrypoint.d/init.sh
+# Create new user to run app process as unprivilaged user
+RUN addgroup --gid 1001 --system uvicorn && \
+    adduser --gid 1001 --shell /bin/false --disabled-password --uid 1001 uvicorn
+
+# Run init.sh script then start uvicorn
+RUN chown -R uvicorn:uvicorn /build
+CMD bash init.sh && \
+    runuser -u uvicorn -- /venv/bin/uvicorn app.main:app --app-dir /build --host 0.0.0.0 --port 8000 --workers 2 --loop uvloop
+EXPOSE 8000
