@@ -1,0 +1,43 @@
+[tool.poetry]
+authors = ["admin <admin@example.com>"]
+description = "FastAPI project generated using minimal-fastapi-postgres-template."
+name = "{{cookiecutter.project_name}}"
+version = "0.1.0-alpha"
+
+[tool.poetry.dependencies]
+fastapi = "^0.89.1"
+pyjwt = {extras = ["crypto"], version = "^2.6.0"}
+python = "^3.11"
+python-multipart = ">=0.0.5,<0.0.6"
+sqlalchemy = "^2.0.1"
+alembic = "^1.9.2"
+asyncpg = "^0.27.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pydantic = {extras = ["dotenv", "email"], version = "^1.10.4"}
+
+[tool.poetry.group.dev.dependencies]
+autoflake = "^2.0.1"
+black = "^23.1.0"
+coverage = "^7.1.0"
+flake8 = "^6.0.0"
+httpx = "^0.23.3"
+isort = "^5.12.0"
+pytest = "^7.2.1"
+pytest-asyncio = "^0.20.3"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+pre-commit = "^3.0.4"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool.pytest.ini_options]
+addopts = "-v"
+asyncio_mode = "auto"
+filterwarnings = []
+markers = ["pytest.mark.asyncio"]
+minversion = "6.0"
+testpaths = ["app/tests"]
+
+[tool.isort]
+profile = "black"

@@ -1,4 +1,3 @@
 {
-  "project_name": "my_project_name",
-  "experimental_fastapi_users_template": false
+  "project_name": "my_project_name"
 }
