@@ -42,7 +42,7 @@
 - [x] [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations
 - [x] Very minimal project structure yet ready for quick start building new apps
 - [x] Refresh token endpoint (not only access like in official template)
-- [x] Two databases in docker-compose.yml (second one for tests) and ready to go Dockerfile with [Nginx Unit](https://unit.nginx.org/) webserver
+- [x] Two databases in docker-compose.yml (second one for tests) and ready to go Dockerfile with [Uvicorn](https://www.uvicorn.org/) webserver
 - [x] [Poetry](https://python-poetry.org/docs/) and Python 3.11 based
 - [x] `pre-commit` with poetry export, autoflake, black, isort and flake8
 - [x] Rich setup for pytest async tests with few included and extensible `conftest.py`
@@ -412,7 +412,7 @@ There are some **opinionated** default settings in `/app/main.py` for documentat
    )
    ```
 
-   If you are not sure what are CORS for, follow https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS. React and most frontend frameworks nowadays operate on `localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in .env file, before going production be sure to include and frontend domain here, like `my-fontend-app.example.com`
+   If you are not sure what are CORS for, follow https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS. React and most frontend frameworks nowadays operate on `http://localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in .env file, before going production be sure to include your frontend domain here, like `https://my-fontend-app.example.com`.
 
 3. Allowed Hosts
 
