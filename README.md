@@ -4,8 +4,8 @@
 <a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE" target="_blank">
     <img src="https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template" alt="License">
 </a>
-<a href="https://docs.python.org/3/whatsnew/3.10.html" target="_blank">
-    <img src="https://img.shields.io/badge/python-3.10-blue" alt="Python">
+<a href="https://docs.python.org/3/whatsnew/3.11.html" target="_blank">
+    <img src="https://img.shields.io/badge/python-3.11-blue" alt="Python">
 </a>
 <a href="https://github.com/psf/black" target="_blank">
     <img src="https://img.shields.io/badge/code%20style-black-lightgrey" alt="Black">
@@ -23,7 +23,8 @@
     - [2. Install dependecies with poetry or without it](#2-install-dependecies-with-poetry-or-without-it)
     - [3. Setup databases](#3-setup-databases)
     - [4. Now you can run app](#4-now-you-can-run-app)
-    - [Running tests](#running-tests)
+    - [5. Activate pre-commit](#5-activate-pre-commit)
+    - [6. Running tests](#6-running-tests)
   - [About](#about)
   - [Step by step example - POST and GET endpoints](#step-by-step-example---post-and-get-endpoints)
     - [1. Create SQLAlchemy model](#1-create-sqlalchemy-model)
@@ -36,19 +37,19 @@
 
 ## Features
 
-- [x] SQLAlchemy 1.4 using new 2.0 API, async queries, and dataclasses in SQLAlchemy models for best possible autocompletion support
+- [x] **SQLAlchemy 2.0 only**, async queries, best possible autocompletion support (SQLAlchemy 2.0.0 was released January 26, 2023)
 - [x] Postgresql database under `asyncpg`
 - [x] [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations
 - [x] Very minimal project structure yet ready for quick start building new apps
 - [x] Refresh token endpoint (not only access like in official template)
 - [x] Two databases in docker-compose.yml (second one for tests) and ready to go Dockerfile with [Nginx Unit](https://unit.nginx.org/) webserver
-- [x] [Poetry](https://python-poetry.org/docs/) and Python 3.10 based
-- [x] `pre-push.sh` script with poetry export, autoflake, black, isort and flake8
+- [x] [Poetry](https://python-poetry.org/docs/) and Python 3.11 based
+- [x] `pre-commit` with poetry export, autoflake, black, isort and flake8
 - [x] Rich setup for pytest async tests with few included and extensible `conftest.py`
 
 <br>
 
-_Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template with added domain and https only._
+_Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added domain and https only._
 
 ![template-fastapi-minimal-openapi-example](./docs/template-minimal-openapi-example.png)
 
@@ -68,16 +69,16 @@ cookiecutter https://github.com/rafsaf/minimal-fastapi-postgres-template
 
 ```bash
 cd project_name
-### Poetry install (python3.10)
+### Poetry install (python3.11)
 poetry install
 
-### Optionally there are also requirements
-python3.10 -m venv venv
+### Optionally there are also `requirements-dev.txt` file
+python3.11 -m venv venv
 source venv/bin/activate
 pip install -r requirements-dev.txt
 ```
 
-Note, be sure to use `python3.10` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove python3.10+ specific syntax for example `str | int`)
+Note, be sure to use `python3.11` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10 or `tomllib` for python < 3.11)
 
 ### 3. Setup databases
 
@@ -99,7 +100,21 @@ uvicorn app.main:app --reload
 
 You should then use `git init` to initialize git repository and access OpenAPI spec at http://localhost:8000/ by default. To customize docs url, cors and allowed hosts settings, read section about it.
 
-### Running tests
+### 5. Activate pre-commit
+
+[pre-commit](https://pre-commit.com/) is de facto standard now for pre push activities like isort or black.
+
+Refer to `.pre-commit-config.yaml` file to see my opinionated choices.
+
+```bash
+# Install pre-commit
+pre-commit install
+
+# First initialization and run on all files
+pre-commit run --all-files
+```
+
+### 6. Running tests
 
 ```bash
 # Note, it will use second database declared in docker-compose.yml, not default one
@@ -122,7 +137,7 @@ pytest
 
 ## About
 
-This project is heavily based on the official template https://github.com/tiangolo/full-stack-fastapi-postgresql (and on my previous work: [link1](https://github.com/rafsaf/fastapi-plan), [link2](https://github.com/rafsaf/docker-fastapi-projects)), but as it now not too much up-to-date, it is much easier to create new one than change official. I didn't like some of conventions over there also (`crud` and `db` folders for example or `schemas` with bunch of files).
+This project is heavily based on the official template https://github.com/tiangolo/full-stack-fastapi-postgresql (and on my previous work: [link1](https://github.com/rafsaf/fastapi-plan), [link2](https://github.com/rafsaf/docker-fastapi-projects)), but as it now not too much up-to-date, it is much easier to create new one than change official. I didn't like some of conventions over there also (`crud` and `db` folders for example or `schemas` with bunch of files). This template aims to be as much up-to-date as possible, using only newest python versions and libraries versions.
 
 `2.0` style SQLAlchemy API is good enough so there is no need to write everything in `crud` and waste our time... The `core` folder was also rewritten. There is great base for writting tests in `tests`, but I didn't want to write hundreds of them, I noticed that usually after changes in the structure of the project, auto tests are useless and you have to write them from scratch anyway (delete old ones...), hence less than more. Similarly with the `User` model, it is very modest, with just `id` (uuid), `email` and `password_hash`, because it will be adapted to the project anyway.
 
@@ -145,51 +160,42 @@ We will add Pet model to `app/models.py`. To keep things clear, below is full re
 # app/models.py
 
 import uuid
-from dataclasses import dataclass, field
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import registry, relationship
-
-Base = registry()
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-@Base.mapped
-@dataclass
-class User:
+class Base(DeclarativeBase):
+    pass
+
+
+class User(Base):
     __tablename__ = "user_model"
-    __sa_dataclass_metadata_key__ = "sa"
 
-    id: uuid.UUID = field(
-        init=False,
-        default_factory=uuid.uuid4,
-        metadata={"sa": Column(UUID(as_uuid=True), primary_key=True)},
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
     )
-    email: str = field(
-        metadata={"sa": Column(String(254), nullable=False, unique=True, index=True)}
+    email: Mapped[str] = mapped_column(
+        String(254), nullable=False, unique=True, index=True
     )
-    hashed_password: str = field(metadata={"sa": Column(String(128), nullable=False)})
+    hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
 
 
-@Base.mapped
-@dataclass
-class Pet:
-    __tablename__ = "pets"
-    __sa_dataclass_metadata_key__ = "sa"
+class Pet(Base):
+    __tablename__ = "pet"
 
-    id: int = field(init=False, metadata={"sa": Column(Integer, primary_key=True)})
-    user_id: uuid.UUID = field(
-        metadata={"sa": Column(ForeignKey("user_model.id", ondelete="CASCADE"))},
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("user_model.id", ondelete="CASCADE"),
     )
-    pet_name: str = field(
-        metadata={"sa": Column(String(50), nullable=False)},
-    )
+    pet_name: Mapped[str] = mapped_column(String(50), nullable=False)
 
 
 
 ```
 
-Note, we are using super powerful SQLAlchemy feature here - you can read more about this fairy new syntax based on dataclasses [in this topic in the docs](https://docs.sqlalchemy.org/en/14/orm/declarative_styles.html#example-two-dataclasses-with-declarative-table).
+Note, we are using super powerful SQLAlchemy feature here - Mapped and mapped_column were first introduced in SQLAlchemy 2.0 on Feb 26, if this syntax is new for you, read carefully "what's new" part of documentation https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html.
 
 <br>
 
@@ -221,9 +227,9 @@ PS. Note, alembic is configured in a way that it work with async setup and also 
 
 ### 3. Create request and response schemas
 
-Note, I personally lately (after seeing clear benefits at work) prefer less files than a lot of them for things like schemas.
+I personally lately (after seeing clear benefits at work in Samsung) prefer less files than a lot of them for things like schemas.
 
-Thats why there are only 2 files: `requests.py` and `responses.py` in `schemas` folder and I would keep it that way even for few dozen of endpoints.
+Thats why there are only 2 files: `requests.py` and `responses.py` in `schemas` folder and I would keep it that way even for few dozen of endpoints. Not to mention this is opinionated.
 
 ```python
 # app/schemas/requests.py
@@ -245,7 +251,7 @@ class PetCreateRequest(BaseRequest):
 class PetResponse(BaseResponse):
     id: int
     pet_name: str
-    user_id: uuid.UUID
+    user_id: str
 
 ```
 
@@ -290,13 +296,8 @@ async def get_all_my_pets(
 ):
     """Get list of pets for currently logged user."""
 
-    pets = await session.execute(
-        select(Pet)
-        .where(
-            Pet.user_id == current_user.id,
-        )
-        .order_by(Pet.pet_name)
-    )
+    stmt = select(Pet).where(Pet.user_id == current_user.id).order_by(Pet.pet_name)
+    pets = await session.execute(stmt)
     return pets.scalars().all()
 
 ```
@@ -341,16 +342,15 @@ async def test_create_new_pet(
     )
     assert response.status_code == 201
     result = response.json()
-    assert result["user_id"] == str(default_user.id)
+    assert result["user_id"] == default_user.id
     assert result["pet_name"] == "Tadeusz"
 
 
 async def test_get_all_my_pets(
     client: AsyncClient, default_user_headers, default_user: User, session: AsyncSession
 ):
-
-    pet1 = Pet(default_user.id, "Pet_1")
-    pet2 = Pet(default_user.id, "Pet_2")
+    pet1 = Pet(user_id=default_user.id, pet_name="Pet_1")
+    pet2 = Pet(user_id=default_user.id, pet_name="Pet_2")
     session.add(pet1)
     session.add(pet2)
     await session.commit()
@@ -363,12 +363,12 @@ async def test_get_all_my_pets(
 
     assert response.json() == [
         {
-            "user_id": str(pet1.user_id),
+            "user_id": pet1.user_id,
             "pet_name": pet1.pet_name,
             "id": pet1.id,
         },
         {
-            "user_id": str(pet2.user_id),
+            "user_id": pet2.user_id,
             "pet_name": pet2.pet_name,
             "id": pet2.id,
         },
@@ -378,11 +378,9 @@ async def test_get_all_my_pets(
 
 ## Deployment strategies - via Docker image
 
-This template has by default included `Dockerfile` with [Nginx Unit](https://unit.nginx.org/) webserver, that is my prefered choice, because of direct support for FastAPI and great ease of configuration. You should be able to run container(s) (over :80 port) and then need to setup the proxy, loadbalancer, with https enbaled, so the app stays behind it.
+This template has by default included `Dockerfile` with [Uvicorn](https://www.uvicorn.org/) webserver, because it's simple and just for showcase purposes, with direct relation to FastAPI and great ease of configuration. You should be able to run container(s) (over :8000 port) and then need to setup the proxy, loadbalancer, with https enbaled, so the app stays behind it.
 
-`nginx-unit-config.json` file included in main folder has some default configuration options, runs app in single process and thread. More info about config file here https://unit.nginx.org/configuration/#python and about also read howto for FastAPI: https://unit.nginx.org/howto/fastapi/.
-
-If you prefer other webservers for FastAPI, check out [Daphne](https://github.com/django/daphne), [Hypercorn](https://pgjones.gitlab.io/hypercorn/index.html) or [Uvicorn](https://www.uvicorn.org/).
+If you prefer other webservers for FastAPI, check out [Nginx Unit](https://unit.nginx.org/), [Daphne](https://github.com/django/daphne), [Hypercorn](https://pgjones.gitlab.io/hypercorn/index.html).
 
 ## Docs URL, CORS and Allowed Hosts
 

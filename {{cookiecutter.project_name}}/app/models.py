@@ -28,7 +28,7 @@ class User(Base):
     __tablename__ = "user_model"
 
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
     )
     email: Mapped[str] = mapped_column(
         String(254), nullable=False, unique=True, index=True
