@@ -72,7 +72,7 @@ cd project_name
 ### Poetry install (python3.11)
 poetry install
 
-### Optionally there are also `requirements-dev.txt` file
+### Optionally there is also `requirements-dev.txt` file
 python3.11 -m venv venv
 source venv/bin/activate
 pip install -r requirements-dev.txt
