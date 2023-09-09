@@ -25,7 +25,8 @@ import tomllib
 from pathlib import Path
 from typing import Literal
 
-from pydantic import AnyHttpUrl, BaseSettings, EmailStr, PostgresDsn, validator
+from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
 with open(f"{PROJECT_DIR}/pyproject.toml", "rb") as f:
@@ -51,7 +52,7 @@ class Settings(BaseSettings):
     DEFAULT_DATABASE_HOSTNAME: str
     DEFAULT_DATABASE_USER: str
     DEFAULT_DATABASE_PASSWORD: str
-    DEFAULT_DATABASE_PORT: str
+    DEFAULT_DATABASE_PORT: int
     DEFAULT_DATABASE_DB: str
     DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
 
@@ -59,7 +60,7 @@ class Settings(BaseSettings):
     TEST_DATABASE_HOSTNAME: str = "postgres"
     TEST_DATABASE_USER: str = "postgres"
     TEST_DATABASE_PASSWORD: str = "postgres"
-    TEST_DATABASE_PORT: str = "5432"
+    TEST_DATABASE_PORT: int = 5432
     TEST_DATABASE_DB: str = "postgres"
     TEST_SQLALCHEMY_DATABASE_URI: str = ""
 
@@ -67,31 +68,33 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_EMAIL: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
 
-    @validator("DEFAULT_SQLALCHEMY_DATABASE_URI")
-    def _assemble_default_db_connection(cls, v: str, values: dict[str, str]) -> str:
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            user=values["DEFAULT_DATABASE_USER"],
-            password=values["DEFAULT_DATABASE_PASSWORD"],
-            host=values["DEFAULT_DATABASE_HOSTNAME"],
-            port=values["DEFAULT_DATABASE_PORT"],
-            path=f"/{values['DEFAULT_DATABASE_DB']}",
+    @model_validator(mode="after")
+    def _assemble_default_db_connection(self):
+        self.DEFAULT_SQLALCHEMY_DATABASE_URI = str(
+            PostgresDsn.build(
+                scheme="postgresql+asyncpg",
+                username=self.DEFAULT_DATABASE_USER,
+                password=self.DEFAULT_DATABASE_PASSWORD,
+                host=self.DEFAULT_DATABASE_HOSTNAME,
+                port=self.DEFAULT_DATABASE_PORT,
+                path=self.DEFAULT_DATABASE_DB,
+            )
         )
 
-    @validator("TEST_SQLALCHEMY_DATABASE_URI")
-    def _assemble_test_db_connection(cls, v: str, values: dict[str, str]) -> str:
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            user=values["TEST_DATABASE_USER"],
-            password=values["TEST_DATABASE_PASSWORD"],
-            host=values["TEST_DATABASE_HOSTNAME"],
-            port=values["TEST_DATABASE_PORT"],
-            path=f"/{values['TEST_DATABASE_DB']}",
+        self.TEST_SQLALCHEMY_DATABASE_URI = str(
+            PostgresDsn.build(
+                scheme="postgresql+asyncpg",
+                username=self.TEST_DATABASE_USER,
+                password=self.TEST_DATABASE_PASSWORD,
+                host=self.TEST_DATABASE_HOSTNAME,
+                port=self.TEST_DATABASE_PORT,
+                path=self.TEST_DATABASE_DB,
+            )
         )
 
-    class Config:
-        env_file = f"{PROJECT_DIR}/.env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file=f"{PROJECT_DIR}/.env", case_sensitive=True
+    )
 
 
 settings: Settings = Settings()  # type: ignore
