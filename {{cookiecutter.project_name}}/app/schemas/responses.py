@@ -1,10 +1,8 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class BaseResponse(BaseModel):
-    # may define additional fields or config shared across responses
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AccessTokenResponse(BaseResponse):
