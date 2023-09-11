@@ -22,10 +22,11 @@ Note, complex types like lists are read as json-encoded strings.
 """
 
 import tomllib
+from functools import cached_property
 from pathlib import Path
 from typing import Literal
 
-from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, model_validator
+from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
@@ -54,7 +55,6 @@ class Settings(BaseSettings):
     DEFAULT_DATABASE_PASSWORD: str
     DEFAULT_DATABASE_PORT: int
     DEFAULT_DATABASE_DB: str
-    DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
 
     # POSTGRESQL TEST DATABASE
     TEST_DATABASE_HOSTNAME: str = "postgres"
@@ -62,15 +62,15 @@ class Settings(BaseSettings):
     TEST_DATABASE_PASSWORD: str = "postgres"
     TEST_DATABASE_PORT: int = 5432
     TEST_DATABASE_DB: str = "postgres"
-    TEST_SQLALCHEMY_DATABASE_URI: str = ""
 
     # FIRST SUPERUSER
     FIRST_SUPERUSER_EMAIL: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
 
-    @model_validator(mode="after")
-    def _assemble_default_db_connection(self):
-        self.DEFAULT_SQLALCHEMY_DATABASE_URI = str(
+    @computed_field
+    @cached_property
+    def DEFAULT_SQLALCHEMY_DATABASE_URI(self) -> str:
+        return str(
             PostgresDsn.build(
                 scheme="postgresql+asyncpg",
                 username=self.DEFAULT_DATABASE_USER,
@@ -81,7 +81,10 @@ class Settings(BaseSettings):
             )
         )
 
-        self.TEST_SQLALCHEMY_DATABASE_URI = str(
+    @computed_field
+    @cached_property
+    def TEST_SQLALCHEMY_DATABASE_URI(self) -> str:
+        return str(
             PostgresDsn.build(
                 scheme="postgresql+asyncpg",
                 username=self.TEST_DATABASE_USER,
