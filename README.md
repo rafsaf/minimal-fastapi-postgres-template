@@ -1,7 +1,7 @@
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Live example](https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet)](https://minimal-fastapi-postgres-template.rafsaf.pl/)
 [![License](https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template)](https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](https://docs.python.org/3/whatsnew/3.12.html)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Black](https://img.shields.io/badge/code%20style-black-lightgrey)](https://github.com/psf/black)
 [![Tests](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml/badge.svg)](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml)
 
