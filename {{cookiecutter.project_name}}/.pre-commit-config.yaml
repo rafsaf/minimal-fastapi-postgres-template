@@ -1,63 +1,28 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-yaml
-      - id: trailing-whitespace
-
-  - repo: https://github.com/myint/autoflake
-    rev: "v2.0.1"
-    hooks:
-      - id: autoflake
-        args:
-          [
-            "--recursive",
-            "--in-place",
-            "--remove-unused-variables",
-            "--remove-all-unused-imports",
-            "--ignore-init-module-imports",
-          ]
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args:
-          [
-            "--py3-plus",
-            "--py36-plus",
-            "--py37-plus",
-            "--py38-plus",
-            "--py39-plus",
-            "--py310-plus",
-            "--py311-plus",
-          ]
-        files: ".*"
 
   - repo: https://github.com/psf/black
-    rev: "23.1.0"
+    rev: "23.10.1"
     hooks:
       - id: black
 
-  - repo: https://github.com/pycqa/isort
-    rev: "5.12.0"
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.4
     hooks:
-      - id: isort
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: "6.0.0"
-    hooks:
-      - id: flake8
+      - id: ruff
+        args: [--fix]
 
   - repo: https://github.com/python-poetry/poetry
-    rev: "1.3.0"
+    rev: "1.7.0"
     hooks:
       - id: poetry-export
         args: ["-o", "requirements.txt", "--without-hashes"]
 
   - repo: https://github.com/python-poetry/poetry
-    rev: "1.3.0"
+    rev: "1.7.0"
     hooks:
       - id: poetry-export
-        args:
-          ["-o", "requirements-dev.txt", "--without-hashes", "--with", "dev"]
+        args: ["-o", "requirements-dev.txt", "--without-hashes", "--with=dev"]
