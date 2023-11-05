@@ -5,28 +5,28 @@ name = "{{cookiecutter.project_name}}"
 version = "0.1.0-alpha"
 
 [tool.poetry.dependencies]
-fastapi = "^0.103.1"
-pyjwt = {extras = ["crypto"], version = "^2.6.0"}
-python = "^3.11"
-python-multipart = ">=0.0.5,<0.0.6"
-sqlalchemy = "^2.0.1"
-alembic = "^1.9.2"
-asyncpg = "^0.27.0"
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-pydantic = {extras = ["dotenv", "email"], version = "^2.3"}
+python = "^3.12"
+
+alembic = "^1.12.1"
+asyncpg = "^0.29.0"
+fastapi = "^0.104.1"
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
+pydantic = { extras = ["dotenv", "email"], version = "^2.4.2" }
 pydantic-settings = "^2.0.3"
+pyjwt = { extras = ["crypto"], version = "^2.8.0" }
+python-multipart = "^0.0.6"
+sqlalchemy = "^2.0.23"
 
 [tool.poetry.group.dev.dependencies]
-autoflake = "^2.0.1"
-black = "^23.1.0"
-coverage = "^7.1.0"
-flake8 = "^6.0.0"
-httpx = "^0.23.3"
-isort = "^5.12.0"
-pytest = "^7.2.1"
-pytest-asyncio = "^0.20.3"
-uvicorn = {extras = ["standard"], version = "^0.20.0"}
-pre-commit = "^3.0.4"
+black = "^23.10.1"
+coverage = "^7.3.2"
+httpx = "^0.25.1"
+pre-commit = "^3.5.0"
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+ruff = "^0.1.4"
+uvicorn = { extras = ["standard"], version = "^0.24.0" }
+
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
@@ -37,11 +37,13 @@ addopts = "-v"
 asyncio_mode = "auto"
 filterwarnings = [
     # Passlib 1.7.4 depends on crypt - https://foss.heptapod.net/python-libs/passlib/-/issues/148
-    "ignore:'crypt' is deprecated and slated for removal"
+    "ignore:'crypt' is deprecated and slated for removal",
 ]
 markers = ["pytest.mark.asyncio"]
 minversion = "6.0"
 testpaths = ["app/tests"]
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+# pycodestyle, pyflakes, isort, pylint, pyupgrade
+select = ["E", "W", "F", "I", "PL", "UP"]
+ignore = ["E501"]

@@ -1,4 +1,4 @@
-from httpx import AsyncClient
+from httpx import AsyncClient, codes
 
 from app.main import app
 from app.models import User
@@ -14,7 +14,7 @@ async def test_auth_access_token(client: AsyncClient, default_user: User):
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-    assert response.status_code == 200
+    assert response.status_code == codes.OK
     token = response.json()
     assert token["token_type"] == "Bearer"
     assert "access_token" in token
@@ -35,7 +35,7 @@ async def test_auth_access_token_fail_no_user(client: AsyncClient):
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
 
-    assert response.status_code == 400
+    assert response.status_code == codes.BAD_REQUEST
     assert response.json() == {"detail": "Incorrect email or password"}
 
 
@@ -53,7 +53,7 @@ async def test_auth_refresh_token(client: AsyncClient, default_user: User):
     new_token_response = await client.post(
         app.url_path_for("refresh_token"), json={"refresh_token": refresh_token}
     )
-    assert new_token_response.status_code == 200
+    assert new_token_response.status_code == codes.OK
     token = new_token_response.json()
     assert token["token_type"] == "Bearer"
     assert "access_token" in token
