@@ -21,11 +21,11 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 Note, complex types like lists are read as json-encoded strings.
 """
 
-import tomllib
 from functools import cached_property
 from pathlib import Path
 from typing import Literal
 
+import tomllib
 from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

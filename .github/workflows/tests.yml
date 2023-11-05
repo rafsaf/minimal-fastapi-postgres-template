@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       # Below will create fresh template in path: minimal_project
       - name: Generate project from template using cookiecutter
@@ -61,5 +61,5 @@ jobs:
           TEST_DATABASE_DB: postgres
         run: |
           cd minimal_project
-          poetry run flake8 app --count --exit-zero --statistics
+          poetry run ruff app
           poetry run coverage run -m pytest

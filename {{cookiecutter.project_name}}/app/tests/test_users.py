@@ -1,4 +1,4 @@
-from httpx import AsyncClient
+from httpx import AsyncClient, codes
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,7 +15,7 @@ async def test_read_current_user(client: AsyncClient, default_user_headers):
     response = await client.get(
         app.url_path_for("read_current_user"), headers=default_user_headers
     )
-    assert response.status_code == 200
+    assert response.status_code == codes.OK
     assert response.json() == {
         "id": default_user_id,
         "email": default_user_email,
@@ -28,7 +28,7 @@ async def test_delete_current_user(
     response = await client.delete(
         app.url_path_for("delete_current_user"), headers=default_user_headers
     )
-    assert response.status_code == 204
+    assert response.status_code == codes.NO_CONTENT
     result = await session.execute(select(User).where(User.id == default_user_id))
     user = result.scalars().first()
     assert user is None
@@ -42,7 +42,7 @@ async def test_reset_current_user_password(
         headers=default_user_headers,
         json={"password": "testxxxxxx"},
     )
-    assert response.status_code == 200
+    assert response.status_code == codes.OK
     result = await session.execute(select(User).where(User.id == default_user_id))
     user = result.scalars().first()
     assert user is not None
@@ -60,7 +60,7 @@ async def test_register_new_user(
             "password": "asdasdasd",
         },
     )
-    assert response.status_code == 200
+    assert response.status_code == codes.OK
     result = await session.execute(select(User).where(User.email == "qwe@example.com"))
     user = result.scalars().first()
     assert user is not None
