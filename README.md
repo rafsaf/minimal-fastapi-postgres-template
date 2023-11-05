@@ -1,18 +1,9 @@
-<a href="https://minimal-fastapi-postgres-template.rafsaf.pl/" target="_blank">
-    <img src="https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet" alt="Live example">
-</a>
-<a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE" target="_blank">
-    <img src="https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template" alt="License">
-</a>
-<a href="https://docs.python.org/3/whatsnew/3.11.html" target="_blank">
-    <img src="https://img.shields.io/badge/python-3.11-blue" alt="Python">
-</a>
-<a href="https://github.com/psf/black" target="_blank">
-    <img src="https://img.shields.io/badge/code%20style-black-lightgrey" alt="Black">
-</a>
-<a href="https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml" target="_blank">
-    <img src="https://github.com/rafsaf/minimal-fastapi-postgres-template/workflows/tests/badge.svg" alt="Tests">
-</a>
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Live example](https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet)](https://minimal-fastapi-postgres-template.rafsaf.pl/)
+[![License](https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template)](https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](https://docs.python.org/3/whatsnew/3.12.html)
+[![Black](https://img.shields.io/badge/code%20style-black-lightgrey)](https://github.com/psf/black)
+[![Tests](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml/badge.svg)](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml)
 
 # Minimal async FastAPI + PostgreSQL template
 
@@ -42,9 +33,9 @@
 - [x] [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations
 - [x] Very minimal project structure yet ready for quick start building new apps
 - [x] Refresh token endpoint (not only access like in official template)
-- [x] Two databases in docker-compose.yml (second one for tests) and ready to go Dockerfile with [Uvicorn](https://www.uvicorn.org/) webserver
-- [x] [Poetry](https://python-poetry.org/docs/) and Python 3.11 based
-- [x] `pre-commit` with poetry export, autoflake, black, isort and flake8
+- [x] Two databases in docker-compose.yml (second one for tests) and ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver
+- [x] [Poetry](https://python-poetry.org/docs/) and Python 3.12 based
+- [x] `pre-commit` with poetry export and [ruff](https://github.com/astral-sh/ruff)
 - [x] Rich setup for pytest async tests with few included and extensible `conftest.py`
 
 <br>
@@ -69,16 +60,16 @@ cookiecutter https://github.com/rafsaf/minimal-fastapi-postgres-template
 
 ```bash
 cd project_name
-### Poetry install (python3.11)
+### Poetry install (python3.12)
 poetry install
 
 ### Optionally there is also `requirements-dev.txt` file
-python3.11 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate
 pip install -r requirements-dev.txt
 ```
 
-Note, be sure to use `python3.11` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10 or `tomllib` for python < 3.11)
+Note, be sure to use `python3.12` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10 or `tomllib` for python < 3.11)
 
 ### 3. Setup databases
 
