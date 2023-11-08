@@ -44,6 +44,7 @@ minversion = "6.0"
 testpaths = ["app/tests"]
 
 [tool.ruff]
+target-version = "py312"
 # pycodestyle, pyflakes, isort, pylint, pyupgrade
 select = ["E", "W", "F", "I", "PL", "UP"]
 ignore = ["E501"]
