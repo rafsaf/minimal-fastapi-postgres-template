@@ -6,15 +6,13 @@ class BaseResponse(BaseModel):
 
 
 class AccessTokenResponse(BaseResponse):
-    token_type: str
+    token_type: str = "Bearer"
     access_token: str
     expires_at: int
-    issued_at: int
     refresh_token: str
     refresh_token_expires_at: int
-    refresh_token_issued_at: int
 
 
 class UserResponse(BaseResponse):
-    id: str
+    user_id: str
     email: EmailStr

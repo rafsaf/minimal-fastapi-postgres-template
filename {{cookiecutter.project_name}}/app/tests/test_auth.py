@@ -5,7 +5,7 @@ from app.models import User
 from app.tests.conftest import default_user_email, default_user_password
 
 
-async def test_auth_access_token(client: AsyncClient, default_user: User):
+async def test_auth_access_token(client: AsyncClient, default_user: User) -> None:
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -25,7 +25,7 @@ async def test_auth_access_token(client: AsyncClient, default_user: User):
     assert "refresh_token_issued_at" in token
 
 
-async def test_auth_access_token_fail_no_user(client: AsyncClient):
+async def test_auth_access_token_fail_no_user(client: AsyncClient) -> None:
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -39,7 +39,7 @@ async def test_auth_access_token_fail_no_user(client: AsyncClient):
     assert response.json() == {"detail": "Incorrect email or password"}
 
 
-async def test_auth_refresh_token(client: AsyncClient, default_user: User):
+async def test_auth_refresh_token(client: AsyncClient, default_user: User) -> None:
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={

@@ -9,23 +9,28 @@ python = "^3.12"
 
 alembic = "^1.12.1"
 asyncpg = "^0.29.0"
-fastapi = "^0.104.1"
-passlib = { extras = ["bcrypt"], version = "^1.7.4" }
-pydantic = { extras = ["dotenv", "email"], version = "^2.4.2" }
-pydantic-settings = "^2.0.3"
+fastapi = "^0.109.0"
+bcrypt = "^4.1.2"
+pydantic = { extras = ["dotenv", "email"], version = "^2.5.3" }
+pydantic-settings = "^2.1.0"
 pyjwt = { extras = ["crypto"], version = "^2.8.0" }
 python-multipart = "^0.0.6"
 sqlalchemy = "^2.0.23"
 
+
 [tool.poetry.group.dev.dependencies]
 black = "^23.10.1"
 coverage = "^7.3.2"
-httpx = "^0.25.1"
+httpx = "^0.26.0"
 pre-commit = "^3.5.0"
 pytest = "^7.4.3"
-pytest-asyncio = "^0.21.1"
+pytest-asyncio = "0.21.1"
 ruff = "^0.1.4"
-uvicorn = { extras = ["standard"], version = "^0.24.0" }
+uvicorn = { extras = ["standard"], version = "^0.26.0" }
+mypy = "^1.8.0"
+pytest-cov = "^4.1.0"
+pytest-env = "^1.1.3"
+types-passlib = "^1.7.7.20240106"
 
 
 [build-system]
@@ -33,15 +38,19 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
 
 [tool.pytest.ini_options]
-addopts = "-v"
+addopts = "-v --cov --cov-report xml --cov-report term-missing"
 asyncio_mode = "auto"
-filterwarnings = [
-    # Passlib 1.7.4 depends on crypt - https://foss.heptapod.net/python-libs/passlib/-/issues/148
-    "ignore:'crypt' is deprecated and slated for removal",
-]
-markers = ["pytest.mark.asyncio"]
+env = ["ENVIRONMENT=PYTEST"]
 minversion = "6.0"
 testpaths = ["app/tests"]
+
+[tool.coverage.run]
+omit = ["app/tests/*"]
+source = ["app"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
 
 [tool.ruff]
 target-version = "py312"

@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import AsyncGenerator
+from typing import Generator
 
 import pytest
 import pytest_asyncio
@@ -22,7 +23,7 @@ default_user_access_token = security.create_jwt_token(
 
 
 @pytest.fixture(scope="session")
-def event_loop():
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop
@@ -30,7 +31,7 @@ def event_loop():
 
 
 @pytest_asyncio.fixture(scope="session")
-async def test_db_setup_sessionmaker():
+async def test_db_setup_sessionmaker() -> None:
     # assert if we use TEST_DB URL for 100%
     assert config.settings.ENVIRONMENT == "PYTEST"
 
@@ -41,14 +42,11 @@ async def test_db_setup_sessionmaker():
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def session(test_db_setup_sessionmaker) -> AsyncGenerator[AsyncSession, None]:
+async def session(test_db_setup_sessionmaker: None) -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         yield session
-
-        # delete all data from all tables after test
-        for name, table in Base.metadata.tables.items():
-            await session.execute(delete(table))
-        await session.commit()
+        await session.rollback()
+        await session.close()
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -59,7 +57,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest_asyncio.fixture
-async def default_user(test_db_setup_sessionmaker) -> User:
+async def default_user(test_db_setup_sessionmaker: None) -> User:
     async with async_session() as session:
         result = await session.execute(
             select(User).where(User.email == default_user_email)
@@ -79,5 +77,5 @@ async def default_user(test_db_setup_sessionmaker) -> User:
 
 
 @pytest.fixture
-def default_user_headers(default_user: User):
+def default_user_headers(default_user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {default_user_access_token}"}

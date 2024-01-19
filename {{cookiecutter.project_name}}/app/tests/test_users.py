@@ -11,7 +11,7 @@ from app.tests.conftest import (
 )
 
 
-async def test_read_current_user(client: AsyncClient, default_user_headers):
+async def test_read_current_user(client: AsyncClient, default_user_headers: dict[str, str]) -> None:
     response = await client.get(
         app.url_path_for("read_current_user"), headers=default_user_headers
     )
@@ -23,8 +23,8 @@ async def test_read_current_user(client: AsyncClient, default_user_headers):
 
 
 async def test_delete_current_user(
-    client: AsyncClient, default_user_headers, session: AsyncSession
-):
+    client: AsyncClient, default_user_headers: dict[str, str], session: AsyncSession
+) -> None:
     response = await client.delete(
         app.url_path_for("delete_current_user"), headers=default_user_headers
     )
@@ -35,8 +35,8 @@ async def test_delete_current_user(
 
 
 async def test_reset_current_user_password(
-    client: AsyncClient, default_user_headers, session: AsyncSession
-):
+    client: AsyncClient, default_user_headers: dict[str, str], session: AsyncSession
+) -> None:
     response = await client.post(
         app.url_path_for("reset_current_user_password"),
         headers=default_user_headers,
@@ -50,8 +50,8 @@ async def test_reset_current_user_password(
 
 
 async def test_register_new_user(
-    client: AsyncClient, default_user_headers, session: AsyncSession
-):
+    client: AsyncClient, default_user_headers: dict[str, str], session: AsyncSession
+) -> None:
     response = await client.post(
         app.url_path_for("register_new_user"),
         headers=default_user_headers,
