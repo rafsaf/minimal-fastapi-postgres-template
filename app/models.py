@@ -15,7 +15,7 @@ alembic upgrade head
 """
 import uuid
 
-from sqlalchemy import Boolean, String, ForeignKey, Uuid, BigInteger
+from sqlalchemy import BigInteger, Boolean, ForeignKey, String, Uuid
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 

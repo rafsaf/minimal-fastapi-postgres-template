@@ -1,8 +1,6 @@
-version: "3.7"
-
 # For local development, only database is running
 #
-# docker-compose up -d
+# docker compose up -d
 # uvicorn app.main:app --reload
 #
 
@@ -13,13 +11,13 @@ services:
     volumes:
       - default_database_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=${DEFAULT_DATABASE_DB}
-      - POSTGRES_USER=${DEFAULT_DATABASE_USER}
-      - POSTGRES_PASSWORD=${DEFAULT_DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE__DB}
+      - POSTGRES_USER=${DATABASE__USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE__PASSWORD}
     env_file:
       - .env
     ports:
-      - "${DEFAULT_DATABASE_PORT}:5432"
+      - "${DATABASE__PORT}:5432"
 
   test_database:
     restart: unless-stopped
@@ -27,13 +25,9 @@ services:
     volumes:
       - test_database_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=${TEST_DATABASE_DB}
-      - POSTGRES_USER=${TEST_DATABASE_USER}
-      - POSTGRES_PASSWORD=${TEST_DATABASE_PASSWORD}
-    env_file:
-      - .env
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - "${TEST_DATABASE_PORT}:5432"
+      - "31234:5432"
 
 volumes:
   test_database_data:

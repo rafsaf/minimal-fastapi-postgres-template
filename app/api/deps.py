@@ -1,14 +1,11 @@
-import time
 from collections.abc import AsyncGenerator
 from typing import Annotated
 
-import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import config, security
 from app.core.security.jwt import verify_jwt_token
 from app.core.session import async_session
 from app.models import User

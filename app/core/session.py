@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.config import get_settings
 
-
 async_engine = create_async_engine(
     get_settings().sqlalchemy_database_uri.get_secret_value(), pool_pre_ping=True
 )

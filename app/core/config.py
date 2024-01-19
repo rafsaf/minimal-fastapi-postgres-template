@@ -21,11 +21,10 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 Note, complex types like lists are read as json-encoded strings.
 """
 
-from functools import cached_property
+from functools import cached_property, lru_cache
 from pathlib import Path
-from functools import lru_cache
 
-from pydantic import BaseModel, AnyHttpUrl, PostgresDsn, SecretStr, computed_field
+from pydantic import AnyHttpUrl, BaseModel, PostgresDsn, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_DIR = Path(__file__).parent.parent.parent

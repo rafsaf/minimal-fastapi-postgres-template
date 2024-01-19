@@ -11,7 +11,9 @@ from app.tests.conftest import (
 )
 
 
-async def test_read_current_user(client: AsyncClient, default_user_headers: dict[str, str]) -> None:
+async def test_read_current_user(
+    client: AsyncClient, default_user_headers: dict[str, str]
+) -> None:
     response = await client.get(
         app.url_path_for("read_current_user"), headers=default_user_headers
     )
@@ -29,7 +31,7 @@ async def test_delete_current_user(
         app.url_path_for("delete_current_user"), headers=default_user_headers
     )
     assert response.status_code == codes.NO_CONTENT
-    result = await session.execute(select(User).where(User.id == default_user_id))
+    result = await session.execute(select(User).where(User.user_id == default_user_id))
     user = result.scalars().first()
     assert user is None
 
@@ -43,7 +45,7 @@ async def test_reset_current_user_password(
         json={"password": "testxxxxxx"},
     )
     assert response.status_code == codes.OK
-    result = await session.execute(select(User).where(User.id == default_user_id))
+    result = await session.execute(select(User).where(User.user_id == default_user_id))
     user = result.scalars().first()
     assert user is not None
     assert user.hashed_password != default_user_password_hash

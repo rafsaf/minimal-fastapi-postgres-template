@@ -1,13 +1,19 @@
-FROM python:3.12.0-slim-bullseye
+FROM python:3.12.1-slim-bullseye as base
 
 ENV PYTHONUNBUFFERED 1
 WORKDIR /build
 
+# Create requirements.txt file
+FROM base as poetry
+RUN pip install poetry==1.7.1
+COPY poetry.lock pyproject.toml ./
+RUN poetry export -o /requirements.txt --without-hashes
+
+FROM base as common
+COPY --from=poetry /requirements.txt .
 # Create venv, add it to path and install requirements
 RUN python -m venv /venv
 ENV PATH="/venv/bin:$PATH"
-
-COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Install uvicorn server

@@ -13,9 +13,9 @@ fastapi = "^0.109.0"
 bcrypt = "^4.1.2"
 pydantic = { extras = ["dotenv", "email"], version = "^2.5.3" }
 pydantic-settings = "^2.1.0"
-pyjwt = { extras = ["crypto"], version = "^2.8.0" }
 python-multipart = "^0.0.6"
 sqlalchemy = "^2.0.23"
+pyjwt = "^2.8.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -38,7 +38,7 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
 
 [tool.pytest.ini_options]
-addopts = "-v --cov --cov-report xml --cov-report term-missing"
+addopts = "-v --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
 asyncio_mode = "auto"
 env = ["ENVIRONMENT=PYTEST"]
 minversion = "6.0"

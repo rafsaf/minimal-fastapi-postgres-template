@@ -1,14 +1,14 @@
 import asyncio
-from collections.abc import AsyncGenerator
-from typing import Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import config, security
+from app.core.security.password import get_password_hash
+from app.core.security.jwt import create_jwt_token
 from app.core.session import async_engine, async_session
 from app.main import app
 from app.models import Base, User
@@ -16,10 +16,8 @@ from app.models import Base, User
 default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
 default_user_email = "geralt@wiedzmin.pl"
 default_user_password = "geralt"
-default_user_password_hash = security.get_password_hash(default_user_password)
-default_user_access_token = security.create_jwt_token(
-    str(default_user_id), 60 * 60 * 24, refresh=False
-)[0]
+default_user_password_hash = get_password_hash(default_user_password)
+default_user_access_token = create_jwt_token(default_user_id)
 
 
 @pytest.fixture(scope="session")
@@ -32,9 +30,6 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
 @pytest_asyncio.fixture(scope="session")
 async def test_db_setup_sessionmaker() -> None:
-    # assert if we use TEST_DB URL for 100%
-    assert config.settings.ENVIRONMENT == "PYTEST"
-
     # always drop and create test db tables between tests session
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -42,7 +37,9 @@ async def test_db_setup_sessionmaker() -> None:
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def session(test_db_setup_sessionmaker: None) -> AsyncGenerator[AsyncSession, None]:
+async def session(
+    test_db_setup_sessionmaker: None,
+) -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         yield session
         await session.rollback()
@@ -68,7 +65,7 @@ async def default_user(test_db_setup_sessionmaker: None) -> User:
                 email=default_user_email,
                 hashed_password=default_user_password_hash,
             )
-            new_user.id = default_user_id
+            new_user.user_id = default_user_id
             session.add(new_user)
             await session.commit()
             await session.refresh(new_user)

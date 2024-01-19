@@ -1,20 +1,18 @@
 import asyncio
 import random
+import secrets
 import time
 
-
-import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import ValidationError
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-import secrets
+
 from app.api import deps
-from app.core import config, security
-from app.core.security.password import verify_password
+from app.core import config
 from app.core.security.jwt import create_jwt_token
-from app.models import User, RefreshToken
+from app.core.security.password import verify_password
+from app.models import RefreshToken, User
 from app.schemas.requests import RefreshTokenRequest
 from app.schemas.responses import AccessTokenResponse
 
