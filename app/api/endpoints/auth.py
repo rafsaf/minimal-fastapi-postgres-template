@@ -1,5 +1,3 @@
-import asyncio
-import random
 import secrets
 import time
 
@@ -11,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import deps
 from app.core import config
 from app.core.security.jwt import create_jwt_token
-from app.core.security.password import verify_password, DUMMY_PASSWORD
+from app.core.security.password import DUMMY_PASSWORD, verify_password
 from app.models import RefreshToken, User
 from app.schemas.requests import RefreshTokenRequest
 from app.schemas.responses import AccessTokenResponse

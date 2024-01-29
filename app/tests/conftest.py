@@ -7,8 +7,8 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security.password import get_password_hash
 from app.core.security.jwt import create_jwt_token
+from app.core.security.password import get_password_hash
 from app.core.session import async_engine, async_session
 from app.main import app
 from app.models import Base, User

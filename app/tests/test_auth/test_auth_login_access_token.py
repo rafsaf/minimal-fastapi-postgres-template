@@ -1,15 +1,15 @@
-from datetime import datetime, timezone
-from httpx import AsyncClient
+from datetime import UTC, datetime
 
 from fastapi import status
-import pytest
+from httpx import AsyncClient
 from sqlalchemy import func, select
-from app.main import app
-from app.models import RefreshToken, User
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import get_settings
 from app.core.security.jwt import verify_jwt_token
+from app.main import app
+from app.models import RefreshToken, User
 from app.tests.conftest import default_user_password
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def test_login_access_token_has_response_code_200(
@@ -49,7 +49,7 @@ async def test_login_access_token_jwt_has_valid_expire_time(
     client: AsyncClient,
     default_user: User,
 ) -> None:
-    current_time = int(datetime.now(tz=timezone.utc).timestamp())
+    current_time = int(datetime.now(tz=UTC).timestamp())
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -71,7 +71,7 @@ async def test_login_access_token_returns_valid_jwt_access_token(
     client: AsyncClient,
     default_user: User,
 ) -> None:
-    now = int(datetime.now(tz=timezone.utc).timestamp())
+    now = int(datetime.now(tz=UTC).timestamp())
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -93,7 +93,7 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
     client: AsyncClient,
     default_user: User,
 ) -> None:
-    current_time = int(datetime.now(tz=timezone.utc).timestamp())
+    current_time = int(datetime.now(tz=UTC).timestamp())
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
