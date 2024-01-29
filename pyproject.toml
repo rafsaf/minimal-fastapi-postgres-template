@@ -1,7 +1,7 @@
 [tool.poetry]
 authors = ["admin <admin@example.com>"]
 description = "FastAPI project generated using minimal-fastapi-postgres-template."
-name = "{{cookiecutter.project_name}}"
+name = "app"
 version = "0.1.0-alpha"
 
 [tool.poetry.dependencies]
@@ -31,7 +31,7 @@ mypy = "^1.8.0"
 pytest-cov = "^4.1.0"
 pytest-env = "^1.1.3"
 types-passlib = "^1.7.7.20240106"
-freezegun = "^1.4.0"
+gevent = "^23.9.1"
 
 
 [build-system]
@@ -41,13 +41,21 @@ requires = ["poetry-core>=1.0.0"]
 [tool.pytest.ini_options]
 addopts = "-v --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
 asyncio_mode = "auto"
-env = ["ENVIRONMENT=PYTEST"]
+env = [
+    "ENVIRONMENT=PYTEST",
+    "DATABASE__PORT=31234",
+    "DATABASE__USERNAME=postgres",
+    "DATABASE__DB=postgres",
+    "DATABASE__PASSWORD=postgres",
+    "SECURITY__PASSWORD_BCRYPT_ROUNDS=4",
+]
 minversion = "6.0"
 testpaths = ["app/tests"]
 
 [tool.coverage.run]
 omit = ["app/tests/*"]
 source = ["app"]
+concurrency = ["gevent"]
 
 [tool.mypy]
 python_version = "3.12"

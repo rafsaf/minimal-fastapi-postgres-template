@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import deps
 from app.core import config
 from app.core.security.jwt import create_jwt_token
-from app.core.security.password import verify_password
+from app.core.security.password import verify_password, DUMMY_PASSWORD
 from app.models import RefreshToken, User
 from app.schemas.requests import RefreshTokenRequest
 from app.schemas.responses import AccessTokenResponse
@@ -26,18 +26,16 @@ async def login_access_token(
 ) -> AccessTokenResponse:
     """OAuth2 compatible token, get an access token for future requests using username and password"""
 
-    wait_delay_ms = random.randint(800, 1000)
-    min_end_time = time.time() + wait_delay_ms / 1000
-
     result = await session.execute(select(User).where(User.email == form_data.username))
     user = result.scalars().first()
 
     if user is None:
-        await asyncio.sleep(min_end_time - time.time())
+        # this is naive method to not return early
+        verify_password(form_data.password, DUMMY_PASSWORD)
+
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     if not verify_password(form_data.password, user.hashed_password):
-        await asyncio.sleep(min_end_time - time.time())
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     jwt_token = create_jwt_token(user_id=user.user_id)
@@ -50,10 +48,9 @@ async def login_access_token(
     session.add(refresh_token)
     await session.commit()
 
-    await asyncio.sleep(min_end_time - time.time())
     return AccessTokenResponse(
         access_token=jwt_token.access_token,
-        expires_at=jwt_token.payload.iat,
+        expires_at=jwt_token.payload.exp,
         refresh_token=refresh_token.refresh_token,
         refresh_token_expires_at=refresh_token.exp,
     )
