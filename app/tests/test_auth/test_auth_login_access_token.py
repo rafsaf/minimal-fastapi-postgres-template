@@ -10,8 +10,10 @@ from app.core.security.jwt import verify_jwt_token
 from app.main import app
 from app.models import RefreshToken, User
 from app.tests.conftest import default_user_password
+from freezegun import freeze_time
 
 
+@freeze_time("2023-01-01")
 async def test_login_access_token_has_response_code_200(
     client: AsyncClient,
     default_user: User,
@@ -28,6 +30,7 @@ async def test_login_access_token_has_response_code_200(
     assert response.status_code == status.HTTP_200_OK
 
 
+@freeze_time("2023-01-01")
 async def test_login_access_token_jwt_has_valid_token_type(
     client: AsyncClient,
     default_user: User,
@@ -45,6 +48,7 @@ async def test_login_access_token_jwt_has_valid_token_type(
     assert token["token_type"] == "Bearer"
 
 
+@freeze_time("2023-01-01")
 async def test_login_access_token_jwt_has_valid_expire_time(
     client: AsyncClient,
     default_user: User,
