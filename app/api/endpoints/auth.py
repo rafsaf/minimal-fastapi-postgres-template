@@ -3,7 +3,7 @@ import time
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
@@ -56,26 +56,19 @@ async def login_access_token(
 
 @router.post("/refresh-token", response_model=AccessTokenResponse)
 async def refresh_token(
-    input: RefreshTokenRequest,
+    data: RefreshTokenRequest,
     session: AsyncSession = Depends(deps.get_session),
 ) -> AccessTokenResponse:
     """OAuth2 compatible token, get an access token for future requests using refresh token"""
 
     result = await session.execute(
-        select(RefreshToken).where(RefreshToken.refresh_token == input.refresh_token)
+        select(RefreshToken).where(RefreshToken.refresh_token == data.refresh_token)
     )
     token = result.scalars().first()
 
-    if token is None or time.time() > token.exp:
+    if token is None or time.time() > token.exp or token.used:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Token not found"
-        )
-    if token.used:
-        await session.execute(
-            delete(RefreshToken).where(RefreshToken.user_id == token.user_id)
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
         )
 
     token.used = True
