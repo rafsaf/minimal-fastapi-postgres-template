@@ -21,11 +21,12 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 Note, complex types like lists are read as json-encoded strings.
 """
 
-from functools import cached_property, lru_cache
+from functools import lru_cache
 from pathlib import Path
 
-from pydantic import AnyHttpUrl, BaseModel, PostgresDsn, SecretStr, computed_field
+from pydantic import AnyHttpUrl, BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine.url import URL
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
 
@@ -53,19 +54,15 @@ class Settings(BaseSettings):
     database: Database
 
     @computed_field  # type: ignore[misc]
-    @cached_property
-    def sqlalchemy_database_uri(self) -> SecretStr:
-        return SecretStr(
-            str(
-                PostgresDsn.build(
-                    scheme="postgresql+asyncpg",
-                    username=self.database.username,
-                    password=self.database.password.get_secret_value(),
-                    host=self.database.hostname,
-                    port=self.database.port,
-                    path=self.database.db,
-                )
-            )
+    @property
+    def sqlalchemy_database_uri(self) -> URL:
+        return URL.create(
+            drivername="postgresql+asyncpg",
+            username=self.database.username,
+            password=self.database.password.get_secret_value(),
+            host=self.database.hostname,
+            port=self.database.port,
+            database=self.database.db,
         )
 
     model_config = SettingsConfigDict(

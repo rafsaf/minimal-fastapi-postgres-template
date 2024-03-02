@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 
 from fastapi import status
+from freezegun import freeze_time
 from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +11,6 @@ from app.core.security.jwt import verify_jwt_token
 from app.main import app
 from app.models import RefreshToken, User
 from app.tests.conftest import default_user_password
-from freezegun import freeze_time
 
 
 @freeze_time("2023-01-01")
@@ -53,7 +53,6 @@ async def test_login_access_token_jwt_has_valid_expire_time(
     client: AsyncClient,
     default_user: User,
 ) -> None:
-    current_time = int(datetime.now(tz=UTC).timestamp())
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -64,10 +63,10 @@ async def test_login_access_token_jwt_has_valid_expire_time(
     )
 
     token = response.json()
+    current_timestamp = int(datetime.now(tz=UTC).timestamp())
     assert (
-        current_time + get_settings().security.jwt_access_token_expire_secs
-        <= token["expires_at"]
-        <= current_time + get_settings().security.jwt_access_token_expire_secs + 1
+        token["expires_at"]
+        == current_timestamp + get_settings().security.jwt_access_token_expire_secs
     )
 
 
@@ -97,7 +96,6 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
     client: AsyncClient,
     default_user: User,
 ) -> None:
-    current_time = int(datetime.now(tz=UTC).timestamp())
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -108,10 +106,10 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
     )
 
     token = response.json()
+    current_time = int(datetime.now(tz=UTC).timestamp())
     assert (
-        current_time + get_settings().security.refresh_token_expire_secs
-        <= token["refresh_token_expires_at"]
-        <= current_time + get_settings().security.refresh_token_expire_secs + 1
+        token["refresh_token_expires_at"]
+        == current_time + get_settings().security.refresh_token_expire_secs
     )
 
 
@@ -162,7 +160,7 @@ async def test_login_access_token_refresh_token_in_db_has_valid_fields(
     assert not refresh_token.used
 
 
-async def test_auth_access_token_fail_for_not_existing_user(
+async def test_auth_access_token_fail_for_not_existing_user_with_message(
     client: AsyncClient,
 ) -> None:
     response = await client.post(
@@ -178,7 +176,7 @@ async def test_auth_access_token_fail_for_not_existing_user(
     assert response.json() == {"detail": "Incorrect email or password"}
 
 
-async def test_auth_access_token_fail_for_invalid_password(
+async def test_auth_access_token_fail_for_invalid_password_with_message(
     client: AsyncClient,
     default_user: User,
 ) -> None:
