@@ -1,16 +1,19 @@
 import asyncio
 from collections.abc import AsyncGenerator, Generator
+from typing import Any
 
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+)
 
+from app.core import database_session
 from app.core.security.jwt import create_jwt_token
 from app.core.security.password import get_password_hash
-from app.core.session import async_engine, async_session
-from app.main import app
+from app.main import app as fastapi_app
 from app.models import Base, User
 
 default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
@@ -28,51 +31,77 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop.close()
 
 
-@pytest_asyncio.fixture(scope="session")
-async def test_db_setup_sessionmaker() -> None:
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def fixture_db_setup_tables_and_start_broad_connection() -> None:
     # always drop and create test db tables between tests session
-    async with async_engine.begin() as conn:
+    async with database_session.ASYNC_ENGINE.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
 
-@pytest_asyncio.fixture(autouse=True)
-async def session(
-    test_db_setup_sessionmaker: None,
+@pytest_asyncio.fixture(scope="function")
+async def fixture_mock_async_session_factory(
+    fixture_db_setup_tables_and_start_broad_connection: None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> AsyncGenerator[None, None]:
+    # we want to monkeypatch sessionmaker with one bound to session
+    # that we will rollback on function scope
+    async with database_session.ASYNC_ENGINE.connect() as conn:
+        async with conn.begin() as transaction:
+            session = AsyncSession(bind=conn, expire_on_commit=False)
+
+            # trick sessionmaker instance to use our crafted session
+            # that will have rollback on the end of each test
+            # note, magic methods goes directly to class __call__ definition
+            # so we need ugly hack with class overwrite
+            # maybe it can be done better
+            class mock_async_sessionmaker(async_sessionmaker):
+                def __call__(self, **local_kw: Any) -> Any:
+                    return session
+
+            session_factory_mock = mock_async_sessionmaker(
+                bind=database_session.ASYNC_ENGINE, expire_on_commit=False
+            )
+            monkeypatch.setattr(
+                database_session,
+                "ASYNC_SESSIONMAKER",
+                session_factory_mock,
+            )
+
+            yield
+
+            await session.close()
+            await transaction.rollback()
+
+
+@pytest_asyncio.fixture(name="session")
+async def fixture_session(
+    fixture_mock_async_session_factory: None,
 ) -> AsyncGenerator[AsyncSession, None]:
-    async with async_session() as session:
+    async with database_session.ASYNC_SESSIONMAKER() as session:
         yield session
-        await session.rollback()
-        await session.close()
 
 
-@pytest_asyncio.fixture(scope="session")
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as client:
+@pytest_asyncio.fixture(name="client")
+async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(app=fastapi_app, base_url="http://test") as client:
         client.headers.update({"Host": "localhost"})
         yield client
 
 
-@pytest_asyncio.fixture
-async def default_user(test_db_setup_sessionmaker: None) -> User:
-    async with async_session() as session:
-        result = await session.execute(
-            select(User).where(User.email == default_user_email)
-        )
-        user = result.scalars().first()
-        if user is None:
-            new_user = User(
-                email=default_user_email,
-                hashed_password=default_user_password_hash,
-            )
-            new_user.user_id = default_user_id
-            session.add(new_user)
-            await session.commit()
-            await session.refresh(new_user)
-            return new_user
-        return user
+@pytest_asyncio.fixture(name="default_user")
+async def fixture_default_user(session: AsyncSession) -> User:
+    default_user = User(
+        user_id=default_user_id,
+        email=default_user_email,
+        hashed_password=default_user_password_hash,
+    )
+    session.add(default_user)
+    await session.commit()
+    await session.refresh(default_user)
+    return default_user
 
 
-@pytest.fixture
-def default_user_headers(default_user: User) -> dict[str, str]:
+@pytest.fixture(name="default_user_headers")
+def fixture_default_user_headers(default_user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {default_user_access_token}"}

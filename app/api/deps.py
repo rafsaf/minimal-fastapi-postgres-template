@@ -6,15 +6,15 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core import database_session
 from app.core.security.jwt import verify_jwt_token
-from app.core.session import async_session
 from app.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/access-token")
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session() as session:
+    async with database_session.ASYNC_SESSIONMAKER() as session:
         yield session
 
 
