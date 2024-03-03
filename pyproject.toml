@@ -16,7 +16,6 @@ pydantic-settings = "^2.1.0"
 python-multipart = "^0.0.6"
 sqlalchemy = "^2.0.23"
 pyjwt = "^2.8.0"
-pytest-xdist = "^3.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -33,6 +32,7 @@ pytest-cov = "^4.1.0"
 types-passlib = "^1.7.7.20240106"
 gevent = "^23.9.1"
 freezegun = "^1.4.0"
+pytest-xdist = "^3.5.0"
 
 
 [build-system]

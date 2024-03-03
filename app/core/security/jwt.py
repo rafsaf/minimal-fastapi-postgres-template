@@ -1,8 +1,10 @@
 import time
 
 import jwt
+from fastapi import HTTPException, status
 from pydantic import BaseModel
 
+from app.api import api_messages
 from app.core.config import get_settings
 
 JWT_ALGORITHM = "HS256"
@@ -49,12 +51,18 @@ def verify_jwt_token(token: str) -> JWTTokenPayload:
             algorithms=[JWT_ALGORITHM],
         )
     except jwt.DecodeError:
-        raise ValueError("invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=api_messages.JWT_ERROR_INVALID_TOKEN,
+        )
 
     token_payload = JWTTokenPayload(**raw_payload)
 
     now = int(time.time())
     if now < token_payload.iat or now > token_payload.exp:
-        raise ValueError("token expired")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=api_messages.JWT_ERROR_EXPIRED_TOKEN,
+        )
 
     return token_payload

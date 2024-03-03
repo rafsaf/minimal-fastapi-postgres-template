@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api import api_messages
 from app.core import database_session
 from app.core.security.jwt import verify_jwt_token
 from app.models import User
@@ -22,13 +23,7 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: AsyncSession = Depends(get_session),
 ) -> User:
-    try:
-        token_payload = verify_jwt_token(token)
-    except ValueError as err:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Could not validate credentials: {err}",
-        )
+    token_payload = verify_jwt_token(token)
 
     result = await session.execute(
         select(User).where(User.user_id == token_payload.sub)
@@ -37,7 +32,7 @@ async def get_current_user(
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=api_messages.JWT_ERROR_USER_REMOVED,
         )
     return user
