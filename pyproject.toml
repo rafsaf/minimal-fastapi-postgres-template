@@ -19,7 +19,6 @@ pyjwt = "^2.8.0"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.10.1"
 coverage = "^7.3.2"
 httpx = "^0.26.0"
 pre-commit = "^3.5.0"
@@ -55,6 +54,8 @@ strict = true
 
 [tool.ruff]
 target-version = "py312"
+
+[tool.ruff.lint]
 # pycodestyle, pyflakes, isort, pylint, pyupgrade
 select = ["E", "W", "F", "I", "PL", "UP"]
 ignore = ["E501"]
