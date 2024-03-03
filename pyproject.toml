@@ -42,7 +42,6 @@ requires = ["poetry-core>=1.0.0"]
 [tool.pytest.ini_options]
 addopts = "-v -n auto --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
 asyncio_mode = "auto"
-minversion = "6.0"
 testpaths = ["app/tests"]
 
 [tool.coverage.run]
