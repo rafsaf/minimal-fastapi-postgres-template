@@ -5,11 +5,11 @@
 #
 
 services:
-  default_database:
+  postgres_database:
     restart: unless-stopped
     image: postgres:latest
     volumes:
-      - default_database_data:/var/lib/postgresql/data
+      - postgres_database:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DATABASE__DB}
       - POSTGRES_USER=${DATABASE__USERNAME}
@@ -19,16 +19,5 @@ services:
     ports:
       - "${DATABASE__PORT}:5432"
 
-  test_database:
-    restart: unless-stopped
-    image: postgres:latest
-    volumes:
-      - test_database_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "31234:5432"
-
 volumes:
-  test_database_data:
-  default_database_data:
+  postgres_database:
