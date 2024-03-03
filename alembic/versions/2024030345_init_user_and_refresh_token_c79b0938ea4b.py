@@ -1,16 +1,17 @@
-"""init_user_and_refresh_token
+"""init user and refresh token
 
-Revision ID: 21f30f70dab2
+Revision ID: c79b0938ea4b
 Revises:
-Create Date: 2024-01-19 01:39:35.369361
+Create Date: 2024-03-03 11:45:21.361225
 
 """
+
 import sqlalchemy as sa
 
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "21f30f70dab2"
+revision = "c79b0938ea4b"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +24,18 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Uuid(as_uuid=False), nullable=False),
         sa.Column("email", sa.String(length=256), nullable=False),
         sa.Column("hashed_password", sa.String(length=128), nullable=False),
+        sa.Column(
+            "create_time",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "update_time",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.PrimaryKeyConstraint("user_id"),
     )
     op.create_index(
@@ -35,6 +48,18 @@ def upgrade() -> None:
         sa.Column("used", sa.Boolean(), nullable=False),
         sa.Column("exp", sa.BigInteger(), nullable=False),
         sa.Column("user_id", sa.Uuid(as_uuid=False), nullable=False),
+        sa.Column(
+            "create_time",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "update_time",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.ForeignKeyConstraint(
             ["user_id"], ["user_account.user_id"], ondelete="CASCADE"
         ),
