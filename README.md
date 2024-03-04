@@ -2,7 +2,6 @@
 [![License](https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template)](https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](https://docs.python.org/3/whatsnew/3.12.html)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Black](https://img.shields.io/badge/code%20style-black-lightgrey)](https://github.com/psf/black)
 [![Tests](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml/badge.svg)](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml)
 
 # Minimal async FastAPI + PostgreSQL template
@@ -28,15 +27,15 @@
 
 ## Features
 
-- [x] **SQLAlchemy 2.0 only**, async queries, best possible autocompletion support (SQLAlchemy 2.0.0 was released January 26, 2023)
+- [x] SQLAlchemy 2.0, async queries, best possible autocompletion support
 - [x] Postgresql database under `asyncpg`
 - [x] [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations
 - [x] Very minimal project structure yet ready for quick start building new apps
 - [x] Refresh token endpoint (not only access like in official template)
-- [x] Two databases in docker-compose.yml (second one for tests) and ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver
+- [x] Database in docker-compose.yml and ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver
 - [x] [Poetry](https://python-poetry.org/docs/) and Python 3.12 based
-- [x] `pre-commit` with poetry export and [ruff](https://github.com/astral-sh/ruff)
-- [x] Rich setup for pytest async tests with few included and extensible `conftest.py`
+- [x] `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
+- [x] **Perfect** pytest asynchronous test setup with +40 tests and full coverage
 
 <br>
 
