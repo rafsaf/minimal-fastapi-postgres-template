@@ -13,8 +13,8 @@ app = FastAPI(
     docs_url="/",
 )
 
-app.include_router(api_router)
 app.include_router(auth_router)
+app.include_router(api_router)
 
 # Sets all CORS enabled origins
 app.add_middleware(
