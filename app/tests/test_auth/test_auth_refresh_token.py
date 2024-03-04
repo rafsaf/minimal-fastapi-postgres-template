@@ -1,11 +1,12 @@
-from datetime import UTC, datetime
 import time
+from datetime import UTC, datetime
 
 from fastapi import status
+from freezegun import freeze_time
 from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from freezegun import freeze_time
+
 from app.api import api_messages
 from app.core.config import get_settings
 from app.core.security.jwt import verify_jwt_token
@@ -121,7 +122,10 @@ async def test_refresh_token_success_old_token_is_used(
         },
     )
 
-    await session.refresh(test_refresh_token)
+    result = await session.execute(
+        select(RefreshToken).where(RefreshToken.refresh_token == "blaxx")
+    )
+    test_refresh_token = result.scalar_one()
     assert test_refresh_token.used
 
 

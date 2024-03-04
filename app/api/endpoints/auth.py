@@ -151,7 +151,7 @@ async def refresh_token(
 
     return AccessTokenResponse(
         access_token=jwt_token.access_token,
-        expires_at=jwt_token.payload.iat,
+        expires_at=jwt_token.payload.exp,
         refresh_token=refresh_token.refresh_token,
         refresh_token_expires_at=refresh_token.exp,
     )
