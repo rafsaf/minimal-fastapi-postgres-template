@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+import time
 
 from fastapi import status
 from freezegun import freeze_time
@@ -62,7 +62,7 @@ async def test_login_access_token_jwt_has_valid_expire_time(
     )
 
     token = response.json()
-    current_timestamp = int(datetime.now(tz=UTC).timestamp())
+    current_timestamp = int(time.time())
     assert (
         token["expires_at"]
         == current_timestamp + get_settings().security.jwt_access_token_expire_secs
@@ -83,7 +83,7 @@ async def test_login_access_token_returns_valid_jwt_access_token(
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
 
-    now = int(datetime.now(tz=UTC).timestamp())
+    now = int(time.time())
     token = response.json()
     token_payload = verify_jwt_token(token["access_token"])
 
@@ -106,7 +106,7 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
     )
 
     token = response.json()
-    current_time = int(datetime.now(tz=UTC).timestamp())
+    current_time = int(time.time())
     assert (
         token["refresh_token_expires_at"]
         == current_time + get_settings().security.refresh_token_expire_secs
