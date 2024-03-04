@@ -9,7 +9,7 @@ auth_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router = APIRouter(
     responses={
         401: {
-            "description": "No `Authorization` access token header or token is invalid",
+            "description": "No `Authorization` access token header, token is invalid or user removed",
             "content": {
                 "application/json": {
                     "examples": {
@@ -21,15 +21,6 @@ api_router = APIRouter(
                             "summary": api_messages.JWT_ERROR_INVALID_TOKEN,
                             "value": {"detail": api_messages.JWT_ERROR_INVALID_TOKEN},
                         },
-                    }
-                }
-            },
-        },
-        403: {
-            "description": "Access token is expired or user was removed",
-            "content": {
-                "application/json": {
-                    "examples": {
                         "expired token": {
                             "summary": api_messages.JWT_ERROR_EXPIRED_TOKEN,
                             "value": {"detail": api_messages.JWT_ERROR_EXPIRED_TOKEN},
@@ -38,7 +29,7 @@ api_router = APIRouter(
                             "summary": api_messages.JWT_ERROR_USER_REMOVED,
                             "value": {"detail": api_messages.JWT_ERROR_USER_REMOVED},
                         },
-                    },
+                    }
                 }
             },
         },

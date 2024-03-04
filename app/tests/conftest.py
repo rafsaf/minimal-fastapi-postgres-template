@@ -21,7 +21,7 @@ from app.models import Base, User
 default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
 default_user_email = "geralt@wiedzmin.pl"
 default_user_password = "geralt"
-default_user_access_token = create_jwt_token(default_user_id)
+default_user_access_token = create_jwt_token(default_user_id).access_token
 
 
 @pytest.fixture(scope="session")

@@ -50,19 +50,15 @@ def verify_jwt_token(token: str) -> JWTTokenPayload:
             get_settings().security.jwt_secret_key.get_secret_value(),
             algorithms=[JWT_ALGORITHM],
         )
-    except jwt.DecodeError:
+    except jwt.ExpiredSignatureError:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=api_messages.JWT_ERROR_EXPIRED_TOKEN,
+        )
+    except (jwt.DecodeError, jwt.InvalidTokenError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=api_messages.JWT_ERROR_INVALID_TOKEN,
         )
 
-    token_payload = JWTTokenPayload(**raw_payload)
-
-    now = int(time.time())
-    if now < token_payload.iat or now > token_payload.exp:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=api_messages.JWT_ERROR_EXPIRED_TOKEN,
-        )
-
-    return token_payload
+    return JWTTokenPayload(**raw_payload)

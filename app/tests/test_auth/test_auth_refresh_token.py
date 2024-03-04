@@ -77,7 +77,7 @@ async def test_refresh_token_fails_with_message_when_token_is_used(
     assert response.json() == {"detail": api_messages.REFRESH_TOKEN_ALREADY_USED}
 
 
-async def test_refresh_token_success_response_200(
+async def test_refresh_token_success_response_status_code(
     client: AsyncClient,
     default_user: User,
     session: AsyncSession,

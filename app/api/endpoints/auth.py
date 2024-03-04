@@ -5,15 +5,20 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import api_messages, deps
 from app.core.config import get_settings
 from app.core.security.jwt import create_jwt_token
-from app.core.security.password import DUMMY_PASSWORD, verify_password
+from app.core.security.password import (
+    DUMMY_PASSWORD,
+    get_password_hash,
+    verify_password,
+)
 from app.models import RefreshToken, User
-from app.schemas.requests import RefreshTokenRequest
-from app.schemas.responses import AccessTokenResponse
+from app.schemas.requests import RefreshTokenRequest, UserCreateRequest
+from app.schemas.responses import AccessTokenResponse, UserResponse
 
 router = APIRouter()
 
@@ -153,3 +158,39 @@ async def refresh_token(
         refresh_token=refresh_token.refresh_token,
         refresh_token_expires_at=refresh_token.exp,
     )
+
+
+@router.post(
+    "/register",
+    response_model=UserResponse,
+    description="Create new user",
+    status_code=status.HTTP_201_CREATED,
+)
+async def register_new_user(
+    new_user: UserCreateRequest,
+    session: AsyncSession = Depends(deps.get_session),
+) -> User:
+    result = await session.execute(select(User).where(User.email == new_user.email))
+    if result.scalars().first() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=api_messages.EMAIL_ADDRESS_ALREADY_USED,
+        )
+
+    user = User(
+        email=new_user.email,
+        hashed_password=get_password_hash(new_user.password),
+    )
+    session.add(user)
+
+    try:
+        await session.commit()
+    except IntegrityError:  # pragma: no cover
+        await session.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=api_messages.EMAIL_ADDRESS_ALREADY_USED,
+        )
+
+    return user

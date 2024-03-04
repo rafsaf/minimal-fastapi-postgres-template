@@ -14,7 +14,7 @@ from app.models import RefreshToken, User
 from app.tests.conftest import default_user_password
 
 
-async def test_login_access_token_has_response_code_200(
+async def test_login_access_token_has_response_status_code(
     client: AsyncClient,
     default_user: User,
 ) -> None:
