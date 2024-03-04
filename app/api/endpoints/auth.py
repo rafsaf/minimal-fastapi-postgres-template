@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import api_messages, deps
-from app.core import config
+from app.core.config import get_settings
 from app.core.security.jwt import create_jwt_token
 from app.core.security.password import DUMMY_PASSWORD, verify_password
 from app.models import RefreshToken, User
@@ -26,7 +26,7 @@ ACCESS_TOKEN_RESPONSES: dict[int | str, dict[str, Any]] = {
     },
 }
 
-REFRESH_TOKEN_RESPONES: dict[int | str, dict[str, Any]] = {
+REFRESH_TOKEN_RESPONSES: dict[int | str, dict[str, Any]] = {
     400: {
         "description": "Refresh token expired or is already used",
         "content": {
@@ -89,7 +89,7 @@ async def login_access_token(
     refresh_token = RefreshToken(
         user_id=user.user_id,
         refresh_token=secrets.token_urlsafe(32),
-        exp=int(time.time() + config.get_settings().security.refresh_token_expire_secs),
+        exp=int(time.time() + get_settings().security.refresh_token_expire_secs),
     )
     session.add(refresh_token)
     await session.commit()
@@ -105,7 +105,7 @@ async def login_access_token(
 @router.post(
     "/refresh-token",
     response_model=AccessTokenResponse,
-    responses=REFRESH_TOKEN_RESPONES,
+    responses=REFRESH_TOKEN_RESPONSES,
 )
 async def refresh_token(
     data: RefreshTokenRequest,
@@ -144,7 +144,7 @@ async def refresh_token(
     refresh_token = RefreshToken(
         user_id=token.user_id,
         refresh_token=secrets.token_urlsafe(32),
-        exp=int(time.time() + config.get_settings().security.refresh_token_expire_secs),
+        exp=int(time.time() + get_settings().security.refresh_token_expire_secs),
     )
     session.add(refresh_token)
     await session.commit()

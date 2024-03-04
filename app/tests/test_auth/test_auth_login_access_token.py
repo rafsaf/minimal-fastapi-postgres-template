@@ -6,6 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api import api_messages
 from app.core.config import get_settings
 from app.core.security.jwt import verify_jwt_token
 from app.main import app
@@ -13,7 +14,6 @@ from app.models import RefreshToken, User
 from app.tests.conftest import default_user_password
 
 
-@freeze_time("2023-01-01")
 async def test_login_access_token_has_response_code_200(
     client: AsyncClient,
     default_user: User,
@@ -30,7 +30,6 @@ async def test_login_access_token_has_response_code_200(
     assert response.status_code == status.HTTP_200_OK
 
 
-@freeze_time("2023-01-01")
 async def test_login_access_token_jwt_has_valid_token_type(
     client: AsyncClient,
     default_user: User,
@@ -74,7 +73,6 @@ async def test_login_access_token_returns_valid_jwt_access_token(
     client: AsyncClient,
     default_user: User,
 ) -> None:
-    now = int(datetime.now(tz=UTC).timestamp())
     response = await client.post(
         app.url_path_for("login_access_token"),
         data={
@@ -84,6 +82,7 @@ async def test_login_access_token_returns_valid_jwt_access_token(
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
 
+    now = int(datetime.now(tz=UTC).timestamp())
     token = response.json()
     token_payload = verify_jwt_token(token["access_token"])
 
@@ -173,7 +172,7 @@ async def test_auth_access_token_fail_for_not_existing_user_with_message(
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json() == {"detail": "Incorrect email or password"}
+    assert response.json() == {"detail": api_messages.PASSWORD_INVALID}
 
 
 async def test_auth_access_token_fail_for_invalid_password_with_message(
@@ -190,4 +189,4 @@ async def test_auth_access_token_fail_for_invalid_password_with_message(
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json() == {"detail": "Incorrect email or password"}
+    assert response.json() == {"detail": api_messages.PASSWORD_INVALID}
