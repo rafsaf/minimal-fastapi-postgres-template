@@ -69,6 +69,7 @@ async def test_login_access_token_jwt_has_valid_expire_time(
     )
 
 
+@freeze_time("2023-01-01")
 async def test_login_access_token_returns_valid_jwt_access_token(
     client: AsyncClient,
     default_user: User,
@@ -87,7 +88,7 @@ async def test_login_access_token_returns_valid_jwt_access_token(
     token_payload = verify_jwt_token(token["access_token"])
 
     assert token_payload.sub == default_user.user_id
-    assert token_payload.iat >= now
+    assert token_payload.iat == now
     assert token_payload.exp == token["expires_at"]
 
 
