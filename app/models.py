@@ -1,18 +1,17 @@
-"""
-SQL Alchemy models declaration.
-https://docs.sqlalchemy.org/en/14/orm/declarative_styles.html#example-two-dataclasses-with-declarative-table
-Dataclass style for powerful autocompletion support.
+# SQL Alchemy models declaration.
+# https://docs.sqlalchemy.org/en/20/orm/quickstart.html#declare-models
+# mapped_column syntax from SQLAlchemy 2.0.
 
-https://alembic.sqlalchemy.org/en/latest/tutorial.html
-Note, it is used by alembic migrations logic, see `alembic/env.py`
+# https://alembic.sqlalchemy.org/en/latest/tutorial.html
+# Note, it is used by alembic migrations logic, see `alembic/env.py`
 
-Alembic shortcuts:
-# create migration
-alembic revision --autogenerate -m "migration_name"
+# Alembic shortcuts:
+# # create migration
+# alembic revision --autogenerate -m "migration_name"
 
-# apply all migrations
-alembic upgrade head
-"""
+# # apply all migrations
+# alembic upgrade head
+
 
 import uuid
 from datetime import datetime

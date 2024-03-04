@@ -1,25 +1,18 @@
-"""
-File with environment variables and general configuration logic.
-`SECRET_KEY`, `ENVIRONMENT` etc. map to env variables with the same names.
+# File with environment variables and general configuration logic.
+# Env variables are combined in nested groups like "Security", "Database" etc.
+# So environment variable (case-insensitive) for jwt_secret_key will be "security__jwt_secret_key"
+#
+# Pydantic priority ordering:
+#
+# 1. (Most important, will overwrite everything) - environment variables
+# 2. `.env` file in root folder of project
+# 3. Default values
+#
+# "sqlalchemy_database_uri" is computed field that will create valid database URL
+#
+# See https://pydantic-docs.helpmanual.io/usage/settings/
+# Note, complex types like lists are read as json-encoded strings.
 
-Pydantic priority ordering:
-
-1. (Most important, will overwrite everything) - environment variables
-2. `.env` file in root folder of project
-3. Default values
-
-For project name, version, description we use pyproject.toml
-For the rest, we use file `.env` (gitignored), see `.env.example`
-
-`DEFAULT_SQLALCHEMY_DATABASE_URI` and `TEST_SQLALCHEMY_DATABASE_URI`:
-Both are ment to be validated at the runtime, do not change unless you know
-what are you doing. All the two validators do is to build full URI (TCP protocol)
-to databases to avoid typo bugs.
-
-See https://pydantic-docs.helpmanual.io/usage/settings/
-
-Note, complex types like lists are read as json-encoded strings.
-"""
 
 from functools import lru_cache
 from pathlib import Path
