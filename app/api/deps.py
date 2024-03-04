@@ -25,12 +25,9 @@ async def get_current_user(
 ) -> User:
     token_payload = verify_jwt_token(token)
 
-    result = await session.execute(
-        select(User).where(User.user_id == token_payload.sub)
-    )
-    user = result.scalars().first()
+    user = await session.scalar(select(User).where(User.user_id == token_payload.sub))
 
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=api_messages.JWT_ERROR_USER_REMOVED,
