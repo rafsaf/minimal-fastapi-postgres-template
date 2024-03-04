@@ -59,13 +59,12 @@ REFRESH_TOKEN_RESPONSES: dict[int | str, dict[str, Any]] = {
     "/access-token",
     response_model=AccessTokenResponse,
     responses=ACCESS_TOKEN_RESPONSES,
+    description="OAuth2 compatible token, get an access token for future requests using username and password",
 )
 async def login_access_token(
     session: AsyncSession = Depends(deps.get_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> AccessTokenResponse:
-    """OAuth2 compatible token, get an access token for future requests using username and password"""
-
     result = await session.execute(select(User).where(User.email == form_data.username))
     user = result.scalars().first()
 
@@ -106,17 +105,16 @@ async def login_access_token(
     "/refresh-token",
     response_model=AccessTokenResponse,
     responses=REFRESH_TOKEN_RESPONSES,
+    description="OAuth2 compatible token, get an access token for future requests using refresh token",
 )
 async def refresh_token(
     data: RefreshTokenRequest,
     session: AsyncSession = Depends(deps.get_session),
 ) -> AccessTokenResponse:
-    """OAuth2 compatible token, get an access token for future requests using refresh token"""
-
     result = await session.execute(
         select(RefreshToken)
         .where(RefreshToken.refresh_token == data.refresh_token)
-        .with_for_update()
+        .with_for_update(skip_locked=True)
     )
     token = result.scalars().first()
 
