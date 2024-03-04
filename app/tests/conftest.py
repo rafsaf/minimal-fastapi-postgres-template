@@ -5,7 +5,7 @@ from collections.abc import AsyncGenerator, Generator
 import pytest
 import pytest_asyncio
 import sqlalchemy
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -102,9 +102,10 @@ async def fixture_session_with_rollback(
 
 @pytest_asyncio.fixture(name="client", scope="function")
 async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=fastapi_app, base_url="http://test") as client:
-        client.headers.update({"Host": "localhost"})
-        yield client
+    transport = ASGITransport(app=fastapi_app)  # type: ignore
+    async with AsyncClient(transport=transport, base_url="http://test") as aclient:
+        aclient.headers.update({"Host": "localhost"})
+        yield aclient
 
 
 @pytest_asyncio.fixture(name="default_user", scope="function")
