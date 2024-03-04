@@ -4,6 +4,8 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Tests](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml/badge.svg)](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml)
 
+_Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added my domain and https only._
+
 # Minimal async FastAPI + PostgreSQL template
 
 - [Minimal async FastAPI + PostgreSQL template](#minimal-async-fastapi--postgresql-template)
@@ -41,7 +43,7 @@
 
 <br>
 
-_Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added my domain and https only._
+
 
 <kbd>![template-fastapi-minimal-openapi-example](https://drive.google.com/uc?export=view&id=1rIXFJK8VyVrV7v4qgtPFryDd5FQrb4gr)</kbd>
 
