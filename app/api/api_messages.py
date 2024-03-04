@@ -1,5 +1,3 @@
-JWT_ERROR_INVALID_TOKEN = "Token invalid"
-JWT_ERROR_EXPIRED_TOKEN = "Token expired"
 JWT_ERROR_USER_REMOVED = "User removed"
 PASSWORD_INVALID = "Incorrect email or password"
 REFRESH_TOKEN_NOT_FOUND = "Refresh token not found"

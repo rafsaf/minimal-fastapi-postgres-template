@@ -4,12 +4,12 @@ import jwt
 from fastapi import HTTPException, status
 from pydantic import BaseModel
 
-from app.api import api_messages
 from app.core.config import get_settings
 
 JWT_ALGORITHM = "HS256"
 
 
+# Payload follows RFC 7519
 # https://www.rfc-editor.org/rfc/rfc7519#section-4.1
 class JWTTokenPayload(BaseModel):
     iss: str
@@ -44,21 +44,25 @@ def create_jwt_token(user_id: str) -> JWTToken:
 
 
 def verify_jwt_token(token: str) -> JWTTokenPayload:
+    # Pay attention to verify_signature passed explicite, even if it is the default.
+    # Verification is based on expected payload fields like "exp", "iat" etc.
+    # so if you rename for example "exp" to "my_custom_exp", this is gonna break,
+    # jwt.ExpiredSignatureError will not be raised, that can potentialy
+    # be major security risk - not validating tokens at all.
+    # If unsure, jump into jwt.decode code, make sure tests are passing
+    # https://pyjwt.readthedocs.io/en/stable/usage.html#encoding-decoding-tokens-with-hs256
+
     try:
         raw_payload = jwt.decode(
             token,
             get_settings().security.jwt_secret_key.get_secret_value(),
             algorithms=[JWT_ALGORITHM],
+            options={"verify_signature": True},
         )
-    except jwt.ExpiredSignatureError:
+    except jwt.InvalidTokenError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=api_messages.JWT_ERROR_EXPIRED_TOKEN,
-        )
-    except (jwt.DecodeError, jwt.InvalidTokenError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=api_messages.JWT_ERROR_INVALID_TOKEN,
+            detail=f"Token invalid: {e}",
         )
 
     return JWTTokenPayload(**raw_payload)

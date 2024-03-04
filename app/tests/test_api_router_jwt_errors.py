@@ -23,7 +23,7 @@ async def test_api_routes_raise_401_on_jwt_decode_errors(
             headers={"Authorization": "Bearer garbage-invalid-jwt"},
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert response.json() == {"detail": api_messages.JWT_ERROR_INVALID_TOKEN}
+        assert response.json() == {"detail": "Token invalid: Not enough segments"}
 
 
 @pytest.mark.parametrize("api_route", api_router.routes)
@@ -42,7 +42,7 @@ async def test_api_routes_raise_401_on_jwt_expired_token(
                 headers={"Authorization": f"Bearer {jwt.access_token}"},
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
-            assert response.json() == {"detail": api_messages.JWT_ERROR_EXPIRED_TOKEN}
+            assert response.json() == {"detail": "Token invalid: Signature has expired"}
 
 
 @pytest.mark.parametrize("api_route", api_router.routes)

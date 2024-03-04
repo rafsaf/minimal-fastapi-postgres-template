@@ -18,12 +18,8 @@ api_router = APIRouter(
                             "value": {"detail": "Not authenticated"},
                         },
                         "invalid token": {
-                            "summary": api_messages.JWT_ERROR_INVALID_TOKEN,
-                            "value": {"detail": api_messages.JWT_ERROR_INVALID_TOKEN},
-                        },
-                        "expired token": {
-                            "summary": api_messages.JWT_ERROR_EXPIRED_TOKEN,
-                            "value": {"detail": api_messages.JWT_ERROR_EXPIRED_TOKEN},
+                            "summary": "Token validation failed, decode failed, it may be expired or malformed",
+                            "value": {"detail": "Token invalid: {detailed error msg}"},
                         },
                         "removed user": {
                             "summary": api_messages.JWT_ERROR_USER_REMOVED,
