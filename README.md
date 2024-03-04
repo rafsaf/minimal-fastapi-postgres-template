@@ -42,7 +42,7 @@
 
 _Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added domain and https only._
 
-![template-fastapi-minimal-openapi-example](./docs/template-minimal-openapi-example.png)
+![template-fastapi-minimal-openapi-example](https://drive.google.com/uc?export=view&id=1xEJx3fmkr1sOOzNQqMh-YWMAurFZYaTo)
 
 ## Quickstart
 
