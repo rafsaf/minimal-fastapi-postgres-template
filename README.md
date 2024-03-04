@@ -9,9 +9,9 @@
 - [Minimal async FastAPI + PostgreSQL template](#minimal-async-fastapi--postgresql-template)
   - [Features](#features)
   - [Quickstart](#quickstart)
-    - [1. Install cookiecutter globally and cookiecutter this project](#1-install-cookiecutter-globally-and-cookiecutter-this-project)
-    - [2. Install dependecies with poetry or without it](#2-install-dependecies-with-poetry-or-without-it)
-    - [3. Setup databases](#3-setup-databases)
+    - [1. Create repository from a template](#1-create-repository-from-a-template)
+    - [2. Install dependecies with Poetry](#2-install-dependecies-with-poetry)
+    - [3. Setup database and migrations](#3-setup-database-and-migrations)
     - [4. Now you can run app](#4-now-you-can-run-app)
     - [5. Activate pre-commit](#5-activate-pre-commit)
     - [6. Running tests](#6-running-tests)
@@ -22,24 +22,26 @@
     - [3. Create request and response schemas](#3-create-request-and-response-schemas)
     - [4. Create endpoints](#4-create-endpoints)
     - [5. Write tests](#5-write-tests)
-  - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
-  - [Docs URL, CORS and Allowed Hosts](#docs-url-cors-and-allowed-hosts)
+  - [Design](#design)
+    - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
+    - [Docs URL, CORS and Allowed Hosts](#docs-url-cors-and-allowed-hosts)
+    - [Test setup](#test-setup)
+
 
 ## Features
 
+- [x] Template repository
 - [x] SQLAlchemy 2.0, async queries, best possible autocompletion support
-- [x] Postgresql database under `asyncpg`
-- [x] [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations
-- [x] Very minimal project structure yet ready for quick start building new apps
+- [x] PostgreSQL 16 database under `asyncpg`, docker-compose.yml
+- [x] Full [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations setup
 - [x] Refresh token endpoint (not only access like in official template)
-- [x] Database in docker-compose.yml and ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver
-- [x] [Poetry](https://python-poetry.org/docs/) and Python 3.12 based
-- [x] `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
+- [x] Ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver as an example
+- [x] [Poetry](https://python-poetry.org/docs/), `mypy`, `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
 - [x] **Perfect** pytest asynchronous test setup with +40 tests and full coverage
 
 <br>
 
-_Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added domain and https only._
+_Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added my domain and https only._
 
 <kbd>![template-fastapi-minimal-openapi-example](https://drive.google.com/uc?export=view&id=1rIXFJK8VyVrV7v4qgtPFryDd5FQrb4gr)</kbd>
 
@@ -47,39 +49,29 @@ _Check out also online example: https://minimal-fastapi-postgres-template.rafsaf
 
 ## Quickstart
 
-### 1. Install cookiecutter globally and cookiecutter this project
+### 1. Create repository from a template
+
+See [docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+
+### 2. Install dependecies with [Poetry](https://python-poetry.org/docs/)
 
 ```bash
-pip install cookiecutter
+cd your_project_name
 
-# And cookiecutter this project :)
-cookiecutter https://github.com/rafsaf/minimal-fastapi-postgres-template
-
-```
-
-### 2. Install dependecies with poetry or without it
-
-```bash
-cd project_name
 ### Poetry install (python3.12)
 poetry install
-
-### Optionally there is also `requirements-dev.txt` file
-python3.12 -m venv venv
-source venv/bin/activate
-pip install -r requirements-dev.txt
 ```
 
 Note, be sure to use `python3.12` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10 or `tomllib` for python < 3.11)
 
-### 3. Setup databases
+### 3. Setup database and migrations
 
 ```bash
-### Setup two databases
+### Setup database
 docker-compose up -d
 
-### Alembic migrations upgrade and initial_data.py script
-bash init.sh
+### Run Alembic migrations
+alembic upgrade head
 ```
 
 ### 4. Now you can run app
@@ -94,35 +86,27 @@ You should then use `git init` to initialize git repository and access OpenAPI s
 
 ### 5. Activate pre-commit
 
-[pre-commit](https://pre-commit.com/) is de facto standard now for pre push activities like isort or black.
+[pre-commit](https://pre-commit.com/) is de facto standard now for pre push activities like isort or black or its replacement ruff.
 
-Refer to `.pre-commit-config.yaml` file to see my opinionated choices.
+Refer to `.pre-commit-config.yaml` file to see my current opinionated choices.
 
 ```bash
 # Install pre-commit
-pre-commit install
+pre-commit install --install-hooks
 
-# First initialization and run on all files
+# Run on all files
 pre-commit run --all-files
 ```
 
 ### 6. Running tests
 
+Note, it will create databases during and run tests in many processes by default, based on how many CPU are available.
+
+For more details, see [Test setup](#test-setup).
+
 ```bash
-# Note, it will use second database declared in docker-compose.yml, not default one
+# see pytest configuration flags in pyproject.toml
 pytest
-
-# collected 7 items
-
-# app/tests/test_auth.py::test_auth_access_token PASSED                                                                       [ 14%]
-# app/tests/test_auth.py::test_auth_access_token_fail_no_user PASSED                                                          [ 28%]
-# app/tests/test_auth.py::test_auth_refresh_token PASSED                                                                      [ 42%]
-# app/tests/test_users.py::test_read_current_user PASSED                                                                      [ 57%]
-# app/tests/test_users.py::test_delete_current_user PASSED                                                                    [ 71%]
-# app/tests/test_users.py::test_reset_current_user_password PASSED                                                            [ 85%]
-# app/tests/test_users.py::test_register_new_user PASSED                                                                      [100%]
-#
-# ======================================================== 7 passed in 1.75s ========================================================
 ```
 
 <br>
@@ -368,13 +352,15 @@ async def test_get_all_my_pets(
 
 ```
 
-## Deployment strategies - via Docker image
+## Design
+
+### Deployment strategies - via Docker image
 
 This template has by default included `Dockerfile` with [Uvicorn](https://www.uvicorn.org/) webserver, because it's simple and just for showcase purposes, with direct relation to FastAPI and great ease of configuration. You should be able to run container(s) (over :8000 port) and then need to setup the proxy, loadbalancer, with https enbaled, so the app stays behind it.
 
 If you prefer other webservers for FastAPI, check out [Nginx Unit](https://unit.nginx.org/), [Daphne](https://github.com/django/daphne), [Hypercorn](https://pgjones.gitlab.io/hypercorn/index.html).
 
-## Docs URL, CORS and Allowed Hosts
+### Docs URL, CORS and Allowed Hosts
 
 There are some **opinionated** default settings in `/app/main.py` for documentation, CORS and allowed hosts.
 
@@ -413,3 +399,5 @@ There are some **opinionated** default settings in `/app/main.py` for documentat
    ```
 
    Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
+
+### Test setup
