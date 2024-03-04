@@ -1,11 +1,11 @@
-FROM python:3.12.1-slim-bullseye as base
+FROM python:3.12.2-slim-bullseye as base
 
 ENV PYTHONUNBUFFERED 1
 WORKDIR /build
 
 # Create requirements.txt file
 FROM base as poetry
-RUN pip install poetry==1.7.1
+RUN pip install poetry==1.8.2
 COPY poetry.lock pyproject.toml ./
 RUN poetry export -o /requirements.txt --without-hashes
 

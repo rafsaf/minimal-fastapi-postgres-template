@@ -1,0 +1,36 @@
+name: dev-build
+on:
+  workflow_run:
+    workflows: ["tests"]
+    branches: [main]
+    types:
+      - completed
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Docker image tag"
+        required: true
+        default: "latest"
+
+env:
+  IMAGE_TAG: ${{ github.event.inputs.tag || 'latest' }}
+
+jobs:
+  dev_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          file: Dockerfile
+          push: true
+          tags: rafsaf/minimal-fastapi-postgres-template:${{ env.IMAGE_TAG }}
