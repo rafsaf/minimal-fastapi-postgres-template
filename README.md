@@ -9,6 +9,7 @@
 
 - [Minimal async FastAPI + PostgreSQL template](#minimal-async-fastapi--postgresql-template)
   - [Features](#features)
+  - [||](#)
   - [Quickstart](#quickstart)
     - [1. Install cookiecutter globally and cookiecutter this project](#1-install-cookiecutter-globally-and-cookiecutter-this-project)
     - [2. Install dependecies with poetry or without it](#2-install-dependecies-with-poetry-or-without-it)
@@ -42,7 +43,9 @@
 
 _Check out also online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added domain and https only._
 
-![template-fastapi-minimal-openapi-example](https://drive.google.com/uc?export=view&id=1rIXFJK8VyVrV7v4qgtPFryDd5FQrb4gr)
+|![template-fastapi-minimal-openapi-example](https://drive.google.com/uc?export=view&id=1rIXFJK8VyVrV7v4qgtPFryDd5FQrb4gr)|
+-
+
 
 ## Quickstart
 
