@@ -70,8 +70,7 @@ async def login_access_token(
     session: AsyncSession = Depends(deps.get_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> AccessTokenResponse:
-    result = await session.execute(select(User).where(User.email == form_data.username))
-    user = result.scalars().first()
+    user = await session.scalar(select(User).where(User.email == form_data.username))
 
     if user is None:
         # this is naive method to not return early
@@ -116,12 +115,11 @@ async def refresh_token(
     data: RefreshTokenRequest,
     session: AsyncSession = Depends(deps.get_session),
 ) -> AccessTokenResponse:
-    result = await session.execute(
+    token = await session.scalar(
         select(RefreshToken)
         .where(RefreshToken.refresh_token == data.refresh_token)
         .with_for_update(skip_locked=True)
     )
-    token = result.scalars().first()
 
     if token is None:
         raise HTTPException(
@@ -170,8 +168,8 @@ async def register_new_user(
     new_user: UserCreateRequest,
     session: AsyncSession = Depends(deps.get_session),
 ) -> User:
-    result = await session.execute(select(User).where(User.email == new_user.email))
-    if result.scalars().first() is not None:
+    user = await session.scalar(select(User).where(User.email == new_user.email))
+    if user is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=api_messages.EMAIL_ADDRESS_ALREADY_USED,

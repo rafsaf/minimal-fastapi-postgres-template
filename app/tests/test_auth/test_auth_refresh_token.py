@@ -122,10 +122,10 @@ async def test_refresh_token_success_old_token_is_used(
         },
     )
 
-    result = await session.execute(
+    test_refresh_token = await session.scalar(
         select(RefreshToken).where(RefreshToken.refresh_token == "blaxx")
     )
-    test_refresh_token = result.scalar_one()
+    assert test_refresh_token is not None
     assert test_refresh_token.used
 
 
