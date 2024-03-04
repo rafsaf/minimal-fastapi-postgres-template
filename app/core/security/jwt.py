@@ -58,6 +58,7 @@ def verify_jwt_token(token: str) -> JWTTokenPayload:
             get_settings().security.jwt_secret_key.get_secret_value(),
             algorithms=[JWT_ALGORITHM],
             options={"verify_signature": True},
+            issuer=get_settings().security.jwt_issuer,
         )
     except jwt.InvalidTokenError as e:
         raise HTTPException(

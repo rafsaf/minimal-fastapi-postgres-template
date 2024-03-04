@@ -121,11 +121,11 @@ async def test_refresh_token_success_old_token_is_used(
         },
     )
 
-    test_refresh_token = await session.scalar(
+    used_test_refresh_token = await session.scalar(
         select(RefreshToken).where(RefreshToken.refresh_token == "blaxx")
     )
-    assert test_refresh_token is not None
-    assert test_refresh_token.used
+    assert used_test_refresh_token is not None
+    assert used_test_refresh_token.used
 
 
 async def test_refresh_token_success_jwt_has_valid_token_type(

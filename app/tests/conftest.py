@@ -70,6 +70,13 @@ async def fixture_setup_new_test_database() -> None:
         await conn.run_sync(Base.metadata.create_all)
 
 
+@pytest_asyncio.fixture(scope="function", autouse=True)
+async def fixture_clean_get_settings_between_tests() -> AsyncGenerator[None, None]:
+    yield
+
+    get_settings.cache_clear()
+
+
 @pytest_asyncio.fixture(name="default_hashed_password", scope="session")
 async def fixture_default_hashed_password() -> str:
     return get_password_hash(default_user_password)
