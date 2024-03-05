@@ -26,7 +26,7 @@ mypy = "^1.8.0"
 pre-commit = "^3.6.2"
 pytest = "^8.0.2"
 # do not bump pytest-asyncio until https://github.com/pytest-dev/pytest-asyncio/issues/706 resolved
-pytest-asyncio = "0.21.1"
+pytest-asyncio = "0.23.5"
 pytest-cov = "^4.1.0"
 pytest-xdist = "^3.5.0"
 ruff = "^0.3.0"
