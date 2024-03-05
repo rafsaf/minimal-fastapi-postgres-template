@@ -27,7 +27,6 @@ _Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, 
   - [Design](#design)
     - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
     - [Docs URL, CORS and Allowed Hosts](#docs-url-cors-and-allowed-hosts)
-    - [Test setup](#test-setup)
 
 
 ## Features
@@ -39,7 +38,7 @@ _Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, 
 - [x] Refresh token endpoint (not only access like in official template)
 - [x] Ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver as an example
 - [x] [Poetry](https://python-poetry.org/docs/), `mypy`, `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
-- [x] **Perfect** pytest asynchronous test setup with +40 tests and full coverage
+- [x] Perfect pytest asynchronous test setup with +40 tests and full coverage
 
 <br>
 
@@ -102,12 +101,14 @@ pre-commit run --all-files
 
 ### 6. Running tests
 
-Note, it will create databases during and run tests in many processes by default, based on how many CPU are available.
+Note, it will create databases for session and run tests in many processes by default (using pytest-xdist) to speed up execution, based on how many CPU are available in environment.
 
-For more details, see [Test setup](#test-setup).
+For more details about initial database setup, see logic `app/tests/conftest.py` file, `fixture_setup_new_test_database` function.
+
+Moreover, there is coverage pytest plugin with required code coverage level 100%.
 
 ```bash
-# see pytest configuration flags in pyproject.toml
+# see all pytest configuration flags in pyproject.toml
 pytest
 ```
 
@@ -402,4 +403,3 @@ There are some **opinionated** default settings in `/app/main.py` for documentat
 
    Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
 
-### Test setup
