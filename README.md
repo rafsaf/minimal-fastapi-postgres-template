@@ -146,7 +146,7 @@ We will add `Pet` model to `app/models.py`.
 ```python
 # app/models.py
 
-...
+(...)
 
 class Pet(Base):
     __tablename__ = "pet"
@@ -278,11 +278,11 @@ Also, we need to add newly created endpoints to router.
 ```python
 # app/api/api.py
 
-...
+(...)
 
 from app.api.endpoints import auth, pets, users
 
-...
+(...)
 
 api_router.include_router(pets.router, prefix="/pets", tags=["pets"])
 
