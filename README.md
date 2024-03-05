@@ -27,6 +27,7 @@ _Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, 
   - [Design](#design)
     - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
     - [Docs URL, CORS and Allowed Hosts](#docs-url-cors-and-allowed-hosts)
+  - [License](#license)
 
 
 ## Features
@@ -403,3 +404,7 @@ There are some **opinionated** default settings in `/app/main.py` for documentat
 
    Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
 
+
+## License
+
+The code is under MIT License. It's here for educational purposes, created mainly to have a place where up-to-date Python and FastAPI software lives. Do whatever you want with this code.
