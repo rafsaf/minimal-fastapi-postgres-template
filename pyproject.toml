@@ -1,0 +1,60 @@
+[tool.poetry]
+authors = ["admin <admin@example.com>"]
+description = "FastAPI project generated using minimal-fastapi-postgres-template."
+name = "app"
+version = "0.1.0-alpha"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+alembic = "^1.13.1"
+asyncpg = "^0.29.0"
+bcrypt = "^4.1.2"
+fastapi = "^0.110.0"
+pydantic = {extras = ["dotenv", "email"], version = "^2.6.3"}
+pydantic-settings = "^2.2.1"
+pyjwt = "^2.8.0"
+python-multipart = "^0.0.9"
+sqlalchemy = "^2.0.28"
+
+[tool.poetry.group.dev.dependencies]
+coverage = "^7.4.3"
+freezegun = "^1.4.0"
+gevent = "^24.2.1"
+httpx = "^0.27.0"
+mypy = "^1.8.0"
+pre-commit = "^3.6.2"
+pytest = "^8.0.2"
+# do not bump pytest-asyncio until https://github.com/pytest-dev/pytest-asyncio/issues/706 resolved
+pytest-asyncio = "0.21.1"
+pytest-cov = "^4.1.0"
+pytest-xdist = "^3.5.0"
+ruff = "^0.3.0"
+types-passlib = "^1.7.7.20240106"
+uvicorn = {extras = ["standard"], version = "^0.27.1"}
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool.pytest.ini_options]
+addopts = "-vv -n auto --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
+asyncio_mode = "auto"
+testpaths = ["app/tests"]
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["app/tests/*"]
+source = ["app"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, isort, pylint, pyupgrade
+ignore = ["E501"]
+select = ["E", "F", "I", "PL", "UP", "W"]

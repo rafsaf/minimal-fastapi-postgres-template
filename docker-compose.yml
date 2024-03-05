@@ -1,0 +1,23 @@
+# For local development, only database is running
+#
+# docker compose up -d
+# uvicorn app.main:app --reload
+#
+
+services:
+  postgres_db:
+    restart: unless-stopped
+    image: postgres:16
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DATABASE__DB}
+      - POSTGRES_USER=${DATABASE__USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE__PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "${DATABASE__PORT}:5432"
+
+volumes:
+  postgres_db:
