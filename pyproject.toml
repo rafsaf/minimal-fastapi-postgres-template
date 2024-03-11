@@ -22,16 +22,16 @@ coverage = "^7.4.3"
 freezegun = "^1.4.0"
 gevent = "^24.2.1"
 httpx = "^0.27.0"
-mypy = "^1.8.0"
+mypy = "^1.9.0"
 pre-commit = "^3.6.2"
-pytest = "^8.0.2"
+pytest = "^8.1.1"
 # do not bump pytest-asyncio until https://github.com/pytest-dev/pytest-asyncio/issues/706 resolved
 pytest-asyncio = "0.21.1"
 pytest-cov = "^4.1.0"
 pytest-xdist = "^3.5.0"
-ruff = "^0.3.0"
-types-passlib = "^1.7.7.20240106"
-uvicorn = {extras = ["standard"], version = "^0.27.1"}
+ruff = "^0.3.2"
+types-passlib = "^1.7.7.20240311"
+uvicorn = {extras = ["standard"], version = "^0.28.0"}
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
