@@ -10,7 +10,7 @@ python = "^3.12"
 alembic = "^1.13.1"
 asyncpg = "^0.29.0"
 bcrypt = "^4.1.2"
-fastapi = "^0.110.0"
+fastapi = "^0.110.1"
 pydantic = {extras = ["dotenv", "email"], version = "^2.6.4"}
 pydantic-settings = "^2.2.1"
 pyjwt = "^2.8.0"
