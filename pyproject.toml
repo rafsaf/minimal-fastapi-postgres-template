@@ -10,8 +10,8 @@ python = "^3.12"
 alembic = "^1.13.1"
 asyncpg = "^0.29.0"
 bcrypt = "^4.1.2"
-fastapi = "^0.110.1"
-pydantic = {extras = ["dotenv", "email"], version = "^2.6.4"}
+fastapi = "^0.110.2"
+pydantic = {extras = ["dotenv", "email"], version = "^2.7.0"}
 pydantic-settings = "^2.2.1"
 pyjwt = "^2.8.0"
 python-multipart = "^0.0.9"
@@ -29,7 +29,7 @@ pytest = "^8.1.1"
 pytest-asyncio = "0.21.1"
 pytest-cov = "^5.0.0"
 pytest-xdist = "^3.5.0"
-ruff = "^0.3.5"
+ruff = "^0.4.1"
 types-passlib = "^1.7.7.20240327"
 uvicorn = {extras = ["standard"], version = "^0.29.0"}
 
