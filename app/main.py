@@ -20,7 +20,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        str(origin) for origin in get_settings().security.backend_cors_origins
+        str(origin).rstrip("/") for origin in get_settings().security.backend_cors_origins
     ],
     allow_credentials=True,
     allow_methods=["*"],
