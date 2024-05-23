@@ -5,6 +5,8 @@ on:
       - "**"
     tags-ignore:
       - "*.*"
+  pull_request:
+    types: [opened, reopened]
 
 jobs:
   tests:
