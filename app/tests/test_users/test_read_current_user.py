@@ -1,3 +1,4 @@
+import pytest
 from fastapi import status
 from httpx import AsyncClient
 
@@ -8,6 +9,7 @@ from app.tests.conftest import (
 )
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_read_current_user_status_code(
     client: AsyncClient, default_user_headers: dict[str, str]
 ) -> None:
@@ -19,6 +21,7 @@ async def test_read_current_user_status_code(
     assert response.status_code == status.HTTP_200_OK
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_read_current_user_response(
     client: AsyncClient, default_user_headers: dict[str, str]
 ) -> None:
