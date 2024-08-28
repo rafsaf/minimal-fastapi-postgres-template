@@ -11,6 +11,7 @@ from app.core.security.jwt import create_jwt_token
 from app.models import User
 
 
+@pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("api_route", api_router.routes)
 async def test_api_routes_raise_401_on_jwt_decode_errors(
     client: AsyncClient,
@@ -26,6 +27,7 @@ async def test_api_routes_raise_401_on_jwt_decode_errors(
         assert response.json() == {"detail": "Token invalid: Not enough segments"}
 
 
+@pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("api_route", api_router.routes)
 async def test_api_routes_raise_401_on_jwt_expired_token(
     client: AsyncClient,
@@ -45,6 +47,7 @@ async def test_api_routes_raise_401_on_jwt_expired_token(
             assert response.json() == {"detail": "Token invalid: Signature has expired"}
 
 
+@pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("api_route", api_router.routes)
 async def test_api_routes_raise_401_on_jwt_user_deleted(
     client: AsyncClient,

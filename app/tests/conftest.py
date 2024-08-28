@@ -1,6 +1,6 @@
-import asyncio
+import logging
 import os
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator
 
 import pytest
 import pytest_asyncio
@@ -24,12 +24,17 @@ default_user_password = "geralt"
 default_user_access_token = create_jwt_token(default_user_id).access_token
 
 
-@pytest.fixture(scope="session")
-def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    yield loop
-    loop.close()
+# @pytest.fixture(scope="session")
+# def event_loop_policy():
+#     return uvloop.EventLoopPolicy()
+
+
+# @pytest.fixture(scope="session")
+# def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     yield loop
+#     loop.close()
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
@@ -102,6 +107,7 @@ async def fixture_session_with_rollback(
 
     yield session
 
+    logging.critical("Rolling back transaction")
     await session.close()
     await transaction.rollback()
     await connection.close()
@@ -118,18 +124,20 @@ async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient, N
 @pytest_asyncio.fixture(name="default_user", scope="function")
 async def fixture_default_user(
     session: AsyncSession, default_hashed_password: str
-) -> User:
+) -> AsyncGenerator[User, None]:
     default_user = User(
         user_id=default_user_id,
         email=default_user_email,
         hashed_password=default_hashed_password,
     )
     session.add(default_user)
+
     await session.commit()
     await session.refresh(default_user)
-    return default_user
+
+    yield default_user
 
 
-@pytest.fixture(name="default_user_headers", scope="function")
+@pytest_asyncio.fixture(name="default_user_headers", scope="function")
 def fixture_default_user_headers(default_user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {default_user_access_token}"}

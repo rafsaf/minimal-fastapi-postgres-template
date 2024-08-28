@@ -1,3 +1,4 @@
+import pytest
 from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy import select
@@ -8,6 +9,7 @@ from app.main import app
 from app.models import User
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_reset_current_user_password_status_code(
     client: AsyncClient,
     default_user_headers: dict[str, str],
@@ -21,6 +23,7 @@ async def test_reset_current_user_password_status_code(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_reset_current_user_password_is_changed_in_db(
     client: AsyncClient,
     default_user_headers: dict[str, str],

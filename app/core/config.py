@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     security: Security
     database: Database
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def sqlalchemy_database_uri(self) -> URL:
         return URL.create(
