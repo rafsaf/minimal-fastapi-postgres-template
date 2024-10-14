@@ -1,4 +1,4 @@
-FROM python:3.12.5-slim-bullseye as base
+FROM python:3.13.0-slim-bullseye as base
 
 ENV PYTHONUNBUFFERED 1
 WORKDIR /build
