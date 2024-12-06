@@ -14,7 +14,7 @@ from app.models import User
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/access-token")
 
 
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_session() -> AsyncGenerator[AsyncSession]:
     async with database_session.get_async_session() as session:
         yield session
 

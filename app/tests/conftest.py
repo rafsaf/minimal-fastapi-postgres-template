@@ -76,7 +76,7 @@ async def fixture_setup_new_test_database() -> None:
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
-async def fixture_clean_get_settings_between_tests() -> AsyncGenerator[None, None]:
+async def fixture_clean_get_settings_between_tests() -> AsyncGenerator[None]:
     yield
 
     get_settings.cache_clear()
@@ -90,7 +90,7 @@ async def fixture_default_hashed_password() -> str:
 @pytest_asyncio.fixture(name="session", scope="function")
 async def fixture_session_with_rollback(
     monkeypatch: pytest.MonkeyPatch,
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     # we want to monkeypatch get_async_session with one bound to session
     # that we will always rollback on function scope
 
@@ -114,8 +114,8 @@ async def fixture_session_with_rollback(
 
 
 @pytest_asyncio.fixture(name="client", scope="function")
-async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-    transport = ASGITransport(app=fastapi_app)  # type: ignore
+async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient]:
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as aclient:
         aclient.headers.update({"Host": "localhost"})
         yield aclient
@@ -124,7 +124,7 @@ async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient, N
 @pytest_asyncio.fixture(name="default_user", scope="function")
 async def fixture_default_user(
     session: AsyncSession, default_hashed_password: str
-) -> AsyncGenerator[User, None]:
+) -> AsyncGenerator[User]:
     default_user = User(
         user_id=default_user_id,
         email=default_user_email,

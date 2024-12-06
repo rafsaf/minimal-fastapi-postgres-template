@@ -7,7 +7,7 @@
 services:
   postgres_db:
     restart: unless-stopped
-    image: postgres:16
+    image: postgres:17
     volumes:
       - postgres_db:/var/lib/postgresql/data
     environment:
