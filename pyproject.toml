@@ -20,7 +20,7 @@ sqlalchemy = "^2.0.36"
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.9"
 freezegun = "^1.5.1"
-gevent = "^24.11.1"
+greenlet = "^3.1.1"
 httpx = "^0.28.1"
 mypy = "^1.13.0"
 pre-commit = "^4.0.1"
@@ -42,7 +42,7 @@ asyncio_mode = "auto"
 testpaths = ["app/tests"]
 
 [tool.coverage.run]
-concurrency = ["gevent"]
+concurrency = ["greenlet"]
 omit = ["app/tests/*"]
 source = ["app"]
 
