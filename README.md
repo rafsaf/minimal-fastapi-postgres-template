@@ -373,7 +373,7 @@ There are some **opinionated** default settings in `/app/main.py` for documentat
     ```python
     app = FastAPI(
         title="minimal fastapi postgres template",
-        version="6.0.0",
+        version="6.1.0",
         description="https://github.com/rafsaf/minimal-fastapi-postgres-template",
         openapi_url="/openapi.json",
         docs_url="/",
