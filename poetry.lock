@@ -1304,6 +1304,7 @@ files = [
 ]
 
 [package.dependencies]
+greenlet = {version = "!=0.4.17", optional = true, markers = "extra == \"asyncio\""}
 typing-extensions = ">=4.6.0"
 
 [package.extras]
@@ -1619,4 +1620,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "0eba2384713b40d26f9eff65bef027b3b0c96bfc824f7056781abeadf42ba77c"
+content-hash = "f3719aec77754eba49a123c806c066893c212c39040066d2be12e8b4fd8d5188"
