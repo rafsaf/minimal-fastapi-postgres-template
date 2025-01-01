@@ -11,25 +11,25 @@ alembic = "^1.14.0"
 asyncpg = "^0.30.0"
 bcrypt = "^4.2.1"
 fastapi = "^0.115.6"
-pydantic = { extras = ["dotenv", "email"], version = "^2.10.3" }
-pydantic-settings = "^2.6.1"
+pydantic = { extras = ["dotenv", "email"], version = "^2.10.4" }
+pydantic-settings = "^2.7.1"
 pyjwt = "^2.10.1"
-python-multipart = "^0.0.19"
+python-multipart = "^0.0.20"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.6.9"
+coverage = "^7.6.10"
 freezegun = "^1.5.1"
 greenlet = "^3.1.1"
 httpx = "^0.28.1"
-mypy = "^1.13.0"
+mypy = "^1.14.1"
 pre-commit = "^4.0.1"
 pytest = "^8.3.4"
-pytest-asyncio = "^0.24.0"
+pytest-asyncio = "^0.25.0"
 pytest-cov = "^6.0.0"
 pytest-xdist = "^3.6.1"
-ruff = "^0.8.2"
-uvicorn = { extras = ["standard"], version = "^0.32.1" }
+ruff = "^0.8.4"
+uvicorn = { extras = ["standard"], version = "^0.34.0" }
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
