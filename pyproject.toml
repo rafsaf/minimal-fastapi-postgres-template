@@ -7,28 +7,28 @@ version = "0.1.0-alpha"
 [tool.poetry.dependencies]
 python = "^3.13"
 
-alembic = "^1.14.1"
+alembic = "^1.15.2"
 asyncpg = "^0.30.0"
 bcrypt = "^4.3.0"
-fastapi = "^0.115.10"
-pydantic = { extras = ["dotenv", "email"], version = "^2.10.6" }
+fastapi = "^0.115.12"
+pydantic = { extras = ["dotenv", "email"], version = "^2.11.1" }
 pydantic-settings = "^2.8.1"
 pyjwt = "^2.10.1"
 python-multipart = "^0.0.20"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.38"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.40"}
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.6.12"
+coverage = "^7.8.0"
 freezegun = "^1.5.1"
 greenlet = "^3.1.1"
 httpx = "^0.28.1"
 mypy = "^1.15.0"
-pre-commit = "^4.1.0"
-pytest = "^8.3.4"
-pytest-asyncio = "^0.25.3"
-pytest-cov = "^6.0.0"
+pre-commit = "^4.2.0"
+pytest = "^8.3.5"
+pytest-asyncio = "^0.26.0"
+pytest-cov = "^6.1.0"
 pytest-xdist = "^3.6.1"
-ruff = "^0.9.9"
+ruff = "^0.11.2"
 uvicorn = { extras = ["standard"], version = "^0.34.0" }
 
 [build-system]
