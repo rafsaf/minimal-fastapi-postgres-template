@@ -18,7 +18,7 @@ import logging.config
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import AnyHttpUrl, BaseModel, SecretStr, computed_field
+from pydantic import AnyHttpUrl, BaseModel, Field, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine.url import URL
 
@@ -27,7 +27,7 @@ PROJECT_DIR = Path(__file__).parent.parent.parent
 
 class Security(BaseModel):
     jwt_issuer: str = "my-app"
-    jwt_secret_key: SecretStr
+    jwt_secret_key: SecretStr = SecretStr("sk-change-me")
     jwt_access_token_expire_secs: int = 24 * 3600  # 1d
     refresh_token_expire_secs: int = 28 * 24 * 3600  # 28d
     password_bcrypt_rounds: int = 12
@@ -38,15 +38,15 @@ class Security(BaseModel):
 class Database(BaseModel):
     hostname: str = "postgres"
     username: str = "postgres"
-    password: SecretStr
+    password: SecretStr = SecretStr("passwd-change-me")
     port: int = 5432
     db: str = "postgres"
 
 
 class Settings(BaseSettings):
-    security: Security
-    database: Database
-    log_level: str = "DEBUG"
+    security: Security = Field(default_factory=Security)
+    database: Database = Field(default_factory=Database)
+    log_level: str = "INFO"
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -78,7 +78,7 @@ def logging_config(log_level: str) -> None:
         "disable_existing_loggers": False,
         "formatters": {
             "verbose": {
-                "format": "{asctime} {threadName} [{levelname}] {name}: {message}",
+                "format": "{asctime} [{levelname}] {name}: {message}",
                 "style": "{",
             },
         },
