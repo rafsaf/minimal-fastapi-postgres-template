@@ -24,19 +24,6 @@ default_user_password = "geralt"
 default_user_access_token = create_jwt_token(default_user_id).access_token
 
 
-# @pytest.fixture(scope="session")
-# def event_loop_policy():
-#     return uvloop.EventLoopPolicy()
-
-
-# @pytest.fixture(scope="session")
-# def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     yield loop
-#     loop.close()
-
-
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def fixture_setup_new_test_database() -> None:
     worker_name = os.getenv("PYTEST_XDIST_WORKER", "gw0")
@@ -139,5 +126,5 @@ async def fixture_default_user(
 
 
 @pytest_asyncio.fixture(name="default_user_headers", scope="function")
-def fixture_default_user_headers(default_user: User) -> dict[str, str]:
+async def fixture_default_user_headers(default_user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {default_user_access_token}"}
