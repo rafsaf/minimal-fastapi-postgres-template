@@ -3,6 +3,7 @@ authors = ["admin <admin@example.com>"]
 description = "FastAPI project generated using minimal-fastapi-postgres-template."
 name = "app"
 version = "0.1.0-alpha"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.13"
