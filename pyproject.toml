@@ -15,7 +15,7 @@ pydantic = { extras = ["dotenv", "email"], version = "^2.11.5" }
 pydantic-settings = "^2.9.1"
 pyjwt = "^2.10.1"
 python-multipart = "^0.0.20"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.41"}
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.41" }
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.8.2"
@@ -24,8 +24,8 @@ greenlet = "^3.2.2"
 httpx = "^0.28.1"
 mypy = "^1.16.0"
 pre-commit = "^4.2.0"
-pytest = "^8.3.5"
-pytest-asyncio = "^0.26.0"
+pytest = "^8.4.0"
+pytest-asyncio = "^1.0.0"
 pytest-cov = "^6.1.1"
 pytest-xdist = "^3.7.0"
 ruff = "^0.11.12"
