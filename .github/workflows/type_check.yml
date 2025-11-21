@@ -14,38 +14,23 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: "Set up Python"
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.13.1"
+          python-version-file: "pyproject.toml"
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+          version: "0.9.2"
+          enable-cache: true
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: false
-          virtualenvs-path: /opt/venv
-
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v4
-        with:
-          path: /opt/venv
-          key: venv-${{ runner.os }}-python-3.13.1-${{ hashFiles('poetry.lock') }}
-
-      - name: Install dependencies and actiavte virtualenv
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: |
-          poetry install --no-interaction --no-root
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+        shell: bash
 
       - name: Run ${{ matrix.check }}
         run: |
-          poetry run ${{ matrix.check }} .
+          uv run ${{ matrix.check }} .

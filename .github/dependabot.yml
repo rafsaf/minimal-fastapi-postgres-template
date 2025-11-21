@@ -1,10 +1,10 @@
 version: 2
 updates:
-  - package-ecosystem: pip
+  - package-ecosystem: uv
     directory: /
     schedule:
       interval: monthly
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     allow:
       - dependency-type: "all"
     groups:
