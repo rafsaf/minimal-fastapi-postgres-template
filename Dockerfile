@@ -4,14 +4,14 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /build
 
 # Create requirements.txt file
-FROM base AS poetry
-RUN pip install poetry==2.1.3
-RUN poetry self add poetry-plugin-export
-COPY poetry.lock pyproject.toml ./
-RUN poetry export -o /requirements.txt --without-hashes
+FROM base AS uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
+COPY uv.lock pyproject.toml ./
+RUN uv export --no-dev --no-hashes -o /requirements.txt --no-install-workspace --frozen
+RUN uv export --only-group dev --no-hashes -o /requirements-dev.txt --no-install-workspace --frozen
 
 FROM base AS final
-COPY --from=poetry /requirements.txt .
+COPY --from=uv /requirements.txt .
 
 # Create venv, add it to path and install requirements
 RUN python -m venv /venv
