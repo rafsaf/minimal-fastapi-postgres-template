@@ -12,7 +12,7 @@ _Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, 
   - [Features](#features)
   - [Quickstart](#quickstart)
     - [1. Create repository from a template](#1-create-repository-from-a-template)
-    - [2. Install dependecies with Poetry](#2-install-dependecies-with-poetry)
+    - [2. Install dependecies with uv](#2-install-dependecies-with-uv)
     - [3. Setup database and migrations](#3-setup-database-and-migrations)
     - [4. Now you can run app](#4-now-you-can-run-app)
     - [5. Activate pre-commit](#5-activate-pre-commit)
@@ -38,7 +38,7 @@ _Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, 
 - [x] Full [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations setup
 - [x] Refresh token endpoint (not only access like in official template)
 - [x] Ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver as an example
-- [x] [Poetry](https://python-poetry.org/docs/), `mypy`, `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
+- [x] [uv](https://docs.astral.sh/uv/getting-started/installation/), `mypy`, `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
 - [x] Perfect pytest asynchronous test setup with +40 tests and full coverage
 
 <br>
@@ -55,16 +55,15 @@ _Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, 
 
 See [docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
 
-### 2. Install dependecies with [Poetry](https://python-poetry.org/docs/)
+### 2. Install dependecies with [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ```bash
 cd your_project_name
 
-### Poetry install (python3.13)
-poetry install
+uv sync
 ```
 
-Note, be sure to use `python3.13` with this template with either poetry or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10)
+Note, be sure to use `python3.13` with this template with either uv or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10)
 
 ### 3. Setup database and migrations
 
