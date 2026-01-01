@@ -8,29 +8,29 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.13"
 
-alembic = "^1.17.1"
-asyncpg = "^0.30.0"
+alembic = "^1.17.2"
+asyncpg = "^0.31.0"
 bcrypt = "^5.0.0"
-fastapi = "^0.120.4"
-pydantic = { extras = ["dotenv", "email"], version = "^2.12.3" }
-pydantic-settings = "^2.11.0"
+fastapi = "^0.128.0"
+pydantic = { extras = ["dotenv", "email"], version = "^2.12.5" }
+pydantic-settings = "^2.12.0"
 pyjwt = "^2.10.1"
-python-multipart = "^0.0.20"
-sqlalchemy = { extras = ["asyncio"], version = "^2.0.44" }
+python-multipart = "^0.0.21"
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.45" }
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.11.0"
+coverage = "^7.13.1"
 freezegun = "^1.5.5"
-greenlet = "^3.2.4"
+greenlet = "^3.3.0"
 httpx = "^0.28.1"
-mypy = "^1.18.2"
-pre-commit = "^4.3.0"
-pytest = "^8.4.2"
+mypy = "^1.19.1"
+pre-commit = "^4.5.1"
+pytest = "^9.0.2"
 pytest-asyncio = "^1.2.0"
 pytest-cov = "^7.0.0"
 pytest-xdist = "^3.8.0"
-ruff = "^0.14.3"
-uvicorn = { extras = ["standard"], version = "^0.38.0" }
+ruff = "^0.14.10"
+uvicorn = { extras = ["standard"], version = "^0.40.0" }
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
