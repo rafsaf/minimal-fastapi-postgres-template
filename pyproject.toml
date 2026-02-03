@@ -44,6 +44,7 @@ requires = ["hatchling"]
 addopts = "-vv -n auto --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
 asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
+filterwarnings = [""]
 testpaths = ["app"]
 
 [tool.coverage.run]

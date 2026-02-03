@@ -28,8 +28,7 @@ async def test_login_access_token_has_response_status_code(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.text
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -45,7 +44,7 @@ async def test_login_access_token_jwt_has_valid_token_type(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-
+    assert response.status_code == status.HTTP_200_OK, response.text
     token = response.json()
     assert token["token_type"] == "Bearer"
 
@@ -64,7 +63,7 @@ async def test_login_access_token_jwt_has_valid_expire_time(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-
+    assert response.status_code == status.HTTP_200_OK, response.text
     token = response.json()
     current_timestamp = int(time.time())
     assert (
@@ -87,6 +86,7 @@ async def test_login_access_token_returns_valid_jwt_access_token(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    assert response.status_code == status.HTTP_200_OK, response.text
 
     now = int(time.time())
     token = response.json()
@@ -110,6 +110,7 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    assert response.status_code == status.HTTP_200_OK, response.text
 
     token = response.json()
     current_time = int(time.time())
@@ -133,6 +134,7 @@ async def test_login_access_token_refresh_token_exists_in_db(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    assert response.status_code == status.HTTP_200_OK, response.text
 
     token = response.json()
 
@@ -156,6 +158,7 @@ async def test_login_access_token_refresh_token_in_db_has_valid_fields(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    assert response.status_code == status.HTTP_200_OK, response.text
 
     token = response.json()
     result = await session.scalars(
@@ -181,7 +184,7 @@ async def test_auth_access_token_fail_for_not_existing_user_with_message(
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
     assert response.json() == {"detail": api_messages.PASSWORD_INVALID}
 
 
@@ -199,5 +202,5 @@ async def test_auth_access_token_fail_for_invalid_password_with_message(
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
     assert response.json() == {"detail": api_messages.PASSWORD_INVALID}

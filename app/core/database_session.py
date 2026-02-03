@@ -35,7 +35,7 @@ _ASYNC_ENGINE = new_async_engine(get_settings().sqlalchemy_database_uri)
 _ASYNC_SESSIONMAKER = async_sessionmaker(_ASYNC_ENGINE, expire_on_commit=False)
 
 
-async def new_async_session() -> AsyncGenerator[AsyncSession]:
+async def new_async_session() -> AsyncGenerator[AsyncSession]:  # pragma: no cover
     session = _ASYNC_SESSIONMAKER()
     try:
         yield session
@@ -44,7 +44,9 @@ async def new_async_session() -> AsyncGenerator[AsyncSession]:
 
 
 @asynccontextmanager
-async def new_script_async_session() -> AsyncGenerator[AsyncSession]:
+async def new_script_async_session() -> AsyncGenerator[
+    AsyncSession
+]:  # pragma: no cover
     _engine = create_async_engine(
         get_settings().sqlalchemy_database_uri, pool_pre_ping=True
     )

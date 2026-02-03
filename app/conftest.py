@@ -17,6 +17,7 @@ from app.auth.jwt import create_jwt_token
 from app.auth.models import User
 from app.core import database_session
 from app.core.config import PROJECT_DIR, get_settings
+from app.core.database_session import new_async_session
 from app.main import app as fastapi_app
 from app.tests.factories import (
     SQLAASyncPersistence,
@@ -26,7 +27,7 @@ from app.tests.factories import (
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def fixture_setup_new_test_database() -> None:
+async def fixture_setup_new_test_database() -> AsyncGenerator[None]:
     worker_name = os.getenv("PYTEST_XDIST_WORKER", "gw0")
     test_db_name = f"test_db_{worker_name}"
 
@@ -36,6 +37,9 @@ async def fixture_setup_new_test_database() -> None:
     await conn.execute(sqlalchemy.text(f"DROP DATABASE IF EXISTS {test_db_name}"))
     await conn.execute(sqlalchemy.text(f"CREATE DATABASE {test_db_name}"))
     await conn.close()
+
+    # dispose the original engine before switching to test database
+    await database_session._ASYNC_ENGINE.dispose()
 
     session_mpatch = pytest.MonkeyPatch()
     session_mpatch.setenv("DATABASE__DB", test_db_name)
@@ -65,6 +69,11 @@ async def fixture_setup_new_test_database() -> None:
 
     loop = asyncio.get_running_loop()
     await loop.run_in_executor(None, alembic_upgrade)
+
+    yield
+
+    # cleanup: dispose the test engine
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
@@ -98,9 +107,7 @@ async def fixture_session_with_rollback(
         lambda: session,
     )
 
-    fastapi_app.dependency_overrides[database_session.new_async_session] = (
-        lambda: session
-    )
+    fastapi_app.dependency_overrides[new_async_session] = lambda: session
 
     persistence_handler = SQLAASyncPersistence(session=session)
     setattr(SQLAlchemySessionMixin, "__async_persistence__", persistence_handler)
@@ -109,7 +116,7 @@ async def fixture_session_with_rollback(
 
     setattr(SQLAlchemySessionMixin, "__async_persistence__", None)
 
-    fastapi_app.dependency_overrides.pop(database_session.new_async_session, None)
+    fastapi_app.dependency_overrides.pop(new_async_session, None)
 
     await session.close()
     await transaction.rollback()
@@ -131,5 +138,5 @@ async def fixture_default_user(session: AsyncSession) -> AsyncGenerator[User]:
 
 @pytest_asyncio.fixture(name="default_user_headers", scope="function")
 async def fixture_default_user_headers(default_user: User) -> dict[str, str]:
-    access_token = create_jwt_token(user_id=default_user.user_id)
+    access_token = create_jwt_token(user_id=default_user.user_id).access_token
     return {"Authorization": f"Bearer {access_token}"}

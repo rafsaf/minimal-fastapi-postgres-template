@@ -76,7 +76,7 @@ def test_jwt_error_with_invalid_secret_key() -> None:
     user_id = "test_user_id"
     token = jwt.create_jwt_token(user_id)
 
-    get_settings().security.jwt_secret_key = SecretStr("the secret has changed now!")
+    get_settings().security.jwt_secret_key = SecretStr("x" * 32)
 
     with pytest.raises(HTTPException) as e:
         jwt.verify_jwt_token(token=token.access_token)

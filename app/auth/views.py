@@ -22,8 +22,8 @@ from app.auth.schemas import (
     UserResponse,
     UserUpdatePasswordRequest,
 )
-from app.core import database_session
 from app.core.config import get_settings
+from app.core.database_session import new_async_session
 
 router = APIRouter(responses=api_messages.UNAUTHORIZED_RESPONSES)
 
@@ -42,7 +42,7 @@ async def read_current_user(
 )
 async def delete_current_user(
     current_user: User = Depends(dependencies.get_current_user),
-    session: AsyncSession = Depends(database_session.new_async_session),
+    session: AsyncSession = Depends(new_async_session),
 ) -> None:
     await session.execute(delete(User).where(User.user_id == current_user.user_id))
     await session.commit()
@@ -55,7 +55,7 @@ async def delete_current_user(
 )
 async def reset_current_user_password(
     user_update_password: UserUpdatePasswordRequest,
-    session: AsyncSession = Depends(database_session.new_async_session),
+    session: AsyncSession = Depends(new_async_session),
     current_user: User = Depends(dependencies.get_current_user),
 ) -> None:
     current_user.hashed_password = get_password_hash(user_update_password.password)
@@ -70,7 +70,7 @@ async def reset_current_user_password(
     description="OAuth2 compatible token, get an access token for future requests using username and password",
 )
 async def login_access_token(
-    session: AsyncSession = Depends(database_session.new_async_session),
+    session: AsyncSession = Depends(new_async_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> AccessTokenResponse:
     user = await session.scalar(select(User).where(User.email == form_data.username))
@@ -116,7 +116,7 @@ async def login_access_token(
 )
 async def refresh_token(
     data: RefreshTokenRequest,
-    session: AsyncSession = Depends(database_session.new_async_session),
+    session: AsyncSession = Depends(new_async_session),
 ) -> AccessTokenResponse:
     token = await session.scalar(
         select(RefreshToken)
@@ -169,7 +169,7 @@ async def refresh_token(
 )
 async def register_new_user(
     new_user: UserCreateRequest,
-    session: AsyncSession = Depends(database_session.new_async_session),
+    session: AsyncSession = Depends(new_async_session),
 ) -> User:
     user = await session.scalar(select(User).where(User.email == new_user.email))
     if user is not None:

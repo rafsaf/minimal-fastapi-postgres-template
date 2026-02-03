@@ -27,7 +27,9 @@ PROJECT_DIR = Path(__file__).parent.parent.parent
 
 class Security(BaseModel):
     jwt_issuer: str = "my-app"
-    jwt_secret_key: SecretStr = SecretStr("sk-change-me")
+    jwt_secret_key: SecretStr = SecretStr(
+        "change-me-to-a-strong-secret-key-at-least-32-chars-long"
+    )
     jwt_access_token_expire_secs: int = Field(default=15 * 60, gt=10)  # 15min
     jwt_refresh_token_expire_secs: int = Field(default=28 * 24 * 3600, gt=60)  # 28d
     jwt_algorithm: str = "HS256"
