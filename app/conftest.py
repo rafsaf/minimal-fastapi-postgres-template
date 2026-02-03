@@ -1,7 +1,9 @@
-import logging
+import asyncio
 import os
 from collections.abc import AsyncGenerator
 
+import alembic.command
+import alembic.config
 import pytest
 import pytest_asyncio
 import sqlalchemy
@@ -11,17 +13,16 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
+from app.auth.jwt import create_jwt_token
+from app.auth.models import User
 from app.core import database_session
-from app.core.config import get_settings
-from app.core.security.jwt import create_jwt_token
-from app.core.security.password import get_password_hash
+from app.core.config import PROJECT_DIR, get_settings
 from app.main import app as fastapi_app
-from app.models import Base, User
-
-default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
-default_user_email = "geralt@wiedzmin.pl"
-default_user_password = "geralt"
-default_user_access_token = create_jwt_token(default_user_id).access_token
+from app.tests.factories import (
+    SQLAASyncPersistence,
+    SQLAlchemySessionMixin,
+    UserFactory,
+)
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
@@ -57,9 +58,13 @@ async def fixture_setup_new_test_database() -> None:
         async_sessionmaker(engine, expire_on_commit=False),
     )
 
-    # create app tables in test database
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    def alembic_upgrade() -> None:
+        # synchronous function to run alembic upgrade
+        alembic_config = alembic.config.Config(PROJECT_DIR / "alembic.ini")
+        alembic.command.upgrade(alembic_config, "head")
+
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, alembic_upgrade)
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
@@ -69,16 +74,11 @@ async def fixture_clean_get_settings_between_tests() -> AsyncGenerator[None]:
     get_settings.cache_clear()
 
 
-@pytest_asyncio.fixture(name="default_hashed_password", scope="session")
-async def fixture_default_hashed_password() -> str:
-    return get_password_hash(default_user_password)
-
-
 @pytest_asyncio.fixture(name="session", scope="function")
 async def fixture_session_with_rollback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> AsyncGenerator[AsyncSession]:
-    # we want to monkeypatch get_async_session with one bound to session
+    # we want to monkeypatch new_async_session with one bound to session
     # that we will always rollback on function scope
 
     connection = await database_session._ASYNC_ENGINE.connect()
@@ -88,13 +88,29 @@ async def fixture_session_with_rollback(
 
     monkeypatch.setattr(
         database_session,
-        "get_async_session",
+        "new_async_session",
         lambda: session,
     )
 
+    monkeypatch.setattr(
+        database_session,
+        "new_script_async_session",
+        lambda: session,
+    )
+
+    fastapi_app.dependency_overrides[database_session.new_async_session] = (
+        lambda: session
+    )
+
+    persistence_handler = SQLAASyncPersistence(session=session)
+    setattr(SQLAlchemySessionMixin, "__async_persistence__", persistence_handler)
+
     yield session
 
-    logging.critical("Rolling back transaction")
+    setattr(SQLAlchemySessionMixin, "__async_persistence__", None)
+
+    fastapi_app.dependency_overrides.pop(database_session.new_async_session, None)
+
     await session.close()
     await transaction.rollback()
     await connection.close()
@@ -109,22 +125,11 @@ async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient]:
 
 
 @pytest_asyncio.fixture(name="default_user", scope="function")
-async def fixture_default_user(
-    session: AsyncSession, default_hashed_password: str
-) -> AsyncGenerator[User]:
-    default_user = User(
-        user_id=default_user_id,
-        email=default_user_email,
-        hashed_password=default_hashed_password,
-    )
-    session.add(default_user)
-
-    await session.commit()
-    await session.refresh(default_user)
-
-    yield default_user
+async def fixture_default_user(session: AsyncSession) -> AsyncGenerator[User]:
+    yield await UserFactory.create_async()
 
 
 @pytest_asyncio.fixture(name="default_user_headers", scope="function")
 async def fixture_default_user_headers(default_user: User) -> dict[str, str]:
-    return {"Authorization": f"Bearer {default_user_access_token}"}
+    access_token = create_jwt_token(user_id=default_user.user_id)
+    return {"Authorization": f"Bearer {access_token}"}

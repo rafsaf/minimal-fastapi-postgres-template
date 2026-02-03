@@ -7,12 +7,12 @@ from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import api_messages
+from app.auth import api_messages
+from app.auth.jwt import verify_jwt_token
+from app.auth.models import RefreshToken, User
 from app.core.config import get_settings
-from app.core.security.jwt import verify_jwt_token
 from app.main import app
-from app.models import RefreshToken, User
-from app.tests.conftest import default_user_password
+from app.tests.auth import TESTS_USER_PASSWORD
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -24,7 +24,7 @@ async def test_login_access_token_has_response_status_code(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
@@ -41,7 +41,7 @@ async def test_login_access_token_jwt_has_valid_token_type(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
@@ -60,7 +60,7 @@ async def test_login_access_token_jwt_has_valid_expire_time(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
@@ -83,7 +83,7 @@ async def test_login_access_token_returns_valid_jwt_access_token(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
@@ -106,7 +106,7 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
@@ -115,7 +115,7 @@ async def test_login_access_token_refresh_token_has_valid_expire_time(
     current_time = int(time.time())
     assert (
         token["refresh_token_expires_at"]
-        == current_time + get_settings().security.refresh_token_expire_secs
+        == current_time + get_settings().security.jwt_refresh_token_expire_secs
     )
 
 
@@ -129,7 +129,7 @@ async def test_login_access_token_refresh_token_exists_in_db(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
@@ -152,7 +152,7 @@ async def test_login_access_token_refresh_token_in_db_has_valid_fields(
         app.url_path_for("login_access_token"),
         data={
             "username": default_user.email,
-            "password": default_user_password,
+            "password": TESTS_USER_PASSWORD,
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )

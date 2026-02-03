@@ -5,14 +5,14 @@ from httpx import AsyncClient
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import api_messages
-from app.api.api_router import api_router
-from app.core.security.jwt import create_jwt_token
-from app.models import User
+from app.auth import api_messages
+from app.auth.jwt import create_jwt_token
+from app.auth.models import User
+from app.auth.views import router
 
 
 @pytest.mark.asyncio(loop_scope="session")
-@pytest.mark.parametrize("api_route", api_router.routes)
+@pytest.mark.parametrize("api_route", router.routes)
 async def test_api_routes_raise_401_on_jwt_decode_errors(
     client: AsyncClient,
     api_route: routing.APIRoute,
@@ -28,7 +28,7 @@ async def test_api_routes_raise_401_on_jwt_decode_errors(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-@pytest.mark.parametrize("api_route", api_router.routes)
+@pytest.mark.parametrize("api_route", router.routes)
 async def test_api_routes_raise_401_on_jwt_expired_token(
     client: AsyncClient,
     default_user: User,
@@ -48,7 +48,7 @@ async def test_api_routes_raise_401_on_jwt_expired_token(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-@pytest.mark.parametrize("api_route", api_router.routes)
+@pytest.mark.parametrize("api_route", router.routes)
 async def test_api_routes_raise_401_on_jwt_user_deleted(
     client: AsyncClient,
     default_user_headers: dict[str, str],

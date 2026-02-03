@@ -28,10 +28,12 @@ PROJECT_DIR = Path(__file__).parent.parent.parent
 class Security(BaseModel):
     jwt_issuer: str = "my-app"
     jwt_secret_key: SecretStr = SecretStr("sk-change-me")
-    jwt_access_token_expire_secs: int = 24 * 3600  # 1d
-    refresh_token_expire_secs: int = 28 * 24 * 3600  # 28d
+    jwt_access_token_expire_secs: int = Field(default=15 * 60, gt=10)  # 15min
+    jwt_refresh_token_expire_secs: int = Field(default=28 * 24 * 3600, gt=60)  # 28d
+    jwt_algorithm: str = "HS256"
+
     password_bcrypt_rounds: int = 12
-    allowed_hosts: list[str] = ["localhost", "127.0.0.1"]
+    allowed_hosts: list[str] = ["localhost", "127.0.0.1", "0.0.0.0"]
     backend_cors_origins: list[AnyHttpUrl] = []
 
 
