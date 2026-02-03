@@ -47,9 +47,18 @@ class Database(BaseModel):
     db: str = "postgres"
 
 
+class Prometheus(BaseModel):
+    enabled: bool = False
+    port: int = 9090
+    addr: str = "127.0.0.1"
+    stop_delay_secs: int = 0
+
+
 class Settings(BaseSettings):
     security: Security = Field(default_factory=Security)
     database: Database = Field(default_factory=Database)
+    prometheus: Prometheus = Field(default_factory=Prometheus)
+
     log_level: str = "INFO"
 
     @computed_field  # type: ignore[prop-decorator]
