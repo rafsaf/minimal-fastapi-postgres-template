@@ -2,10 +2,7 @@ import logging
 from typing import TypeVar
 
 from faker import Faker
-from polyfactory.factories.sqlalchemy_factory import (
-    SQLAASyncPersistence,
-    SQLAlchemyFactory,
-)
+from polyfactory.factories.sqlalchemy_factory import SQLAlchemyFactory
 from polyfactory.fields import Use
 
 from app.auth.models import User
@@ -21,10 +18,6 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
-class SQLAlchemySessionMixin[T]:
-    __async_persistence__: SQLAASyncPersistence[T] | None = None
-
-
-class UserFactory(SQLAlchemySessionMixin[User], SQLAlchemyFactory[User]):
+class UserFactory(SQLAlchemyFactory[User]):
     email = Use(Faker().email)
     hashed_password = Use(lambda: get_password_hash(TESTS_USER_PASSWORD))

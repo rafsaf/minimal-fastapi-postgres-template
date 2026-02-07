@@ -8,6 +8,10 @@ import pytest
 import pytest_asyncio
 import sqlalchemy
 from httpx import ASGITransport, AsyncClient
+from polyfactory.factories.sqlalchemy_factory import (
+    SQLAASyncPersistence,
+    SQLAlchemyFactory,
+)
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -19,14 +23,10 @@ from app.core import database_session
 from app.core.config import PROJECT_DIR, get_settings
 from app.core.database_session import new_async_session
 from app.main import app as fastapi_app
-from app.tests.factories import (
-    SQLAASyncPersistence,
-    SQLAlchemySessionMixin,
-    UserFactory,
-)
+from app.tests.factories import UserFactory
 
 
-@pytest_asyncio.fixture(scope="session", autouse=True)
+@pytest_asyncio.fixture(scope="session", loop_scope="session", autouse=True)
 async def fixture_setup_new_test_database() -> AsyncGenerator[None]:
     worker_name = os.getenv("PYTEST_XDIST_WORKER", "gw0")
     test_db_name = f"test_db_{worker_name}"
@@ -76,14 +76,14 @@ async def fixture_setup_new_test_database() -> AsyncGenerator[None]:
     await engine.dispose()
 
 
-@pytest_asyncio.fixture(scope="function", autouse=True)
+@pytest_asyncio.fixture(scope="function", loop_scope="session", autouse=True)
 async def fixture_clean_get_settings_between_tests() -> AsyncGenerator[None]:
     yield
 
     get_settings.cache_clear()
 
 
-@pytest_asyncio.fixture(name="session", scope="function")
+@pytest_asyncio.fixture(name="session", loop_scope="session", scope="function")
 async def fixture_session_with_rollback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> AsyncGenerator[AsyncSession]:
@@ -97,24 +97,20 @@ async def fixture_session_with_rollback(
 
     monkeypatch.setattr(
         database_session,
-        "new_async_session",
-        lambda: session,
-    )
-
-    monkeypatch.setattr(
-        database_session,
         "new_script_async_session",
         lambda: session,
     )
 
     fastapi_app.dependency_overrides[new_async_session] = lambda: session
 
-    persistence_handler = SQLAASyncPersistence(session=session)
-    setattr(SQLAlchemySessionMixin, "__async_persistence__", persistence_handler)
+    # now some work around SQLAlchemyFactory to actually use our session
+    # refer to https://polyfactory.litestar.dev/latest/usage/configuration.html
+    persistence_handler = SQLAASyncPersistence(session=session)  # type: ignore
+    setattr(SQLAlchemyFactory, "__async_persistence__", persistence_handler)
 
     yield session
 
-    setattr(SQLAlchemySessionMixin, "__async_persistence__", None)
+    setattr(SQLAlchemyFactory, "__async_persistence__", None)
 
     fastapi_app.dependency_overrides.pop(new_async_session, None)
 
@@ -123,7 +119,7 @@ async def fixture_session_with_rollback(
     await connection.close()
 
 
-@pytest_asyncio.fixture(name="client", scope="function")
+@pytest_asyncio.fixture(name="client", loop_scope="session", scope="function")
 async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient]:
     transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as aclient:
@@ -131,12 +127,14 @@ async def fixture_client(session: AsyncSession) -> AsyncGenerator[AsyncClient]:
         yield aclient
 
 
-@pytest_asyncio.fixture(name="default_user", scope="function")
+@pytest_asyncio.fixture(name="default_user", loop_scope="session", scope="function")
 async def fixture_default_user(session: AsyncSession) -> AsyncGenerator[User]:
     yield await UserFactory.create_async()
 
 
-@pytest_asyncio.fixture(name="default_user_headers", scope="function")
+@pytest_asyncio.fixture(
+    name="default_user_headers", loop_scope="session", scope="function"
+)
 async def fixture_default_user_headers(default_user: User) -> dict[str, str]:
     access_token = create_jwt_token(user_id=default_user.user_id).access_token
     return {"Authorization": f"Bearer {access_token}"}

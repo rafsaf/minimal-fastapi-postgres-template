@@ -1,4 +1,3 @@
-import pytest
 from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy import select
@@ -8,7 +7,6 @@ from app.auth.models import User
 from app.main import app
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_current_user_status_code(
     client: AsyncClient,
     default_user_headers: dict[str, str],
@@ -21,7 +19,6 @@ async def test_delete_current_user_status_code(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_current_user_is_deleted_in_db(
     client: AsyncClient,
     default_user_headers: dict[str, str],

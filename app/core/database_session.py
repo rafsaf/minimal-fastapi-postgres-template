@@ -47,6 +47,10 @@ async def new_async_session() -> AsyncGenerator[AsyncSession]:  # pragma: no cov
 async def new_script_async_session() -> AsyncGenerator[
     AsyncSession
 ]:  # pragma: no cover
+    # you can use this version inside scripts that run eg. as cronjobs outside of FastAPI context
+    # that you will run with asyncio.run()
+    # Global enginer and sessionmaker are created by global loop and cannot be shared across loops,
+    # so we need to create new ones here
     _engine = create_async_engine(
         get_settings().sqlalchemy_database_uri, pool_pre_ping=True
     )

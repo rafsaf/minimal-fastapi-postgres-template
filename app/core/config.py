@@ -50,7 +50,7 @@ class Database(BaseModel):
 class Prometheus(BaseModel):
     enabled: bool = False
     port: int = 9090
-    addr: str = "127.0.0.1"
+    addr: str = "0.0.0.0"
     stop_delay_secs: int = 0
 
 

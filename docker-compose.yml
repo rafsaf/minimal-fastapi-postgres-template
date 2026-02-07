@@ -1,15 +1,9 @@
-# For local development, only database is running
-#
-# docker compose up -d
-# uvicorn app.main:app --reload
-#
-
 services:
   postgres_db:
     restart: unless-stopped
-    image: postgres:17
+    image: postgres:18
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - postgres_db:/var/lib/postgresql
     environment:
       - POSTGRES_DB=${DATABASE__DB}
       - POSTGRES_USER=${DATABASE__USERNAME}

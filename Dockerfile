@@ -1,4 +1,4 @@
-FROM python:3.13.5-slim-bookworm AS base
+FROM python:3.14-slim-trixie AS base
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /build
@@ -28,8 +28,9 @@ COPY alembic.ini .
 COPY pyproject.toml .
 COPY init.sh .
 
-# Expose port
+# Expose port 8000 for app and optional 9090 for prometheus metrics
 EXPOSE 8000
+EXPOSE 9090
 
 # Make the init script executable
 RUN chmod +x ./init.sh
@@ -39,4 +40,4 @@ ENTRYPOINT ["./init.sh"]
 
 # Set CMD to uvicorn
 # /venv/bin/uvicorn is used because from entrypoint script PATH is new
-CMD ["/venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2", "--loop", "uvloop"]
+CMD ["/venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--loop", "uvloop"]

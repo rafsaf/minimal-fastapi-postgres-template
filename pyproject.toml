@@ -43,7 +43,7 @@ requires = ["hatchling"]
 
 [tool.pytest.ini_options]
 addopts = "-vv -n auto --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
-asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 asyncio_mode = "auto"
 filterwarnings = [""]
 testpaths = ["app"]
@@ -54,6 +54,8 @@ omit = ["alembic/*", "app/tests/*", "conftest.py", "test_*.py"]
 source = ["app"]
 
 [tool.mypy]
+exclude = [".venv", "alembic"]
+files = "app/**"
 python_version = "3.14"
 strict = true
 
