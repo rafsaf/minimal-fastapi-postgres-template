@@ -1,58 +1,66 @@
-[tool.poetry]
-authors = ["admin <admin@example.com>"]
+[project]
+authors = [{ name = "admin", email = "admin@example.com" }]
+dependencies = [
+    "alembic>=1.18.3",
+    "asyncpg>=0.31.0",
+    "bcrypt>=5.0.0",
+    "fastapi>=0.128.0",
+    "prometheus-client>=0.24.1",
+    "pydantic-settings>=2.12.0",
+    "pydantic[email]>=2.12.5",
+    "pyjwt>=2.11.0",
+    "python-multipart>=0.0.22",
+    "sqlalchemy[asyncio]>=2.0.46",
+]
 description = "FastAPI project generated using minimal-fastapi-postgres-template."
 name = "app"
+requires-python = ">=3.14,<3.15"
 version = "0.1.0-alpha"
-package-mode = false
 
-[tool.poetry.dependencies]
-python = "^3.13"
+[dependency-groups]
+dev = [
+    "coverage>=7.13.2",
+    "freezegun>=1.5.5",
+    "greenlet>=3.3.1",
+    "httpx>=0.28.1",
+    "mypy>=1.19.1",
+    "polyfactory>=3.2.0",
+    "pre-commit>=4.5.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "pytest-xdist>=3.8.0",
+    "pytest>=9.0.2",
+    "ruff>=0.14.14",
+    "uvicorn[standard]>=0.40.0",
+]
 
-alembic = "^1.17.1"
-asyncpg = "^0.30.0"
-bcrypt = "^5.0.0"
-fastapi = "^0.120.4"
-pydantic = { extras = ["dotenv", "email"], version = "^2.12.3" }
-pydantic-settings = "^2.11.0"
-pyjwt = "^2.10.1"
-python-multipart = "^0.0.20"
-sqlalchemy = { extras = ["asyncio"], version = "^2.0.44" }
-
-[tool.poetry.group.dev.dependencies]
-coverage = "^7.11.0"
-freezegun = "^1.5.5"
-greenlet = "^3.2.4"
-httpx = "^0.28.1"
-mypy = "^1.18.2"
-pre-commit = "^4.3.0"
-pytest = "^8.4.2"
-pytest-asyncio = "^1.2.0"
-pytest-cov = "^7.0.0"
-pytest-xdist = "^3.8.0"
-ruff = "^0.14.3"
-uvicorn = { extras = ["standard"], version = "^0.38.0" }
+[tool.uv]
+package = false
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
 
 [tool.pytest.ini_options]
 addopts = "-vv -n auto --cov --cov-report xml --cov-report term-missing --cov-fail-under=100"
-asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 asyncio_mode = "auto"
-testpaths = ["app/tests"]
+filterwarnings = [""]
+testpaths = ["app"]
 
 [tool.coverage.run]
 concurrency = ["greenlet"]
-omit = ["app/tests/*"]
+omit = ["alembic/*", "app/tests/*", "conftest.py", "test_*.py"]
 source = ["app"]
 
 [tool.mypy]
-python_version = "3.13"
+exclude = [".venv", "alembic"]
+files = "app/**"
+python_version = "3.14"
 strict = true
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 # pycodestyle, pyflakes, isort, pylint, pyupgrade

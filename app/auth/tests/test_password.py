@@ -1,4 +1,4 @@
-from app.core.security.password import get_password_hash, verify_password
+from app.auth.password import get_password_hash, verify_password
 
 
 def test_hashed_password_is_verified() -> None:

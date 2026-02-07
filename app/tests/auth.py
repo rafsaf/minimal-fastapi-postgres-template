@@ -1,0 +1,1 @@
+TESTS_USER_PASSWORD = "geralt"

@@ -1,17 +1,17 @@
-FROM python:3.13.5-slim-bookworm AS base
+FROM python:3.14-slim-trixie AS base
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /build
 
 # Create requirements.txt file
-FROM base AS poetry
-RUN pip install poetry==2.1.3
-RUN poetry self add poetry-plugin-export
-COPY poetry.lock pyproject.toml ./
-RUN poetry export -o /requirements.txt --without-hashes
+FROM base AS uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
+COPY uv.lock pyproject.toml ./
+RUN uv export --no-dev --no-hashes -o /requirements.txt --no-install-workspace --frozen
+RUN uv export --only-group dev --no-hashes -o /requirements-dev.txt --no-install-workspace --frozen
 
 FROM base AS final
-COPY --from=poetry /requirements.txt .
+COPY --from=uv /requirements.txt .
 
 # Create venv, add it to path and install requirements
 RUN python -m venv /venv
@@ -28,8 +28,9 @@ COPY alembic.ini .
 COPY pyproject.toml .
 COPY init.sh .
 
-# Expose port
+# Expose port 8000 for app and optional 9090 for prometheus metrics
 EXPOSE 8000
+EXPOSE 9090
 
 # Make the init script executable
 RUN chmod +x ./init.sh
@@ -39,4 +40,4 @@ ENTRYPOINT ["./init.sh"]
 
 # Set CMD to uvicorn
 # /venv/bin/uvicorn is used because from entrypoint script PATH is new
-CMD ["/venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2", "--loop", "uvloop"]
+CMD ["/venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--loop", "uvloop"]

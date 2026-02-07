@@ -1,15 +1,13 @@
-import pytest
 from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import api_messages
+from app.auth import api_messages
+from app.auth.models import User
 from app.main import app
-from app.models import User
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_register_new_user_status_code(
     client: AsyncClient,
 ) -> None:
@@ -24,7 +22,6 @@ async def test_register_new_user_status_code(
     assert response.status_code == status.HTTP_201_CREATED
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_register_new_user_creates_record_in_db(
     client: AsyncClient,
     session: AsyncSession,
@@ -43,7 +40,6 @@ async def test_register_new_user_creates_record_in_db(
     assert user_count == 1
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_register_new_user_cannot_create_already_created_user(
     client: AsyncClient,
     session: AsyncSession,

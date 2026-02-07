@@ -19,14 +19,12 @@ fileConfig(config.config_file_name)  # type: ignore
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from app.models import Base  # noqa
+from app.core.models import Base  # noqa
 
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+# import other models here
+import app.auth.models  # noqa
 
 
 def get_database_uri() -> str:
@@ -93,4 +91,16 @@ async def run_migrations_online() -> None:
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    asyncio.run(run_migrations_online())
+    try:
+        loop: asyncio.AbstractEventLoop | None = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        # pytest-asyncio or other test runner is running the event loop
+        # so we need to use run_coroutine_threadsafe
+        future = asyncio.run_coroutine_threadsafe(run_migrations_online(), loop)
+        future.result(timeout=15)
+    else:
+        # no event loop is running, safe to use asyncio.run
+        asyncio.run(run_migrations_online())
