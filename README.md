@@ -15,18 +15,18 @@ _Check out online example: [https://minimal-fastapi-postgres-template.rafsaf.pl]
     - [1. Create repository from a template](#1-create-repository-from-a-template)
     - [2. Install dependecies with uv](#2-install-dependecies-with-uv)
     - [3. Run app](#3-run-app)
-    - [5. Activate pre-commit](#5-activate-pre-commit)
-    - [6. Running tests](#6-running-tests)
+    - [4. Activate pre-commit](#4-activate-pre-commit)
+    - [5. Running tests](#5-running-tests)
   - [Step by step example - POST and GET endpoints](#step-by-step-example---post-and-get-endpoints)
     - [1. Create new app](#1-create-new-app)
     - [2. Create SQLAlchemy model](#2-create-sqlalchemy-model)
     - [3. Import new models.py file in alembic env.py](#3-import-new-modelspy-file-in-alembic-envpy)
-    - [2. Create and apply alembic migration](#2-create-and-apply-alembic-migration)
-    - [3. Create request and response schemas](#3-create-request-and-response-schemas)
-    - [4. Create endpoints](#4-create-endpoints)
-    - [5. Add Pet model to tests factories](#5-add-pet-model-to-tests-factories)
-    - [5. Create new test file](#5-create-new-test-file)
-    - [6. Write tests](#6-write-tests)
+    - [4. Create and apply alembic migration](#4-create-and-apply-alembic-migration)
+    - [5. Create request and response schemas](#5-create-request-and-response-schemas)
+    - [6. Create endpoints](#6-create-endpoints)
+    - [7. Add Pet model to tests factories](#7-add-pet-model-to-tests-factories)
+    - [8. Create new test file](#8-create-new-test-file)
+    - [9. Write tests](#9-write-tests)
   - [Design choices](#design-choices)
     - [Dockerfile](#dockerfile)
     - [Registration](#registration)
@@ -40,8 +40,6 @@ _Check out online example: [https://minimal-fastapi-postgres-template.rafsaf.pl]
 
 ## About
 
-This project is heavily based on [the official template](https://github.com/tiangolo/full-stack-fastapi-postgresql) (and on my previous work: [link1](https://github.com/rafsaf/fastapi-plan), [link2](https://github.com/rafsaf/docker-fastapi-projects)), started on Sep 2021 and then updated (more or less) on yearly basis.
-
 If you are curious about latest changes and rationale, read 2026 update blog post: [Update of minimal-fastapi-postgres-template to version 7.0.0](https://rafsaf.pl/blog/2026/02/07/update-of-minimal-fastapi-postgres-template-to-version-7.0.0/).
 
 Enjoy!
@@ -54,8 +52,8 @@ Enjoy!
 - [x] Full [Alembic](https://github.com/alembic/alembic) migrations setup (also in unit tests).
 - [x] Secure and tested setup for [PyJWT](https://github.com/jpadilla/pyjwt) and [bcrypt](https://github.com/pyca/bcrypt).
 - [x] Ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver.
-- [x] [uv](https://docs.astral.sh/uv/getting-started/installation/), [mypy](https://github.com/python/mypy), [pre-commit](https://github.com/pre-commit/pre-commit) hooks with [ruff](https://github.com/astral-sh/ruff)
-- [x] Perfect pytest asynchronous test setup with +40 tests and full coverage
+- [x] [uv](https://docs.astral.sh/uv/getting-started/installation/), [mypy](https://github.com/python/mypy), [pre-commit](https://github.com/pre-commit/pre-commit) hooks with [ruff](https://github.com/astral-sh/ruff).
+- [x] Perfect pytest asynchronous test setup and full coverage.
 
 ![template-fastapi-minimal-openapi-example](https://rafsaf.pl/blog/2026/02/07/update-of-minimal-fastapi-postgres-template-to-version-7.0.0/minimal-fastapi-postgres-template-2026-02-07-version-7.0.0.png)
 
@@ -98,7 +96,7 @@ uvicorn app.main:app --reload
 
 You should then use `git init` (if needed) to initialize git repository and access OpenAPI spec at [http://localhost:8000/](http://localhost:8000/) by default. See last section for customizations.
 
-### 5. Activate pre-commit
+### 4. Activate pre-commit
 
 [pre-commit](https://pre-commit.com/) is de facto standard now for pre push activities like isort or black or its nowadays replacement ruff.
 
@@ -121,7 +119,7 @@ pre-commit run --all-files
 
 ```
 
-### 6. Running tests
+### 5. Running tests
 
 Note, it will create databases for session and run tests in many processes by default (using pytest-xdist) to speed up execution, based on how many CPU are available in environment.
 
@@ -190,7 +188,7 @@ import app.pets.models  # noqa
 
 ```
 
-### 2. Create and apply alembic migration
+### 4. Create and apply alembic migration
 
 ```bash
 ### Use below commands in root folder in virtualenv ###
@@ -214,7 +212,7 @@ alembic upgrade head
 
 PS. Note, alembic is configured in a way that it work with async setup and also detects specific column changes if using `--autogenerate` flag.
 
-### 3. Create request and response schemas
+### 5. Create request and response schemas
 
 ```python
 # app/pets/schemas.py
@@ -235,7 +233,7 @@ class PetResponse(BaseModel):
 
 ```
 
-### 4. Create endpoints
+### 6. Create endpoints
 
 ```python
 # app/pets/views.py
@@ -305,7 +303,7 @@ app.include_router(pets_router, prefix="/pets", tags=["pets"])
 
 ```
 
-### 5. Add Pet model to tests factories
+### 7. Add Pet model to tests factories
 
 File `app/tests/factories.py` contains `User` model factory already. Every new DB model should also have it, as it really simplify things later (when you have more models and relationships).
 
@@ -322,11 +320,11 @@ class PetFactory(SQLAlchemyFactory[Pet]):
 
 ```
 
-### 5. Create new test file
+### 8. Create new test file
 
 Create folder `app/pet/tests` and inside files `__init__.py` and eg. `test_pets_views.py`.
 
-### 6. Write tests
+### 9. Write tests
 
 We will write two really simple tests into new file `test_pets_views.py`
 
