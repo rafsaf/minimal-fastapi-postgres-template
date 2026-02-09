@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth import api_messages
 from app.auth.models import User
 from app.main import app
+from app.tests.factories import UserFactory
 
 
 async def test_register_new_user_status_code(
@@ -44,17 +45,12 @@ async def test_register_new_user_cannot_create_already_created_user(
     client: AsyncClient,
     session: AsyncSession,
 ) -> None:
-    user = User(
-        email="test@email.com",
-        hashed_password="bla",
-    )
-    session.add(user)
-    await session.commit()
+    existing_user = await UserFactory.create_async()
 
     response = await client.post(
         app.url_path_for("register_new_user"),
         json={
-            "email": "test@email.com",
+            "email": existing_user.email,
             "password": "testtesttest",
         },
     )

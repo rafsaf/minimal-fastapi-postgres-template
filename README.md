@@ -1,59 +1,69 @@
+# Minimal FastAPI PostgreSQL template
+
 [![Live example](https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet)](https://minimal-fastapi-postgres-template.rafsaf.pl/)
 [![License](https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template)](https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE)
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue)](https://docs.python.org/3/whatsnew/3.13.html)
+[![Python 3.14](https://img.shields.io/badge/python-3.14-blue)](https://docs.python.org/3/whatsnew/3.14.html)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Tests](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml/badge.svg)](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml)
 
-_Check out online example: https://minimal-fastapi-postgres-template.rafsaf.pl, it's 100% code used in template (docker image) with added my domain and https only._
+_Check out online example: [https://minimal-fastapi-postgres-template.rafsaf.pl](https://minimal-fastapi-postgres-template.rafsaf.pl), it's 100% code used in template (docker image) with added my domain and https only._
 
-# Minimal async FastAPI + PostgreSQL template
-
-- [Minimal async FastAPI + PostgreSQL template](#minimal-async-fastapi--postgresql-template)
+- [Minimal FastAPI PostgreSQL template](#minimal-fastapi-postgresql-template)
+  - [About](#about)
   - [Features](#features)
   - [Quickstart](#quickstart)
     - [1. Create repository from a template](#1-create-repository-from-a-template)
     - [2. Install dependecies with uv](#2-install-dependecies-with-uv)
-    - [3. Setup database and migrations](#3-setup-database-and-migrations)
-    - [4. Now you can run app](#4-now-you-can-run-app)
+    - [3. Run app](#3-run-app)
     - [5. Activate pre-commit](#5-activate-pre-commit)
     - [6. Running tests](#6-running-tests)
-  - [About](#about)
   - [Step by step example - POST and GET endpoints](#step-by-step-example---post-and-get-endpoints)
-    - [1. Create SQLAlchemy model](#1-create-sqlalchemy-model)
+    - [1. Create new app](#1-create-new-app)
+    - [2. Create SQLAlchemy model](#2-create-sqlalchemy-model)
+    - [3. Import new models.py file in alembic env.py](#3-import-new-modelspy-file-in-alembic-envpy)
     - [2. Create and apply alembic migration](#2-create-and-apply-alembic-migration)
     - [3. Create request and response schemas](#3-create-request-and-response-schemas)
     - [4. Create endpoints](#4-create-endpoints)
-    - [5. Write tests](#5-write-tests)
-  - [Design](#design)
-    - [Deployment strategies - via Docker image](#deployment-strategies---via-docker-image)
-    - [Docs URL, CORS and Allowed Hosts](#docs-url-cors-and-allowed-hosts)
+    - [5. Add Pet model to tests factories](#5-add-pet-model-to-tests-factories)
+    - [5. Create new test file](#5-create-new-test-file)
+    - [6. Write tests](#6-write-tests)
+  - [Design choices](#design-choices)
+    - [Dockerfile](#dockerfile)
+    - [Registration](#registration)
+    - [Delete user endpoint](#delete-user-endpoint)
+    - [JWT and refresh tokens](#jwt-and-refresh-tokens)
+    - [Writting scripts / cron](#writting-scripts--cron)
+    - [Docs URL](#docs-url)
+    - [CORS](#cors)
+    - [Allowed Hosts](#allowed-hosts)
   - [License](#license)
 
+## About
+
+This project is heavily based on [the official template](https://github.com/tiangolo/full-stack-fastapi-postgresql) (and on my previous work: [link1](https://github.com/rafsaf/fastapi-plan), [link2](https://github.com/rafsaf/docker-fastapi-projects)), started on Sep 2021 and then updated (more or less) on yearly basis.
+
+If you are curious about latest changes and rationale, read 2026 update blog post: [Update of minimal-fastapi-postgres-template to version 7.0.0](https://rafsaf.pl/blog/2026/02/07/update-of-minimal-fastapi-postgres-template-to-version-7.0.0/).
+
+Enjoy!
 
 ## Features
 
-- [x] Template repository
-- [x] SQLAlchemy 2.0, async queries, best possible autocompletion support
-- [x] PostgreSQL 16 database under `asyncpg`, docker-compose.yml
-- [x] Full [Alembic](https://alembic.sqlalchemy.org/en/latest/) migrations setup
-- [x] Refresh token endpoint (not only access like in official template)
-- [x] Ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver as an example
-- [x] [uv](https://docs.astral.sh/uv/getting-started/installation/), `mypy`, `pre-commit` hooks with [ruff](https://github.com/astral-sh/ruff)
+- [x] Template repository.
+- [x] [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy) 2.0, async queries, best possible autocompletion support.
+- [x] PostgreSQL 18 database under [asyncpg](https://github.com/MagicStack/asyncpg) interface.
+- [x] Full [Alembic](https://github.com/alembic/alembic) migrations setup (also in unit tests).
+- [x] Secure and tested setup for [PyJWT](https://github.com/jpadilla/pyjwt) and [bcrypt](https://github.com/pyca/bcrypt).
+- [x] Ready to go Dockerfile with [uvicorn](https://www.uvicorn.org/) webserver.
+- [x] [uv](https://docs.astral.sh/uv/getting-started/installation/), [mypy](https://github.com/python/mypy), [pre-commit](https://github.com/pre-commit/pre-commit) hooks with [ruff](https://github.com/astral-sh/ruff)
 - [x] Perfect pytest asynchronous test setup with +40 tests and full coverage
 
-<br>
-
-
-
-<kbd>![template-fastapi-minimal-openapi-example](https://drive.google.com/uc?export=view&id=1rIXFJK8VyVrV7v4qgtPFryDd5FQrb4gr)</kbd>
-
-
+![template-fastapi-minimal-openapi-example](https://rafsaf.pl/blog/2026/02/07/update-of-minimal-fastapi-postgres-template-to-version-7.0.0/minimal-fastapi-postgres-template-2026-02-07-version-7.0.0.png)
 
 ## Quickstart
 
 ### 1. Create repository from a template
 
-See [docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+See [docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) or just use git clone.
 
 ### 2. Install dependecies with [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
@@ -61,29 +71,32 @@ See [docs](https://docs.github.com/en/repositories/creating-and-managing-reposit
 cd your_project_name
 
 uv sync
+
 ```
 
-Note, be sure to use `python3.13` with this template with either uv or standard venv & pip, if you need to stick to some earlier python version, you should adapt it yourself (remove new versions specific syntax for example `str | int` for python < 3.10)
+Uv should automatically install Python version currently required by template (>=3.14) or use existing Python installation if you already have it.
 
-### 3. Setup database and migrations
+### 3. Run app
 
 ```bash
-### Setup database
-docker-compose up -d
+make up
 
-### Run Alembic migrations
+```
+
+Refer to `Makefile` to see shortcut (`apt install build-essential` - on linux)
+
+If you want to work without it, this should do:
+
+```bash
+docker compose up -d
+
 alembic upgrade head
-```
 
-### 4. Now you can run app
-
-```bash
-### And this is it:
 uvicorn app.main:app --reload
 
 ```
 
-You should then use `git init` (if needed) to initialize git repository and access OpenAPI spec at http://localhost:8000/ by default. To customize docs url, cors and allowed hosts settings, read [section about it](#docs-url-cors-and-allowed-hosts).
+You should then use `git init` (if needed) to initialize git repository and access OpenAPI spec at [http://localhost:8000/](http://localhost:8000/) by default. See last section for customizations.
 
 ### 5. Activate pre-commit
 
@@ -92,43 +105,38 @@ You should then use `git init` (if needed) to initialize git repository and acce
 Refer to `.pre-commit-config.yaml` file to see my current opinionated choices.
 
 ```bash
+# Shortcut
+make lint
+
+```
+
+Full commands
+
+```bash
 # Install pre-commit
 pre-commit install --install-hooks
 
 # Run on all files
 pre-commit run --all-files
+
 ```
 
 ### 6. Running tests
 
 Note, it will create databases for session and run tests in many processes by default (using pytest-xdist) to speed up execution, based on how many CPU are available in environment.
 
-For more details about initial database setup, see logic `app/tests/conftest.py` file, `fixture_setup_new_test_database` function.
+For more details about initial database setup, see logic `app/conftest.py` file, especially `fixture_setup_new_test_database` function. Pytest configuration is also in `[tool.pytest.ini_options]` in `pyproject.toml`.
 
 Moreover, there is coverage pytest plugin with required code coverage level 100%.
 
 ```bash
 # see all pytest configuration flags in pyproject.toml
 pytest
+
+# or 
+make test
+
 ```
-
-<br>
-
-## About
-
-This project is heavily based on the official template https://github.com/tiangolo/full-stack-fastapi-postgresql (and on my previous work: [link1](https://github.com/rafsaf/fastapi-plan), [link2](https://github.com/rafsaf/docker-fastapi-projects)), but as it now not too much up-to-date, it is much easier to create new one than change official. I didn't like some of conventions over there also (`crud` and `db` folders for example or `schemas` with bunch of files). This template aims to be as much up-to-date as possible, using only newest python versions and libraries versions.
-
-`2.0` style SQLAlchemy API is good enough so there is no need to write everything in `crud` and waste our time... The `core` folder was also rewritten. There is great base for writting tests in `tests`, but I didn't want to write hundreds of them, I noticed that usually after changes in the structure of the project, auto tests are useless and you have to write them from scratch anyway (delete old ones...), hence less than more. Similarly with the `User` model, it is very modest, with just `id` (uuid), `email` and `password_hash`, because it will be adapted to the project anyway.
-
-2024 update:
-
-The template was adpoted to my current style and knowledge, the test based expanded to cover more, added mypy, ruff and test setup was completly rewritten to have three things:
-
-- run test in paraller in many processes for speed 
-- transactions rollback after every test
-- create test databases instead of having another in docker-compose.yml
-
-<br>
 
 ## Step by step example - POST and GET endpoints
 
@@ -137,31 +145,50 @@ I always enjoy to have some kind of an example in templates (even if I don't lik
 - `POST` endpoint `/pets/create` for creating `Pets` with relation to currently logged `User`
 - `GET` endpoint `/pets/me` for fetching all user's pets.
 
-<br>
+### 1. Create new app
 
-### 1. Create SQLAlchemy model
+Add `app/pets` folder and `app/pets/__init__.py`.
 
-We will add `Pet` model to `app/models.py`.
+### 2. Create SQLAlchemy model
+
+We will add `Pet` model to `app/pets/models.py`.
 
 ```python
-# app/models.py
+# app/pets/models.py
 
-(...)
+import sqlalchemy as sa
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.core.models import Base
+
 
 class Pet(Base):
-    __tablename__ = "pet"
+    __tablename__ = "pets_pet"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(sa.BigInteger, primary_key=True)
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("user_account.user_id", ondelete="CASCADE"),
+        sa.ForeignKey("auth_user.user_id", ondelete="CASCADE"),
     )
-    pet_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    pet_name: Mapped[str] = mapped_column(sa.String(50), nullable=False)
 
 ```
 
-Note, we are using super powerful SQLAlchemy feature here - Mapped and mapped_column were first introduced in SQLAlchemy 2.0, if this syntax is new for you, read carefully "what's new" part of documentation https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html.
+Note, we are using super powerful SQLAlchemy feature here - `Mapped` and `mapped_column` were first introduced in SQLAlchemy 2.0, if this syntax is new for you, read carefully [what's new](https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html) part of documentation.
 
-<br>
+### 3. Import new models.py file in alembic env.py
+
+Without this step, alembic won't be able to follow changes in new `models.py` file. In `alembic/env.py` import new file
+
+```python
+# alembic/env.py
+
+(...) 
+# import other models here
+import app.pets.models  # noqa
+
+(...)
+
+```
 
 ### 2. Create and apply alembic migration
 
@@ -187,51 +214,41 @@ alembic upgrade head
 
 PS. Note, alembic is configured in a way that it work with async setup and also detects specific column changes if using `--autogenerate` flag.
 
-<br>
-
 ### 3. Create request and response schemas
 
-There are only 2 files: `requests.py` and `responses.py` in `schemas` folder and I would keep it that way even for few dozen of endpoints. Not to mention this is opinionated.
-
 ```python
-# app/schemas/requests.py
+# app/pets/schemas.py
 
-(...)
+from pydantic import BaseModel, ConfigDict
 
 
-class PetCreateRequest(BaseRequest):
+class PetCreateRequest(BaseModel):
     pet_name: str
 
-```
 
-```python
-# app/schemas/responses.py
-
-(...)
-
-
-class PetResponse(BaseResponse):
+class PetResponse(BaseModel):
     id: int
     pet_name: str
     user_id: str
 
-```
+    model_config = ConfigDict(from_attributes=True)
 
-<br>
+```
 
 ### 4. Create endpoints
 
 ```python
-# app/api/endpoints/pets.py
+# app/pets/views.py
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
-from app.models import Pet, User
-from app.schemas.requests import PetCreateRequest
-from app.schemas.responses import PetResponse
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.core import database_session
+from app.pets.models import Pet
+from app.pets.schemas import PetCreateRequest, PetResponse
 
 router = APIRouter()
 
@@ -244,8 +261,8 @@ router = APIRouter()
 )
 async def create_new_pet(
     data: PetCreateRequest,
-    session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(deps.get_current_user),
+    session: AsyncSession = Depends(database_session.new_async_session),
+    current_user: User = Depends(get_current_user),
 ) -> Pet:
     new_pet = Pet(user_id=current_user.user_id, pet_name=data.pet_name)
 
@@ -262,8 +279,8 @@ async def create_new_pet(
     description="Get list of pets for currently logged user.",
 )
 async def get_all_my_pets(
-    session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(deps.get_current_user),
+    session: AsyncSession = Depends(database_session.new_async_session),
+    current_user: User = Depends(get_current_user),
 ) -> list[Pet]:
     pets = await session.scalars(
         select(Pet).where(Pet.user_id == current_user.user_id).order_by(Pet.pet_name)
@@ -273,36 +290,55 @@ async def get_all_my_pets(
 
 ```
 
-Also, we need to add newly created endpoints to router.
+Now we need to add newly created router to `main.py` app.
 
 ```python
-# app/api/api.py
+# main.py
 
 (...)
 
-from app.api.endpoints import auth, pets, users
+from app.pets.views import router as pets_router
 
 (...)
 
-api_router.include_router(pets.router, prefix="/pets", tags=["pets"])
+app.include_router(pets_router, prefix="/pets", tags=["pets"])
 
 ```
 
-<br>
+### 5. Add Pet model to tests factories
 
-### 5. Write tests
-
-We will write two really simple tests in combined file inside newly created `app/tests/test_pets` folder.
+File `app/tests/factories.py` contains `User` model factory already. Every new DB model should also have it, as it really simplify things later (when you have more models and relationships).
 
 ```python
-# app/tests/test_pets/test_pets.py
+# app/tests/factories.py
+(...)
+
+from app.pets.models import Pet
+
+(...)
+
+class PetFactory(SQLAlchemyFactory[Pet]):
+    pet_name = Use(Faker().first_name)
+
+```
+
+### 5. Create new test file
+
+Create folder `app/pet/tests` and inside files `__init__.py` and eg. `test_pets_views.py`.
+
+### 6. Write tests
+
+We will write two really simple tests into new file `test_pets_views.py`
+
+```python
+# app/pet/tests/test_pets_views.py
 
 from fastapi import status
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.models import User
 from app.main import app
-from app.models import Pet, User
+from app.tests.factories import PetFactory
 
 
 async def test_create_new_pet(
@@ -324,14 +360,13 @@ async def test_get_all_my_pets(
     client: AsyncClient,
     default_user_headers: dict[str, str],
     default_user: User,
-    session: AsyncSession,
 ) -> None:
-    pet1 = Pet(user_id=default_user.user_id, pet_name="Pet_1")
-    pet2 = Pet(user_id=default_user.user_id, pet_name="Pet_2")
-
-    session.add(pet1)
-    session.add(pet2)
-    await session.commit()
+    pet1 = await PetFactory.create_async(
+        user_id=default_user.user_id, pet_name="Alfred"
+    )
+    pet2 = await PetFactory.create_async(
+        user_id=default_user.user_id, pet_name="Tadeusz"
+    )
 
     response = await client.get(
         app.url_path_for("get_all_my_pets"),
@@ -352,57 +387,67 @@ async def test_get_all_my_pets(
         },
     ]
 
-
 ```
 
-## Design
+## Design choices
 
-### Deployment strategies - via Docker image
+There are couple decisions to make and changes that can/should be done after fork. I try to describe below things I consider most opinionated.
 
-This template has by default included `Dockerfile` with [Uvicorn](https://www.uvicorn.org/) webserver, because it's simple and just for showcase purposes, with direct relation to FastAPI and great ease of configuration. You should be able to run container(s) (over :8000 port) and then need to setup the proxy, loadbalancer, with https enbaled, so the app stays behind it.
+### Dockerfile
 
-If you prefer other webservers for FastAPI, check out [Nginx Unit](https://unit.nginx.org/), [Daphne](https://github.com/django/daphne), [Hypercorn](https://pgjones.gitlab.io/hypercorn/index.html).
+This template has by default included `Dockerfile` with [Uvicorn](https://www.uvicorn.org/) webserver, because it's simple in direct relation to FastAPI and great ease of configuration. You should be able to run container(s) (over :8000 port) and then need to setup the proxy, loadbalancer, with https enbaled, so the app stays behind it. Ye, **it's safe**(as much as anything is safe), you don't need anything except prefered LB. Other webservers to consider: [Nginx Unit](https://unit.nginx.org/), [Daphne](https://github.com/django/daphne), [Hypercorn](https://pgjones.gitlab.io/hypercorn/index.html).
 
-### Docs URL, CORS and Allowed Hosts
+### Registration
 
-There are some **opinionated** default settings in `/app/main.py` for documentation, CORS and allowed hosts.
+Is open. You would probably want to either remove it altogether or change.
 
-1. Docs
+### Delete user endpoint
 
-    ```python
-    app = FastAPI(
-        title="minimal fastapi postgres template",
-        version="7.0.0",
-        description="https://github.com/rafsaf/minimal-fastapi-postgres-template",
-        openapi_url="/openapi.json",
-        docs_url="/",
-    )
-    ```
+Rethink `delete_current_user`, maybe you don't need it.
 
-   Docs page is simpy `/` (by default in FastAPI it is `/docs`). You can change it completely for the project, just as title, version, etc.
+### JWT and refresh tokens
 
-2. CORS
+By using `/auth/access-token` user can exchange username + password for JWT. Refresh tokens is saved **in database table**. I've seen a lot of other, not always secure or sane setups. It's up to you if you want to change it to be also JWT (which seems to be popular), just one small note: It's `good` design if one can revoke all or preferably some refresh tokens. It's much `worse` design if one cannot. On the other hand, it's fine not to have option to revoke access tokens (as they are shortlived).
 
-    ```python
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    ```
+### Writting scripts / cron
 
-   If you are not sure what are CORS for, follow https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS. React and most frontend frameworks nowadays operate on `http://localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in .env file, before going production be sure to include your frontend domain here, like `https://my-fontend-app.example.com`.
+Very rarely app has not some kind of background tasks. Feel free to use `new_script_async_session` if you need to have access to database outside of FastAPI. Cron can be simply: new file, async task with session (doing something), wrapped by `asyncio.run(script_func())`.
 
-3. Allowed Hosts
+### Docs URL
 
-   ```python
-   app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
-   ```
+Docs page is simpy `/` (by default in FastAPI it is `/docs`). You can change it completely for the project, just as title, version, etc.
 
-   Prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default in .env there are two most popular records: `ALLOWED_HOSTS=["localhost", "127.0.0.1"]`
+```python
+app = FastAPI(
+    title="minimal fastapi postgres template",
+    version="7.0.0",
+    description="https://github.com/rafsaf/minimal-fastapi-postgres-template",
+    openapi_url="/openapi.json",
+    docs_url="/",
+)
+```
 
+### CORS
+
+If you are not sure what are CORS for, follow [developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS). Most frontend frameworks nowadays operate on `http://localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in `.env` file, before going production be sure to include your frontend domain there, like `https://my-fontend-app.example.com`.
+
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+### Allowed Hosts
+
+This middleware prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default `"localhost", "127.0.0.1", "0.0.0.0"`
+
+```python
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
+```
 
 ## License
 
