@@ -13,7 +13,7 @@ _Check out online example: [https://minimal-fastapi-postgres-template.rafsaf.pl]
   - [Features](#features)
   - [Quickstart](#quickstart)
     - [1. Create repository from a template](#1-create-repository-from-a-template)
-    - [2. Install dependecies with uv](#2-install-dependecies-with-uv)
+    - [2. Install dependencies with uv](#2-install-dependencies-with-uv)
     - [3. Run app](#3-run-app)
     - [4. Activate pre-commit](#4-activate-pre-commit)
     - [5. Running tests](#5-running-tests)
@@ -32,7 +32,7 @@ _Check out online example: [https://minimal-fastapi-postgres-template.rafsaf.pl]
     - [Registration](#registration)
     - [Delete user endpoint](#delete-user-endpoint)
     - [JWT and refresh tokens](#jwt-and-refresh-tokens)
-    - [Writting scripts / cron](#writting-scripts--cron)
+    - [Writing scripts / cron](#writing-scripts--cron)
     - [Docs URL](#docs-url)
     - [CORS](#cors)
     - [Allowed Hosts](#allowed-hosts)
@@ -63,7 +63,7 @@ Enjoy!
 
 See [docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) or just use git clone.
 
-### 2. Install dependecies with [uv](https://docs.astral.sh/uv/getting-started/installation/)
+### 2. Install dependencies with [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ```bash
 cd your_project_name
@@ -407,13 +407,13 @@ Rethink `delete_current_user`, maybe you don't need it.
 
 By using `/auth/access-token` user can exchange username + password for JWT. Refresh tokens is saved **in database table**. I've seen a lot of other, not always secure or sane setups. It's up to you if you want to change it to be also JWT (which seems to be popular), just one small note: It's `good` design if one can revoke all or preferably some refresh tokens. It's much `worse` design if one cannot. On the other hand, it's fine not to have option to revoke access tokens (as they are shortlived).
 
-### Writting scripts / cron
+### Writing scripts / cron
 
 Very rarely app has not some kind of background tasks. Feel free to use `new_script_async_session` if you need to have access to database outside of FastAPI. Cron can be simply: new file, async task with session (doing something), wrapped by `asyncio.run(script_func())`.
 
 ### Docs URL
 
-Docs page is simpy `/` (by default in FastAPI it is `/docs`). You can change it completely for the project, just as title, version, etc.
+Docs page is simply `/` (by default in FastAPI it is `/docs`). You can change it completely for the project, just as title, version, etc.
 
 ```python
 app = FastAPI(
@@ -427,7 +427,7 @@ app = FastAPI(
 
 ### CORS
 
-If you are not sure what are CORS for, follow [developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS). Most frontend frameworks nowadays operate on `http://localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in `.env` file, before going production be sure to include your frontend domain there, like `https://my-fontend-app.example.com`.
+If you are not sure what are CORS for, follow [developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS). Most frontend frameworks nowadays operate on `http://localhost:3000` thats why it's included in `BACKEND_CORS_ORIGINS` in `.env` file, before going production be sure to include your frontend domain there, like `https://my-frontend-app.example.com`.
 
 ```python
 app.add_middleware(
@@ -441,7 +441,7 @@ app.add_middleware(
 
 ### Allowed Hosts
 
-This middleware prevents HTTP Host Headers attack, you shoud put here you server IP or (preferably) full domain under it's accessible like `example.com`. By default `"localhost", "127.0.0.1", "0.0.0.0"`
+This middleware prevents HTTP Host Headers attack, you should put here your server IP or (preferably) full domain under which it's accessible like `example.com`. By default `"localhost", "127.0.0.1", "0.0.0.0"`
 
 ```python
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
