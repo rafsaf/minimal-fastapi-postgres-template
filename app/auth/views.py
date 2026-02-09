@@ -1,73 +1,76 @@
 import secrets
 import time
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import api_messages, deps
-from app.core.config import get_settings
-from app.core.security.jwt import create_jwt_token
-from app.core.security.password import (
+from app.auth import api_messages, dependencies
+from app.auth.jwt import create_jwt_token
+from app.auth.models import RefreshToken, User
+from app.auth.password import (
     DUMMY_PASSWORD,
     get_password_hash,
     verify_password,
 )
-from app.models import RefreshToken, User
-from app.schemas.requests import RefreshTokenRequest, UserCreateRequest
-from app.schemas.responses import AccessTokenResponse, UserResponse
+from app.auth.schemas import (
+    AccessTokenResponse,
+    RefreshTokenRequest,
+    UserCreateRequest,
+    UserResponse,
+    UserUpdatePasswordRequest,
+)
+from app.core.config import get_settings
+from app.core.database_session import new_async_session
 
-router = APIRouter()
+router = APIRouter(responses=api_messages.UNAUTHORIZED_RESPONSES)
 
-ACCESS_TOKEN_RESPONSES: dict[int | str, dict[str, Any]] = {
-    400: {
-        "description": "Invalid email or password",
-        "content": {
-            "application/json": {"example": {"detail": api_messages.PASSWORD_INVALID}}
-        },
-    },
-}
 
-REFRESH_TOKEN_RESPONSES: dict[int | str, dict[str, Any]] = {
-    400: {
-        "description": "Refresh token expired or is already used",
-        "content": {
-            "application/json": {
-                "examples": {
-                    "refresh token expired": {
-                        "summary": api_messages.REFRESH_TOKEN_EXPIRED,
-                        "value": {"detail": api_messages.REFRESH_TOKEN_EXPIRED},
-                    },
-                    "refresh token already used": {
-                        "summary": api_messages.REFRESH_TOKEN_ALREADY_USED,
-                        "value": {"detail": api_messages.REFRESH_TOKEN_ALREADY_USED},
-                    },
-                }
-            }
-        },
-    },
-    404: {
-        "description": "Refresh token does not exist",
-        "content": {
-            "application/json": {
-                "example": {"detail": api_messages.REFRESH_TOKEN_NOT_FOUND}
-            }
-        },
-    },
-}
+@router.get("/me", response_model=UserResponse, description="Get current user")
+async def read_current_user(
+    current_user: User = Depends(dependencies.get_current_user),
+) -> User:
+    return current_user
+
+
+@router.delete(
+    "/me",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Delete current user",
+)
+async def delete_current_user(
+    current_user: User = Depends(dependencies.get_current_user),
+    session: AsyncSession = Depends(new_async_session),
+) -> None:
+    await session.execute(delete(User).where(User.user_id == current_user.user_id))
+    await session.commit()
+
+
+@router.post(
+    "/reset-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Update current user password",
+)
+async def reset_current_user_password(
+    user_update_password: UserUpdatePasswordRequest,
+    session: AsyncSession = Depends(new_async_session),
+    current_user: User = Depends(dependencies.get_current_user),
+) -> None:
+    current_user.hashed_password = get_password_hash(user_update_password.password)
+    session.add(current_user)
+    await session.commit()
 
 
 @router.post(
     "/access-token",
     response_model=AccessTokenResponse,
-    responses=ACCESS_TOKEN_RESPONSES,
+    responses=api_messages.ACCESS_TOKEN_RESPONSES,
     description="OAuth2 compatible token, get an access token for future requests using username and password",
 )
 async def login_access_token(
-    session: AsyncSession = Depends(deps.get_session),
+    session: AsyncSession = Depends(new_async_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> AccessTokenResponse:
     user = await session.scalar(select(User).where(User.email == form_data.username))
@@ -92,7 +95,7 @@ async def login_access_token(
     refresh_token = RefreshToken(
         user_id=user.user_id,
         refresh_token=secrets.token_urlsafe(32),
-        exp=int(time.time() + get_settings().security.refresh_token_expire_secs),
+        exp=int(time.time() + get_settings().security.jwt_refresh_token_expire_secs),
     )
     session.add(refresh_token)
     await session.commit()
@@ -108,12 +111,12 @@ async def login_access_token(
 @router.post(
     "/refresh-token",
     response_model=AccessTokenResponse,
-    responses=REFRESH_TOKEN_RESPONSES,
+    responses=api_messages.REFRESH_TOKEN_RESPONSES,
     description="OAuth2 compatible token, get an access token for future requests using refresh token",
 )
 async def refresh_token(
     data: RefreshTokenRequest,
-    session: AsyncSession = Depends(deps.get_session),
+    session: AsyncSession = Depends(new_async_session),
 ) -> AccessTokenResponse:
     token = await session.scalar(
         select(RefreshToken)
@@ -145,7 +148,7 @@ async def refresh_token(
     refresh_token = RefreshToken(
         user_id=token.user_id,
         refresh_token=secrets.token_urlsafe(32),
-        exp=int(time.time() + get_settings().security.refresh_token_expire_secs),
+        exp=int(time.time() + get_settings().security.jwt_refresh_token_expire_secs),
     )
     session.add(refresh_token)
     await session.commit()
@@ -166,7 +169,7 @@ async def refresh_token(
 )
 async def register_new_user(
     new_user: UserCreateRequest,
-    session: AsyncSession = Depends(deps.get_session),
+    session: AsyncSession = Depends(new_async_session),
 ) -> User:
     user = await session.scalar(select(User).where(User.email == new_user.email))
     if user is not None:

@@ -6,8 +6,6 @@ from pydantic import BaseModel
 
 from app.core.config import get_settings
 
-JWT_ALGORITHM = "HS256"
-
 
 # Payload follows RFC 7519
 # https://www.rfc-editor.org/rfc/rfc7519#section-4.1
@@ -37,7 +35,7 @@ def create_jwt_token(user_id: str) -> JWTToken:
     access_token = jwt.encode(
         token_payload.model_dump(),
         key=get_settings().security.jwt_secret_key.get_secret_value(),
-        algorithm=JWT_ALGORITHM,
+        algorithm=get_settings().security.jwt_algorithm,
     )
 
     return JWTToken(payload=token_payload, access_token=access_token)
@@ -56,7 +54,7 @@ def verify_jwt_token(token: str) -> JWTTokenPayload:
         raw_payload = jwt.decode(
             token,
             get_settings().security.jwt_secret_key.get_secret_value(),
-            algorithms=[JWT_ALGORITHM],
+            algorithms=[get_settings().security.jwt_algorithm],
             options={"verify_signature": True},
             issuer=get_settings().security.jwt_issuer,
         )
