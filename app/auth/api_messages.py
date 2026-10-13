@@ -6,6 +6,7 @@ REFRESH_TOKEN_NOT_FOUND = "Refresh token not found"
 REFRESH_TOKEN_EXPIRED = "Refresh token expired"
 REFRESH_TOKEN_ALREADY_USED = "Refresh token already used"
 EMAIL_ADDRESS_ALREADY_USED = "Cannot use this email address"
+PASSWORD_EMPTY = "Password cannot be empty"
 
 
 UNAUTHORIZED_RESPONSES: dict[int | str, dict[str, Any]] = {

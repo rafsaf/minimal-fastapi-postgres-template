@@ -171,6 +171,11 @@ async def register_new_user(
     new_user: UserCreateRequest,
     session: AsyncSession = Depends(new_async_session),
 ) -> User:
+    if new_user.password.strip() == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=api_messages.PASSWORD_EMPTY,
+        )
     user = await session.scalar(select(User).where(User.email == new_user.email))
     if user is not None:
         raise HTTPException(
