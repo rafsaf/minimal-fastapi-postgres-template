@@ -57,3 +57,19 @@ async def test_register_new_user_cannot_create_already_created_user(
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json() == {"detail": api_messages.EMAIL_ADDRESS_ALREADY_USED}
+
+
+async def test_register_new_user_cannot_create_password_empty_user(
+    client: AsyncClient,
+    session: AsyncSession,
+) -> None:
+    response = await client.post(
+        app.url_path_for("register_new_user"),
+        json={
+            "email": "test@email.com",
+            "password": "",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == {"detail": api_messages.PASSWORD_EMPTY}
