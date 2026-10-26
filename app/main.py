@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="minimal fastapi postgres template",
-    version="7.0.0",
+    version="8.0.0",
     description="https://github.com/rafsaf/minimal-fastapi-postgres-template",
     openapi_url="/openapi.json",
     docs_url="/",

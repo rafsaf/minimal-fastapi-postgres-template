@@ -2,7 +2,7 @@
 
 [![Live example](https://img.shields.io/badge/live%20example-https%3A%2F%2Fminimal--fastapi--postgres--template.rafsaf.pl-blueviolet)](https://minimal-fastapi-postgres-template.rafsaf.pl/)
 [![License](https://img.shields.io/github/license/rafsaf/minimal-fastapi-postgres-template)](https://github.com/rafsaf/minimal-fastapi-postgres-template/blob/main/LICENSE)
-[![Python 3.14](https://img.shields.io/badge/python-3.14-blue)](https://docs.python.org/3/whatsnew/3.14.html)
+[![Python 3.15](https://img.shields.io/badge/python-3.15-blue)](https://docs.python.org/3/whatsnew/3.15.html)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Tests](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml/badge.svg)](https://github.com/rafsaf/minimal-fastapi-postgres-template/actions/workflows/tests.yml)
 
@@ -72,7 +72,7 @@ uv sync
 
 ```
 
-Uv should automatically install Python version currently required by template (>=3.14) or use existing Python installation if you already have it.
+Uv should automatically install Python version currently required by template (>=3.15) or use existing Python installation if you already have it.
 
 ### 3. Run app
 
@@ -99,6 +99,8 @@ You should then use `git init` (if needed) to initialize git repository and acce
 ### 4. Activate pre-commit
 
 [pre-commit](https://pre-commit.com/) is de facto standard now for pre push activities like isort or black or its nowadays replacement ruff.
+
+It's best to install it using `apt`, `brew` or equivalent on your system.
 
 Refer to `.pre-commit-config.yaml` file to see my current opinionated choices.
 
@@ -168,7 +170,6 @@ class Pet(Base):
         sa.ForeignKey("auth_user.user_id", ondelete="CASCADE"),
     )
     pet_name: Mapped[str] = mapped_column(sa.String(50), nullable=False)
-
 ```
 
 Note, we are using super powerful SQLAlchemy feature here - `Mapped` and `mapped_column` were first introduced in SQLAlchemy 2.0, if this syntax is new for you, read carefully [what's new](https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html) part of documentation.
@@ -180,12 +181,11 @@ Without this step, alembic won't be able to follow changes in new `models.py` fi
 ```python
 # alembic/env.py
 
-(...) 
+(...)
 # import other models here
 import app.pets.models  # noqa
 
 (...)
-
 ```
 
 ### 4. Create and apply alembic migration
@@ -230,7 +230,6 @@ class PetResponse(BaseModel):
     user_id: str
 
     model_config = ConfigDict(from_attributes=True)
-
 ```
 
 ### 6. Create endpoints
@@ -285,7 +284,6 @@ async def get_all_my_pets(
     )
 
     return list(pets.all())
-
 ```
 
 Now we need to add newly created router to `main.py` app.
@@ -300,7 +298,6 @@ from app.pets.views import router as pets_router
 (...)
 
 app.include_router(pets_router, prefix="/pets", tags=["pets"])
-
 ```
 
 ### 7. Add Pet model to tests factories
@@ -315,9 +312,9 @@ from app.pets.models import Pet
 
 (...)
 
+
 class PetFactory(SQLAlchemyFactory[Pet]):
     pet_name = Use(Faker().first_name)
-
 ```
 
 ### 8. Create new test file
@@ -384,7 +381,6 @@ async def test_get_all_my_pets(
             "id": pet2.id,
         },
     ]
-
 ```
 
 ## Design choices
@@ -418,7 +414,7 @@ Docs page is simply `/` (by default in FastAPI it is `/docs`). You can change it
 ```python
 app = FastAPI(
     title="minimal fastapi postgres template",
-    version="7.0.0",
+    version="8.0.0",
     description="https://github.com/rafsaf/minimal-fastapi-postgres-template",
     openapi_url="/openapi.json",
     docs_url="/",

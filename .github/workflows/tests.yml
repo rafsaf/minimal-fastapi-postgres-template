@@ -2,9 +2,12 @@ name: tests
 on:
   push:
     branches:
-      - "**"
+      - "main"
     tags-ignore:
       - "*.*"
+  pull_request:
+      branches:
+        - "**"
 
 jobs:
   tests:
@@ -30,9 +33,9 @@ jobs:
           python-version-file: "pyproject.toml"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10
         with:
-          version: "0.9.2"
+          version: "0.13.5"
           enable-cache: true
 
       - name: Install the project
