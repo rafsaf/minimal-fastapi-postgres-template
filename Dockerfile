@@ -1,11 +1,11 @@
-FROM python:3.14-slim-trixie AS base
+FROM python:3.15.1-slim-trixie AS base
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /build
 
 # Create requirements.txt file
 FROM base AS uv
-COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /uvx /bin/
 COPY uv.lock pyproject.toml ./
 RUN uv export --no-dev --no-hashes -o /requirements.txt --no-install-workspace --frozen
 RUN uv export --only-group dev --no-hashes -o /requirements-dev.txt --no-install-workspace --frozen
